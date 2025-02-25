@@ -1,0 +1,15 @@
+{
+  "name": "modelos",
+  "version": "1.0.0",
+  "description": "Aplicativo desktop para armazenamento, edição e utilização de modelos de decisões judiciais.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "Alfredo Rolim Pereira",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^34.2.0"
+  }
+}
