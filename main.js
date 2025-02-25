@@ -14,8 +14,8 @@ const createWindow = () => {
     }
   })
 
-  // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  // Ajustando o caminho para o index.html no diretório src
+  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'))
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
