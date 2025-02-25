@@ -11,10 +11,12 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: false,
+      enableRemoteModule: false,
       devTools: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js')  // Caminho atualizado para a raiz
     }
   })
 
@@ -31,9 +33,9 @@ const createWindow = () => {
     }
   });
 
-  ipcMain.handle('salvar-documento', async (event, { titulo, conteudo }) => {
+  ipcMain.handle('salvar-documento', async (event, { nome, tag, texto }) => {
     try {
-      return await database.inserirModelo(titulo, conteudo);
+      return await database.inserirModelo(nome, tag, texto);
     } catch (err) {
       console.error('Erro ao salvar:', err);
       return null;
