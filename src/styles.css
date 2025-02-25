@@ -99,4 +99,22 @@ body {
     white-space: pre-wrap;
     font-family: monospace;
     padding: 10px;
+    margin-bottom: 10px;  /* Adicionar margem inferior */
+}
+
+.btn-inserir {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.btn-inserir:hover {
+    background-color: #45a049;
 }

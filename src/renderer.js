@@ -51,9 +51,19 @@ function exibirResultados(resultados) {
             // Adicionar seleção ao item clicado
             item.classList.add('selected');
             
-            // Exibir o texto do modelo
+            // Exibir o texto do modelo e o botão
             const texto = decodeURIComponent(item.dataset.texto);
-            resultsContent.innerHTML = `<div class="resultado-texto">${texto}</div>`;
+            resultsContent.innerHTML = `
+                <div class="resultado-texto">${texto}</div>
+                <button class="btn-inserir">Inserir no modelo</button>
+            `;
+
+            // Adicionar evento de clique ao botão
+            const btnInserir = resultsContent.querySelector('.btn-inserir');
+            btnInserir.addEventListener('click', () => {
+                const textArea = document.querySelector('.textarea-editor');
+                textArea.value = texto;
+            });
         });
     });
 
