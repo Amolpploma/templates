@@ -34,12 +34,22 @@ async function realizarBusca(termo) {
 
 function exibirResultados(resultados) {
     resultsList.innerHTML = resultados
-        .map(modelo => `
-            <div class="resultado-nome" data-id="${modelo.id}" data-texto="${encodeURIComponent(modelo.texto)}">
-                <div class="nome-texto">${modelo.nome}</div>
-                <span class="tag">${modelo.tag}</span>
-            </div>
-        `)
+        .map(modelo => {
+            // Parse das tags (assumindo que vem como string JSON)
+            const tags = Array.isArray(modelo.tag) ? modelo.tag : JSON.parse(modelo.tag || '[]');
+            
+            // Criar elementos HTML para cada tag
+            const tagsHtml = tags
+                .map(tag => `<span class="tag">${tag}</span>`)
+                .join('');
+
+            return `
+                <div class="resultado-nome" data-id="${modelo.id}" data-texto="${encodeURIComponent(modelo.texto)}">
+                    <div class="nome-texto">${modelo.nome}</div>
+                    <div class="tags-container">${tagsHtml}</div>
+                </div>
+            `;
+        })
         .join('');
 
     // Adicionar listeners para os itens clicáveis
