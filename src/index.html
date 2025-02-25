@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'">
-    <link rel="stylesheet" href="styles.css">
-    <title>Modelos</title>
-  </head>
-  <body>
-    <div class="container">
-      <div class="left-panel">
-        <input type="text" class="search-input" placeholder="Pesquisar modelos...">
-        <div id="search-results"></div>
-      </div>
-      <div id="resizer"></div>
-      <div class="right-panel">
-        <textarea class="textarea-editor" placeholder="Digite seu texto aqui..."></textarea>
-      </div>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'">
+  <link rel="stylesheet" href="styles.css">
+  <title>Modelos</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <textarea class="textarea-editor" placeholder="Digite seu texto aqui..."></textarea>
     </div>
-    <script src="resizer.js"></script>
-    <script src="renderer.js"></script>
-  </body>
+    <div id="resizer"></div>
+    <div class="right-panel">
+      <input type="text" class="search-input" placeholder="Pesquisar modelos...">
+      <div id="search-results"></div>
+    </div>
+  </div>
+  <script src="resizer.js"></script>
+  <script src="renderer.js"></script>
+</body>
+
 </html>
