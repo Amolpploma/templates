@@ -22,20 +22,27 @@ body {
 
 .left-panel {
     width: 50%;
+    min-width: 400px;
 }
 
 .right-panel {
     width: 50%;
+    min-width: 200px;
 }
 
 #resizer {
-    width: 8px;
+    width: 3px;
     height: 100%;
-    background-color: #e1e1e1;
+    background-color: #ddd;
     cursor: col-resize;
     flex-shrink: 0;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
+    transition: all 0.2s ease;
+}
+
+#resizer:hover,
+#resizer.dragging {
+    width: 3px;
+    background-color: #999;
 }
 
 .textarea-editor {
