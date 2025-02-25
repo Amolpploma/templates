@@ -54,7 +54,9 @@ function exibirResultados(resultados) {
             // Exibir o texto do modelo e o botão
             const texto = decodeURIComponent(item.dataset.texto);
             resultsContent.innerHTML = `
-                <div class="resultado-texto">${texto}</div>
+                <div class="resultado-texto-container">
+                    <div class="resultado-texto">${texto}</div>
+                </div>
                 <button class="btn-inserir">Inserir no modelo</button>
             `;
 
@@ -71,7 +73,11 @@ function exibirResultados(resultados) {
     if (itensResultado.length > 0) {
         itensResultado[0].click();
     } else {
-        resultsContent.innerHTML = '<div class="resultado-texto">Nenhum resultado encontrado</div>';
+        resultsContent.innerHTML = `
+            <div class="resultado-texto-container">
+                <div class="resultado-texto">Nenhum resultado encontrado</div>
+            </div>
+        `;
     }
 }
 
