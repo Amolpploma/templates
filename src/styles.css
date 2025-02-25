@@ -21,9 +21,12 @@ body {
     padding: 10px;
 }
 
-.left-panel {
+/* Estilos compartilhados para os painéis laterais */
+.left-panel, .right-panel {
     width: 30%;
-    min-width: 300px;
+    min-width: 200px;
+    height: 100%;
+    padding: 10px;
 }
 
 .editor-panel {
@@ -36,9 +39,9 @@ body {
     min-width: 400px;
 }
 
+/* Remover definições duplicadas anteriores */
 .right-panel {
-    width: 30%;
-    min-width: 200px;
+    /* remover width e height daqui pois já estão definidos acima */
 }
 
 #resizer-left, #resizer-right {
@@ -69,14 +72,15 @@ body {
     line-height: 1.6;
 }
 
-.search-input {
+/* Estilos compartilhados para inputs de pesquisa */
+.search-input, .search-checklist-input {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
 }
 
-#search-results {
+#search-results, #search-checklist-results {
     display: flex;
     flex-direction: column;
     height: calc(100% - 45px);
