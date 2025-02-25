@@ -10,26 +10,14 @@ class Database {
                 console.error('Erro ao conectar ao banco:', err);
             } else {
                 console.log('Conectado ao banco SQLite');
-                this.initDatabase();
             }
         });
     }
 
-    initDatabase() {
-        this.db.run(`
-            CREATE TABLE IF NOT EXISTS documentos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                titulo TEXT,
-                conteudo TEXT,
-                data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-    }
-
-    inserirDocumento(titulo, conteudo) {
+    inserirModelo(titulo, conteudo) {
         return new Promise((resolve, reject) => {
             this.db.run(
-                'INSERT INTO documentos (titulo, conteudo) VALUES (?, ?)',
+                'INSERT INTO modelos (titulo, conteudo) VALUES (?, ?)',
                 [titulo, conteudo],
                 function(err) {
                     if (err) reject(err);
@@ -39,14 +27,53 @@ class Database {
         });
     }
 
-    buscarDocumentos(termo) {
+    buscarModelos(termo) {
         return new Promise((resolve, reject) => {
             this.db.all(
-                'SELECT * FROM documentos WHERE titulo LIKE ? OR conteudo LIKE ?',
+                'SELECT * FROM modelos WHERE titulo LIKE ? OR conteudo LIKE ?',
                 [`%${termo}%`, `%${termo}%`],
                 (err, rows) => {
                     if (err) reject(err);
                     else resolve(rows);
+                }
+            );
+        });
+    }
+
+    atualizarModelo(id, titulo, conteudo) {
+        return new Promise((resolve, reject) => {
+            this.db.run(
+                'UPDATE modelos SET titulo = ?, conteudo = ? WHERE id = ?',
+                [titulo, conteudo, id],
+                function(err) {
+                    if (err) reject(err);
+                    else resolve(this.changes);
+                }
+            );
+        });
+    }
+
+    deletarModelo(id) {
+        return new Promise((resolve, reject) => {
+            this.db.run(
+                'DELETE FROM modelos WHERE id = ?',
+                [id],
+                function(err) {
+                    if (err) reject(err);
+                    else resolve(this.changes);
+                }
+            );
+        });
+    }
+
+    obterModeloPorId(id) {
+        return new Promise((resolve, reject) => {
+            this.db.get(
+                'SELECT * FROM modelos WHERE id = ?',
+                [id],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
                 }
             );
         });

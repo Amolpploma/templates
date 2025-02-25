@@ -24,7 +24,7 @@ const createWindow = () => {
   // Registrar handlers IPC
   ipcMain.handle('buscar-documentos', async (event, termo) => {
     try {
-      return await database.buscarDocumentos(termo);
+      return await database.buscarModelos(termo);
     } catch (err) {
       console.error('Erro na busca:', err);
       return [];
@@ -33,7 +33,7 @@ const createWindow = () => {
 
   ipcMain.handle('salvar-documento', async (event, { titulo, conteudo }) => {
     try {
-      return await database.inserirDocumento(titulo, conteudo);
+      return await database.inserirModelo(titulo, conteudo);
     } catch (err) {
       console.error('Erro ao salvar:', err);
       return null;
