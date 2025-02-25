@@ -1,8 +1,9 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, globalShortcut } = require('electron')
+const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
 const path = require('node:path')
+const database = require('./src/database')
 
 const createWindow = () => {
   // Create the browser window.
@@ -20,6 +21,24 @@ const createWindow = () => {
   // Ajustando o caminho para o index.html no diretório src
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'))
 
+  // Registrar handlers IPC
+  ipcMain.handle('buscar-documentos', async (event, termo) => {
+    try {
+      return await database.buscarDocumentos(termo);
+    } catch (err) {
+      console.error('Erro na busca:', err);
+      return [];
+    }
+  });
+
+  ipcMain.handle('salvar-documento', async (event, { titulo, conteudo }) => {
+    try {
+      return await database.inserirDocumento(titulo, conteudo);
+    } catch (err) {
+      console.error('Erro ao salvar:', err);
+      return null;
+    }
+  });
 }
 
 // This method will be called when Electron has finished
@@ -45,6 +64,7 @@ app.on('window-all-closed', () => {
 app.on('will-quit', () => {
   // Desregistrar todos os atalhos ao fechar
   globalShortcut.unregisterAll()
+  database.fecharConexao();
 })
 
 // In this file you can include the rest of your app's specific main process

@@ -23,6 +23,7 @@
     "electron": "^34.2.0"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "sqlite3": "^5.1.7"
   }
 }
