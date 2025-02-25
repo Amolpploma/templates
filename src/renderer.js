@@ -36,7 +36,8 @@ function exibirResultados(resultados) {
     resultsList.innerHTML = resultados
         .map(modelo => `
             <div class="resultado-nome" data-id="${modelo.id}" data-texto="${encodeURIComponent(modelo.texto)}">
-                ${modelo.nome} <span class="tag">${modelo.tag}</span>
+                <div class="nome-texto">${modelo.nome}</div>
+                <span class="tag">${modelo.tag}</span>
             </div>
         `)
         .join('');

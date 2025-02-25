@@ -119,10 +119,13 @@ body {
 }
 
 .resultado-nome {
-    padding: 12px;
+    padding: 8px 12px;
     cursor: pointer;
     border-bottom: 1px solid #e0e0e0;
     transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .resultado-nome:nth-child(odd) {
@@ -141,6 +144,20 @@ body {
 .resultado-nome.selected {
     background-color: #e3f2fd;
     border-left: 4px solid #2196f3;
+}
+
+.resultado-nome .nome-texto {
+    font-size: 1em;
+    color: #333;
+}
+
+.resultado-nome .tag {
+    font-size: 0.8em;
+    color: #666;
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    padding: 2px 8px;
+    align-self: flex-start;
 }
 
 .resultado-nome .tag {
