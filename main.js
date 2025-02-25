@@ -1,7 +1,7 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, globalShortcut } = require('electron')
 const path = require('node:path')
 
 const createWindow = () => {
@@ -10,6 +10,9 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      devTools: true,
       preload: path.join(__dirname, 'preload.js')
     }
   })
@@ -17,8 +20,6 @@ const createWindow = () => {
   // Ajustando o caminho para o index.html no diretório src
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'))
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -39,6 +40,11 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
+})
+
+app.on('will-quit', () => {
+  // Desregistrar todos os atalhos ao fechar
+  globalShortcut.unregisterAll()
 })
 
 // In this file you can include the rest of your app's specific main process
