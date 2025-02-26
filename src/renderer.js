@@ -71,12 +71,7 @@ function exibirResultados(resultados) {
                 <button class="btn-inserir">Inserir no modelo</button>
             `;
 
-            // Adicionar evento de clique ao botão
-            const btnInserir = resultsContent.querySelector('.btn-inserir');
-            btnInserir.addEventListener('click', () => {
-                const textArea = document.querySelector('.textarea-editor');
-                textArea.value = modelo;
-            });
+            atualizarBotaoInserir();
         });
     });
 
@@ -89,6 +84,129 @@ function exibirResultados(resultados) {
                 <div class="resultado-modelo">Nenhum resultado encontrado</div>
             </div>
         `;
+    }
+}
+
+function getRandomPastelColor() {
+    const hue = Math.floor(Math.random() * 360);
+    return `hsl(${hue}, 70%, 95%)`;
+}
+
+function createModeloBox(texto) {
+    const div = document.createElement('div');
+    div.className = 'modelo-box';
+    div.style.backgroundColor = getRandomPastelColor();
+    
+    div.innerHTML = `
+        <div class="modelo-actions">
+            <button class="modelo-action-btn" title="Copiar" type="button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+            </button>
+            <button class="modelo-action-btn" title="Fechar" type="button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modelo-content" contenteditable="true">${texto}</div>
+    `;
+
+    const modeloContent = div.querySelector('.modelo-content');
+    const copyBtn = div.querySelector('.modelo-action-btn[title="Copiar"]');
+    const closeBtn = div.querySelector('.modelo-action-btn[title="Fechar"]');
+
+    // Prevenir inserção de modelos dentro de modelos
+    modeloContent.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = e.clipboardData.getData('text/plain');
+        document.execCommand('insertText', false, text);
+    });
+
+    copyBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        navigator.clipboard.writeText(modeloContent.textContent);
+        copyBtn.style.color = '#4CAF50';
+        setTimeout(() => copyBtn.style.color = '', 500);
+    });
+
+    closeBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        div.remove();
+    });
+
+    return div;
+}
+
+function inserirModelo(texto) {
+    const editor = document.querySelector('.textarea-editor');
+    const modeloBox = createModeloBox(texto);
+    
+    // Garantir que o editor tenha foco
+    editor.focus();
+    
+    // Obter a seleção atual
+    const selection = window.getSelection();
+    let insertAtEnd = true;
+    
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        let container = range.commonAncestorContainer;
+        
+        // Se o container for um texto, pegar o pai
+        if (container.nodeType === 3) {
+            container = container.parentNode;
+        }
+        
+        // Verificar se o cursor está dentro do editor
+        if (editor.contains(container)) {
+            // Verificar se está dentro de uma caixa de modelo
+            const modeloParent = container.closest('.modelo-box');
+            
+            if (modeloParent) {
+                // Inserir após a caixa de modelo atual
+                modeloParent.parentNode.insertBefore(modeloBox, modeloParent.nextSibling);
+                insertAtEnd = false;
+            } else if (container === editor) {
+                // Inserir na posição do cursor se estiver diretamente no editor
+                range.deleteContents();
+                range.insertNode(modeloBox);
+                insertAtEnd = false;
+            }
+        }
+    }
+    
+    // Se não encontrou um lugar válido, inserir no final
+    if (insertAtEnd) {
+        editor.appendChild(modeloBox);
+    }
+    
+    // Adicionar quebra de linha após o modelo
+    const br = document.createElement('br');
+    modeloBox.parentNode.insertBefore(br, modeloBox.nextSibling);
+    
+    // Mover o cursor para depois da quebra de linha
+    const newRange = document.createRange();
+    newRange.setStartAfter(br);
+    newRange.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(newRange);
+    
+    // Rolar para a posição do novo modelo
+    modeloBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Atualizar o evento do botão inserir
+function atualizarBotaoInserir() {
+    const btnInserir = resultsContent.querySelector('.btn-inserir');
+    if (btnInserir) {
+        btnInserir.addEventListener('click', () => {
+            const modelo = decodeURIComponent(
+                document.querySelector('.resultado-nome.selected').dataset.modelo
+            );
+            inserirModelo(modelo);
+        });
     }
 }
 

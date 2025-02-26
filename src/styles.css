@@ -68,6 +68,13 @@ body {
     font-family: 'Libre Baskerville', Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif;
     font-size: 0.8em;
     line-height: 1.6;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+.textarea-editor:empty:before {
+    content: attr(placeholder);
+    color: #999;
 }
 
 /* Estilos compartilhados para inputs de pesquisa */
@@ -245,4 +252,52 @@ body {
 .checklist-text {
     flex-grow: 1;
     font-size: 0.8em;
+}
+
+.modelo-box {
+    position: relative;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-family: 'Libre Baskerville', Baskerville, serif;
+    font-size: 0.8em;
+    line-height: 1.6;
+}
+
+.modelo-content {
+    text-align: justify;
+    outline: none; /* Remove a borda ao focar */
+    min-height: 1em; /* Garante altura mínima mesmo vazio */
+}
+
+.modelo-actions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    gap: 5px;
+}
+
+.modelo-action-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 3px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modelo-action-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
+.modelo-action-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
 }
