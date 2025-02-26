@@ -40,9 +40,7 @@ body {
 }
 
 /* Remover definições duplicadas anteriores */
-.right-panel {
-    /* remover width e height daqui pois já estão definidos acima */
-}
+/* .right-panel rule removed as it was empty */
 
 #resizer-left, #resizer-right {
     width: 3px;

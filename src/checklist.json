@@ -1,0 +1,39 @@
+{
+    "nome": "Busca e apreensão - Inicial",
+    "tag": [
+        "busca apreensão",
+        "inicial"
+    ],
+    "checklist": [
+        {
+            "descrição": "A inicial foi endereçada a este juízo?",
+            "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento.",
+            "modelo": 3
+        },
+        {
+            "descrição": "O endereço do requerido é na comarca?",
+            "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento, advertindo-o ainda que no caso de silêncio, será realizado o declínio de competência.",
+            "modelo": 4
+        },
+        {
+            "descrição": "O advogado que assinou a inicial possui procuração ou substabelecimento válido?",
+            "solução": "Intimar o autor para emendar a inicial, juntando procuração ou substabelecimento válido."
+        },
+        {
+            "descrição": "Foi anexado o contrato com cláusula de alienação fiduciária assinado pelo devedor?",
+            "solução": "Intimar o autor para emendar a inicial, juntando o contrato assinado pelo devedor."
+        },
+        {
+            "descrição": "O endereço da notificação é o mesmo contido no contrato?",
+            "solução": "Intimar o autor para emendar a inicial, juntando a notificação extrajudicial válida."
+        },
+        {
+            "descrição": "O veículo descrito no contrato é o mesmo descrito na petição inicial?",
+            "solução": "Intimar o autor para emendar a inicial, corrigindo a descrição do bem objeto da ação."
+        },
+        {
+            "descrição": "Foram recolhidas as custas iniciais?",
+            "solução": "Intimar o autor para emendar a inicial, juntando o comprovante de recolhimento das custas iniciais."
+        }
+    ]
+}
