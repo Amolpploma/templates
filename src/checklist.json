@@ -1,44 +1,105 @@
-{
-    "nome": "Busca e apreensão - Inicial",
-    "tag": [
+[
+    {
+      "nome": "Busca e apreensão - Inicial",
+      "tag": [
         "busca apreensão",
         "inicial"
-    ],
-    "checklist": [
+      ],
+      "checklist": [
         {
-            "descrição": "A inicial foi endereçada a este juízo?",
-            "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento.",
-            "modelo": 3
+          "descrição": "A inicial foi endereçada a este juízo?",
+          "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento.",
+          "modelo": 3
         },
         {
-            "descrição": "O endereço do requerido é na comarca?",
-            "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento, advertindo-o ainda que no caso de silêncio, será realizado o declínio de competência.",
-            "modelo": 4
+          "descrição": "O endereço do requerido é na comarca?",
+          "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento, advertindo-o ainda que no caso de silêncio, será realizado o declínio de competência.",
+          "modelo": 4
         },
         {
-            "descrição": "O advogado que assinou a inicial possui procuração ou substabelecimento válido?",
-            "solução": "Intimar o autor para emendar a inicial, juntando procuração ou substabelecimento válido.",
-            "modelo": null
+          "descrição": "O advogado que assinou a inicial possui procuração ou substabelecimento válido?",
+          "solução": "Intimar o autor para emendar a inicial, juntando procuração ou substabelecimento válido.",
+          "modelo": null
         },
         {
-            "descrição": "Foi anexado o contrato com cláusula de alienação fiduciária assinado pelo devedor?",
-            "solução": "Intimar o autor para emendar a inicial, juntando o contrato assinado pelo devedor.",
-            "modelo": null
+          "descrição": "Foi anexado o contrato com cláusula de alienação fiduciária assinado pelo devedor?",
+          "solução": "Intimar o autor para emendar a inicial, juntando o contrato assinado pelo devedor.",
+          "modelo": null
         },
         {
-            "descrição": "O endereço da notificação é o mesmo contido no contrato?",
-            "solução": "Intimar o autor para emendar a inicial, juntando a notificação extrajudicial válida.",
-            "modelo": null
+          "descrição": "O endereço da notificação é o mesmo contido no contrato?",
+          "solução": "Intimar o autor para emendar a inicial, juntando a notificação extrajudicial válida.",
+          "modelo": null
         },
         {
-            "descrição": "O veículo descrito no contrato é o mesmo descrito na petição inicial?",
-            "solução": "Intimar o autor para emendar a inicial, corrigindo a descrição do bem objeto da ação.",
-            "modelo": null
+          "descrição": "O veículo descrito no contrato é o mesmo descrito na petição inicial?",
+          "solução": "Intimar o autor para emendar a inicial, corrigindo a descrição do bem objeto da ação.",
+          "modelo": null
         },
         {
-            "descrição": "Foram recolhidas as custas iniciais?",
-            "solução": "Intimar o autor para emendar a inicial, juntando o comprovante de recolhimento das custas iniciais.",
-            "modelo": null
+          "descrição": "Foram recolhidas as custas iniciais?",
+          "solução": "Intimar o autor para emendar a inicial, juntando o comprovante de recolhimento das custas iniciais.",
+          "modelo": null
         }
-    ]
-}
+      ]
+    },
+    {
+      "nome": "Usucapião - Inicial",
+      "tag": [
+        "usucapião",
+        "inicial"
+      ],
+      "checklist": [
+        {
+          "descrição": "A inicial foi endereçada a este juízo?",
+          "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento.",
+          "modelo": null
+        },
+        {
+          "descrição": "O imóvel é situado na comarca?",
+          "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento, advertindo-o ainda que no caso de silêncio, será realizado o declínio de competência.",
+          "modelo": null
+        },
+        {
+          "descrição": "O advogado que assinou a inicial possui procuração ou substabelecimento válido?",
+          "solução": "Intimar o autor para emendar a inicial, juntando procuração ou substabelecimento válido.",
+          "modelo": null
+        },
+        {
+          "descrição": "Foi anexado memorial descritivo assinado por profissional habilitado?",
+          "solução": "Intimar o autor para emendar a inicial, juntando o memorial descritivo.",
+          "modelo": null
+        },
+        {
+          "descrição": "Foi anexada planta georreferenciada do imóvel assinada por profissional habilitado?",
+          "solução": "Intimar o autor para emendar a inicial, juntando a planta.",
+          "modelo": null
+        },
+        {
+          "descrição": "Foi anexada a certidão de matrícula do imóvel, ou no caso de este não ser registrado, certidões negativas para fins de usucapião dos cartórios de registro de imóveis da comarca?",
+          "solução": "Intimar o autor para juntar aos autos as certidões.",
+          "modelo": null
+        },
+        {
+          "descrição": "No caso de serem apresentadas certidões negativas, a descrição é idêntica à que consta no memorial descritivo?",
+          "solução": "Intimar o autor para esclarecer esse ponto, apresentando, se for o caso, novas certidões ou novo memorial descritivo.",
+          "modelo": null
+        },
+        {
+          "descrição": "Foram recolhidas as custas iniciais (sem pedido de gratuidade judiciária)?",
+          "solução": "Intimar o autor para emendar a inicial, juntando o comprovante de recolhimento das custas iniciais.",
+          "modelo": null
+        },
+        {
+          "descrição": "Foi anexada declaração de hipossuficiência econômica? (com pedido de gratudiodade judiciária)",
+          "solução": "Intimar o autor para emendar juntar aos autos declaração de hipossuficiência.",
+          "modelo": null
+        },
+        {
+          "descrição": "Há indícios de que o autor não atende aos requisitos para obter a gratuidade judiciária?",
+          "solução": "Intimar o autor para emendar a inicial, comprovando fazer jus aos requisitos.",
+          "modelo": null
+        }
+      ]
+    }
+  ]

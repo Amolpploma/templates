@@ -97,8 +97,11 @@ function exibirResultadosChecklist(resultados) {
                 checklistItems.forEach(item => {
                     item.addEventListener('click', () => {
                         const currentState = item.dataset.state;
+                        
                         if (currentState === 'inactive') {
+                            // Primeiro clique: inativo -> ativo
                             item.dataset.state = 'active';
+                            item.classList.remove('inactive');
                             item.classList.add('active');
                             item.querySelector('.checklist-icon').innerHTML = `
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -106,12 +109,23 @@ function exibirResultadosChecklist(resultados) {
                                 </svg>
                             `;
                         } else if (currentState === 'active') {
+                            // Segundo clique: ativo -> desligado
                             item.dataset.state = 'disabled';
                             item.classList.remove('active');
                             item.classList.add('inactive');
                             item.querySelector('.checklist-icon').innerHTML = `
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                                </svg>
+                            `;
+                        } else if (currentState === 'disabled') {
+                            // Terceiro clique: desligado -> ativo
+                            item.dataset.state = 'active';
+                            item.classList.remove('inactive');
+                            item.classList.add('active');
+                            item.querySelector('.checklist-icon').innerHTML = `
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                                 </svg>
                             `;
                         }
