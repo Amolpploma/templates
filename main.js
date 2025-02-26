@@ -33,9 +33,9 @@ const createWindow = () => {
     }
   });
 
-  ipcMain.handle('salvar-documento', async (event, { nome, tag, texto }) => {
+  ipcMain.handle('salvar-documento', async (event, { nome, tag, modelo }) => {
     try {
-      return await database.inserirModelo(nome, tag, texto);
+      return await database.inserirModelo(nome, tag, modelo);
     } catch (err) {
       console.error('Erro ao salvar:', err);
       return null;

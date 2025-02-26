@@ -14,11 +14,11 @@ class Database {
         });
     }
 
-    inserirModelo(nome, tag, texto) {
+    inserirModelo(nome, tag, modelo) {
         return new Promise((resolve, reject) => {
             this.db.run(
-                'INSERT INTO modelos (nome, tag, texto) VALUES (?, ?, ?)',
-                [nome, tag, texto],
+                'INSERT INTO modelos (nome, tag, modelo) VALUES (?, ?, ?)',
+                [nome, tag, modelo],
                 function(err) {
                     if (err) reject(err);
                     else resolve(this.lastID);
@@ -30,7 +30,7 @@ class Database {
     buscarModelos(termo) {
         return new Promise((resolve, reject) => {
             this.db.all(
-                'SELECT * FROM modelos WHERE nome LIKE ? OR tag LIKE ? OR texto LIKE ?',
+                'SELECT * FROM modelos WHERE nome LIKE ? OR tag LIKE ? OR modelo LIKE ?',
                 [`%${termo}%`, `%${termo}%`, `%${termo}%`],
                 (err, rows) => {
                     if (err) reject(err);
@@ -40,11 +40,11 @@ class Database {
         });
     }
 
-    atualizarModelo(id, nome, tag, texto) {
+    atualizarModelo(id, nome, tag, modelo) {
         return new Promise((resolve, reject) => {
             this.db.run(
-                'UPDATE modelos SET nome = ?, tag = ?, texto = ? WHERE id = ?',
-                [nome, tag, texto, id],
+                'UPDATE modelos SET nome = ?, tag = ?, modelo = ? WHERE id = ?',
+                [nome, tag, modelo, id],
                 function(err) {
                     if (err) reject(err);
                     else resolve(this.changes);

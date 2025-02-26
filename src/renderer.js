@@ -44,8 +44,8 @@ function exibirResultados(resultados) {
                 .join('');
 
             return `
-                <div class="resultado-nome" data-id="${modelo.id}" data-texto="${encodeURIComponent(modelo.texto)}">
-                    <div class="nome-texto">${modelo.nome}</div>
+                <div class="resultado-nome" data-id="${modelo.id}" data-modelo="${encodeURIComponent(modelo.modelo)}">
+                    <div class="nome-modelo">${modelo.nome}</div>
                     <div class="tags-container">${tagsHtml}</div>
                 </div>
             `;
@@ -62,11 +62,11 @@ function exibirResultados(resultados) {
             // Adicionar seleção ao item clicado
             item.classList.add('selected');
             
-            // Exibir o texto do modelo e o botão
-            const texto = decodeURIComponent(item.dataset.texto);
+            // Exibir o modelo do modelo e o botão
+            const modelo = decodeURIComponent(item.dataset.modelo);
             resultsContent.innerHTML = `
-                <div class="resultado-texto-container">
-                    <div class="resultado-texto">${texto}</div>
+                <div class="resultado-modelo-container">
+                    <div class="resultado-modelo">${modelo}</div>
                 </div>
                 <button class="btn-inserir">Inserir no modelo</button>
             `;
@@ -75,7 +75,7 @@ function exibirResultados(resultados) {
             const btnInserir = resultsContent.querySelector('.btn-inserir');
             btnInserir.addEventListener('click', () => {
                 const textArea = document.querySelector('.textarea-editor');
-                textArea.value = texto;
+                textArea.value = modelo;
             });
         });
     });
@@ -85,20 +85,20 @@ function exibirResultados(resultados) {
         itensResultado[0].click();
     } else {
         resultsContent.innerHTML = `
-            <div class="resultado-texto-container">
-                <div class="resultado-texto">Nenhum resultado encontrado</div>
+            <div class="resultado-modelo-container">
+                <div class="resultado-modelo">Nenhum resultado encontrado</div>
             </div>
         `;
     }
 }
 
 async function salvarDocumento() {
-    const texto = textArea.value;
+    const modelo = textArea.value;
     const nome = document.getElementById('nome-input').value || 'Sem nome';
     const tag = document.getElementById('tag-input').value || 'sem-tag';
     
     try {
-        await window.electronAPI.salvarDocumento({ nome, tag, texto });
+        await window.electronAPI.salvarDocumento({ nome, tag, modelo });
     } catch (err) {
         console.error('Erro ao salvar:', err);
     }
