@@ -17,23 +17,28 @@
         },
         {
             "descrição": "O advogado que assinou a inicial possui procuração ou substabelecimento válido?",
-            "solução": "Intimar o autor para emendar a inicial, juntando procuração ou substabelecimento válido."
+            "solução": "Intimar o autor para emendar a inicial, juntando procuração ou substabelecimento válido.",
+            "modelo": null
         },
         {
             "descrição": "Foi anexado o contrato com cláusula de alienação fiduciária assinado pelo devedor?",
-            "solução": "Intimar o autor para emendar a inicial, juntando o contrato assinado pelo devedor."
+            "solução": "Intimar o autor para emendar a inicial, juntando o contrato assinado pelo devedor.",
+            "modelo": null
         },
         {
             "descrição": "O endereço da notificação é o mesmo contido no contrato?",
-            "solução": "Intimar o autor para emendar a inicial, juntando a notificação extrajudicial válida."
+            "solução": "Intimar o autor para emendar a inicial, juntando a notificação extrajudicial válida.",
+            "modelo": null
         },
         {
             "descrição": "O veículo descrito no contrato é o mesmo descrito na petição inicial?",
-            "solução": "Intimar o autor para emendar a inicial, corrigindo a descrição do bem objeto da ação."
+            "solução": "Intimar o autor para emendar a inicial, corrigindo a descrição do bem objeto da ação.",
+            "modelo": null
         },
         {
             "descrição": "Foram recolhidas as custas iniciais?",
-            "solução": "Intimar o autor para emendar a inicial, juntando o comprovante de recolhimento das custas iniciais."
+            "solução": "Intimar o autor para emendar a inicial, juntando o comprovante de recolhimento das custas iniciais.",
+            "modelo": null
         }
     ]
 }

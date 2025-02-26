@@ -40,6 +40,26 @@ class Database {
         });
     }
 
+    buscarChecklists(termo) {
+        return new Promise((resolve, reject) => {
+            this.db.all(
+                `SELECT * FROM checklists 
+                WHERE nome LIKE ? 
+                OR EXISTS (
+                    SELECT 1 
+                    FROM json_each(tag) 
+                    WHERE value LIKE ?
+                )
+                ORDER BY nome COLLATE NOCASE`,
+                [`%${termo}%`, `%${termo}%`],
+                (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                }
+            );
+        });
+    }
+
     atualizarModelo(id, nome, tag, modelo) {
         return new Promise((resolve, reject) => {
             this.db.run(

@@ -23,7 +23,21 @@ const createWindow = () => {
   // Ajustando o caminho para o index.html no diretório src
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'))
 
-  // Registrar handlers IPC
+  // Registrar todos os handlers IPC antes de qualquer outra operação
+  registerIpcHandlers();
+}
+
+function registerIpcHandlers() {
+  ipcMain.handle('buscar-checklists', async (event, termo) => {
+    try {
+      const resultados = await database.buscarChecklists(termo);
+      return resultados;
+    } catch (err) {
+      console.error('Erro na busca de checklists:', err);
+      return [];
+    }
+  });
+
   ipcMain.handle('buscar-documentos', async (event, termo) => {
     try {
       return await database.buscarModelos(termo);
@@ -64,8 +78,12 @@ app.on('window-all-closed', () => {
 })
 
 app.on('will-quit', () => {
-  // Desregistrar todos os atalhos ao fechar
-  globalShortcut.unregisterAll()
+  // Remover todos os handlers ao fechar
+  ipcMain.removeHandler('buscar-checklists');
+  ipcMain.removeHandler('buscar-documentos');
+  ipcMain.removeHandler('salvar-documento');
+  
+  globalShortcut.unregisterAll();
   database.fecharConexao();
 })
 
