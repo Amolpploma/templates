@@ -171,6 +171,16 @@ body {
     color: #333;
 }
 
+.resultado-nome .nome-texto {
+    font-size: 0.8em;
+    color: #333;
+}
+
+.resultado-nome .nome-modelo {
+    font-size: 0.8em;
+    color: #333;
+}
+
 .resultado-nome .tag {
     font-size: 0.6em;
     color: #666;
@@ -234,4 +244,5 @@ body {
 
 .checklist-text {
     flex-grow: 1;
+    font-size: 0.8em;
 }
