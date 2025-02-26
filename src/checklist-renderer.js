@@ -78,7 +78,10 @@ function exibirResultadosChecklist(resultados) {
                 const checklistHtml = checklist
                     .map(item => `
                         <div class="checklist-item">
-                            <div class="checklist-descricao">${item.descrição || item.descricao}</div>
+                            <div class="checklist-descricao" data-state="inactive">
+                                <span class="checklist-icon"></span>
+                                <span class="checklist-text">${item.descrição || item.descricao}</span>
+                            </div>
                         </div>
                     `)
                     .join('');
@@ -88,6 +91,33 @@ function exibirResultadosChecklist(resultados) {
                         <div class="resultado-texto">${checklistHtml}</div>
                     </div>
                 `;
+
+                // Adicionar eventos de clique aos itens do checklist
+                const checklistItems = checklistResultsContent.querySelectorAll('.checklist-descricao');
+                checklistItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const currentState = item.dataset.state;
+                        if (currentState === 'inactive') {
+                            item.dataset.state = 'active';
+                            item.classList.add('active');
+                            item.querySelector('.checklist-icon').innerHTML = `
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                                </svg>
+                            `;
+                        } else if (currentState === 'active') {
+                            item.dataset.state = 'disabled';
+                            item.classList.remove('active');
+                            item.classList.add('inactive');
+                            item.querySelector('.checklist-icon').innerHTML = `
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                                </svg>
+                            `;
+                        }
+                    });
+                });
+
             } catch (err) {
                 console.error('Erro ao processar checklist:', err, 'Dados:', item.dataset.checklist);
                 checklistResultsContent.innerHTML = `
