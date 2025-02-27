@@ -113,15 +113,6 @@ body {
     margin-bottom: 60px; /* Espaço para o botão fixo */
 }
 
-.resultado-modelo {
-    white-space: pre-wrap;
-    font-family: 'Libre Baskerville', Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif;
-    font-size: 0.8em;
-    padding: 10px;
-    margin-bottom: 10px;
-    line-height: 1.6;
-}
-
 .btn-inserir {
     position: absolute;
     bottom: 0;
@@ -143,17 +134,7 @@ body {
     background-color: #45a049;
 }
 
-.resultado-modelo {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #e0e0e0;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.resultado-checklist {
+.resultado-modelo, .resultado-checklist {
     padding: 8px 12px;
     cursor: pointer;
     border-bottom: 1px solid #e0e0e0;
@@ -183,21 +164,6 @@ body {
 .resultado-checklist.selected {
     background-color: #e3f2fd;
     border-left: 4px solid #2196f3;
-}
-
-.resultado-nome .nome-modelo {
-    font-size: 0.8em;
-    color: #333;
-}
-
-.resultado-nome .nome-texto {
-    font-size: 0.8em;
-    color: #333;
-}
-
-.resultado-nome .nome-modelo {
-    font-size: 0.8em;
-    color: #333;
 }
 
 .resultado-nome .tag {
@@ -314,16 +280,6 @@ body {
     fill: currentColor;
 }
 
-.resultado-modelo, .resultado-checklist {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #e0e0e0;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
 .nome-modelo, .nome-texto {
     font-size: 0.8em;
     color: #333;
@@ -339,7 +295,7 @@ body {
     display: inline-block;
 }
 
-.resultado-modelo-texto, .resultado-texto {
+.resultado-modelo-texto {
     white-space: pre-wrap;
     font-family: 'Libre Baskerville', Baskerville, serif;
     font-size: 0.8em;
