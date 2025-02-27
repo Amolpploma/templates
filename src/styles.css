@@ -230,6 +230,7 @@ body {
 .checklist-text {
     flex-grow: 1;
     font-size: 0.8em;
+    text-align: justify;
 }
 
 .modelo-box {
@@ -302,4 +303,5 @@ body {
     padding: 10px;
     margin-bottom: 10px;
     line-height: 1.6;
+    text-align: justify;
 }
