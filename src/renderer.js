@@ -35,38 +35,37 @@ async function realizarBusca(termo) {
 function exibirResultados(resultados) {
     resultsList.innerHTML = resultados
         .map(modelo => {
-            // Parse das tags (assumindo que vem como string JSON)
-            const tags = Array.isArray(modelo.tag) ? modelo.tag : JSON.parse(modelo.tag || '[]');
-            
-            // Criar elementos HTML para cada tag
-            const tagsHtml = tags
-                .map(tag => `<span class="tag">${tag}</span>`)
-                .join('');
+            try {
+                const tags = Array.isArray(modelo.tag) ? modelo.tag : JSON.parse(modelo.tag || '[]');
+                const tagsHtml = tags
+                    .map(tag => `<span class="tag">${tag}</span>`)
+                    .join('');
 
-            return `
-                <div class="resultado-nome" data-id="${modelo.id}" data-modelo="${encodeURIComponent(modelo.modelo)}">
-                    <div class="nome-modelo">${modelo.nome}</div>
-                    <div class="tags-container">${tagsHtml}</div>
-                </div>
-            `;
+                return `
+                    <div class="resultado-modelo" data-id="${modelo.id}" data-modelo="${encodeURIComponent(modelo.modelo)}">
+                        <div class="nome-modelo">${modelo.nome}</div>
+                        <div class="tags-container">${tagsHtml}</div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error('Erro ao processar modelo:', err);
+                return '';
+            }
         })
         .join('');
 
-    // Adicionar listeners para os itens clicáveis
-    const itensResultado = resultsList.querySelectorAll('.resultado-nome');
+    const itensResultado = resultsList.querySelectorAll('.resultado-modelo');
     itensResultado.forEach(item => {
         item.addEventListener('click', () => {
-            // Remover seleção anterior
-            document.querySelector('.resultado-nome.selected')?.classList.remove('selected');
+            // Remover seleção anterior apenas dos modelos
+            document.querySelector('.resultado-modelo.selected')?.classList.remove('selected');
             
-            // Adicionar seleção ao item clicado
             item.classList.add('selected');
             
-            // Exibir o modelo do modelo e o botão
             const modelo = decodeURIComponent(item.dataset.modelo);
             resultsContent.innerHTML = `
                 <div class="resultado-modelo-container">
-                    <div class="resultado-modelo">${modelo}</div>
+                    <div class="resultado-modelo-texto">${modelo}</div>
                 </div>
                 <button class="btn-inserir">Inserir no modelo</button>
             `;
@@ -156,10 +155,11 @@ function atualizarBotaoInserir() {
     const btnInserir = resultsContent.querySelector('.btn-inserir');
     if (btnInserir) {
         btnInserir.addEventListener('click', () => {
-            const modelo = decodeURIComponent(
-                document.querySelector('.resultado-nome.selected').dataset.modelo
-            );
-            inserirModelo(modelo);
+            const modeloSelecionado = document.querySelector('.resultado-modelo.selected');
+            if (modeloSelecionado) {
+                const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
+                inserirModelo(modelo);
+            }
         });
     }
 }

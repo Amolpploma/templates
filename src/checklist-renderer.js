@@ -36,9 +36,7 @@ function exibirResultadosChecklist(resultados) {
     checklistResultsList.innerHTML = resultados
         .map(checklist => {
             try {
-                // Parse das tags
                 const tags = Array.isArray(checklist.tag) ? checklist.tag : JSON.parse(checklist.tag || '[]');
-                // Parse do checklist antecipadamente para validar
                 const checklistData = typeof checklist.checklist === 'string' ? 
                     JSON.parse(checklist.checklist) : checklist.checklist;
 
@@ -47,7 +45,7 @@ function exibirResultadosChecklist(resultados) {
                     .join('');
 
                 return `
-                    <div class="resultado-nome" data-id="${checklist.id}" data-checklist='${JSON.stringify(checklistData)}'>
+                    <div class="resultado-checklist" data-id="${checklist.id}" data-checklist='${JSON.stringify(checklistData)}'>
                         <div class="nome-texto">${checklist.nome}</div>
                         <div class="tags-container">${tagsHtml}</div>
                     </div>
@@ -59,10 +57,11 @@ function exibirResultadosChecklist(resultados) {
         })
         .join('');
 
-    const itensResultado = checklistResultsList.querySelectorAll('.resultado-nome');
+    const itensResultado = checklistResultsList.querySelectorAll('.resultado-checklist');
     itensResultado.forEach(item => {
         item.addEventListener('click', () => {
-            document.querySelector('.resultado-nome.selected')?.classList.remove('selected');
+            // Remover seleção anterior apenas dos checklists
+            document.querySelector('.resultado-checklist.selected')?.classList.remove('selected');
             item.classList.add('selected');
             
             try {
