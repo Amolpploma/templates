@@ -133,6 +133,7 @@ function createModeloBox(texto) {
 
     closeBtn.addEventListener('mousedown', (e) => {
         e.preventDefault();
+        // Simplesmente remove a caixa sem afetar nenhuma linha
         div.remove();
     });
 
@@ -143,55 +144,8 @@ function inserirModelo(texto) {
     const editor = document.querySelector('.textarea-editor');
     const modeloBox = createModeloBox(texto);
     
-    // Garantir que o editor tenha foco
-    editor.focus();
-    
-    // Obter a seleção atual
-    const selection = window.getSelection();
-    let insertAtEnd = true;
-    
-    if (selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        let container = range.commonAncestorContainer;
-        
-        // Se o container for um texto, pegar o pai
-        if (container.nodeType === 3) {
-            container = container.parentNode;
-        }
-        
-        // Verificar se o cursor está dentro do editor
-        if (editor.contains(container)) {
-            // Verificar se está dentro de uma caixa de modelo
-            const modeloParent = container.closest('.modelo-box');
-            
-            if (modeloParent) {
-                // Inserir após a caixa de modelo atual
-                modeloParent.parentNode.insertBefore(modeloBox, modeloParent.nextSibling);
-                insertAtEnd = false;
-            } else if (container === editor) {
-                // Inserir na posição do cursor se estiver diretamente no editor
-                range.deleteContents();
-                range.insertNode(modeloBox);
-                insertAtEnd = false;
-            }
-        }
-    }
-    
-    // Se não encontrou um lugar válido, inserir no final
-    if (insertAtEnd) {
-        editor.appendChild(modeloBox);
-    }
-    
-    // Adicionar quebra de linha após o modelo
-    const br = document.createElement('br');
-    modeloBox.parentNode.insertBefore(br, modeloBox.nextSibling);
-    
-    // Mover o cursor para depois da quebra de linha
-    const newRange = document.createRange();
-    newRange.setStartAfter(br);
-    newRange.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(newRange);
+    // Simplesmente adiciona a caixa ao final do editor
+    editor.appendChild(modeloBox);
     
     // Rolar para a posição do novo modelo
     modeloBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
