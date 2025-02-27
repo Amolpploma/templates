@@ -320,3 +320,31 @@ body {
     overflow-y: auto;
     padding-right: 10px; /* Espaço para a barra de rolagem */
 }
+
+/* Estilos para barras de rolagem */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Ajustes específicos para containers com rolagem */
+.textarea-editor,
+.search-results-list,
+.resultado-modelo-container,
+.resultado-texto-container {
+    scrollbar-width: thin; /* Para Firefox */
+    scrollbar-color: #c1c1c1 transparent; /* Para Firefox */
+}
