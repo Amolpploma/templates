@@ -1,9 +1,15 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const path = require('path');
 
 module.exports = {
   packagerConfig: {
-    asar: true,
+    asar: {
+      unpack: "**/recursos/database.sqlite"
+    },
+    extraResource: [
+      './recursos/database.sqlite'
+    ]
   },
   rebuildConfig: {},
   makers: [

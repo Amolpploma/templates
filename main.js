@@ -3,7 +3,42 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
 const path = require('node:path')
-const database = require('./src/database')
+const fs = require('fs')
+
+// Função para determinar o caminho correto do banco de dados
+function getDatabasePath() {
+    const userDataPath = app.getPath('userData');
+    const dbPath = path.join(userDataPath, 'database.sqlite');
+
+    // Verificar se o banco já existe no diretório do usuário
+    if (!fs.existsSync(dbPath)) {
+        try {
+            // Em desenvolvimento
+            const devDbPath = path.join(__dirname, 'recursos', 'database.sqlite');
+            if (fs.existsSync(devDbPath)) {
+                fs.copyFileSync(devDbPath, dbPath);
+            } 
+            // Em produção
+            else {
+                const prodDbPath = path.join(process.resourcesPath, 'app.asar.unpacked', 'recursos', 'database.sqlite');
+                if (fs.existsSync(prodDbPath)) {
+                    fs.copyFileSync(prodDbPath, dbPath);
+                } else {
+                    console.error('Database not found:', { devDbPath, prodDbPath });
+                    throw new Error('Database file not found');
+                }
+            }
+        } catch (err) {
+            console.error('Error copying database:', err);
+            throw err;
+        }
+    }
+
+    return dbPath;
+}
+
+// Inicializar o banco de dados com o caminho correto
+const database = require('./src/database')(getDatabasePath());
 
 const createWindow = () => {
   // Create the browser window.

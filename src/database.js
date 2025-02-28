@@ -1,15 +1,15 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const dbPath = path.join(__dirname, 'database.sqlite');
+const dbPath = path.join(__dirname, '../recursos','database.sqlite');
 
 class Database {
-    constructor() {
+    constructor(dbPath) {
         this.db = new sqlite3.Database(dbPath, (err) => {
             if (err) {
                 console.error('Erro ao conectar ao banco:', err);
             } else {
-                console.log('Conectado ao banco SQLite');
+                console.log('Conectado ao banco SQLite em:', dbPath);
             }
         });
     }
@@ -104,4 +104,7 @@ class Database {
     }
 }
 
-module.exports = new Database();
+// Exportar uma função factory ao invés de uma instância
+module.exports = function(dbPath) {
+    return new Database(dbPath);
+};
