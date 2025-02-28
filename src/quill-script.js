@@ -9,10 +9,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             modules: {
                 toolbar: [
                     ['bold', 'italic', 'underline'],
-                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    [{ 'color': [] }, { 'background': [] }]
-                ]
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'font': [] }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ],
+                history: {
+                    delay: 2000,
+                    maxStack: 500,
+                    userOnly: true
+                  }
             }
         });
         
