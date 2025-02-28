@@ -16,35 +16,45 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
-    let isResizing = false, startY = 0, startEditorHeight = 0;
-    const minHeight = 100; // altura mínima em px para cada área
-    const panelHeight = panel ? panel.offsetHeight : 0; // altura total do painel
+    let isResizing = false;
+    let startY;
+    let startHeights;
 
     resizer.addEventListener('mousedown', (e) => {
-        e.preventDefault(); // Impede seleção de texto
+        e.preventDefault();
         isResizing = true;
-        startY = e.pageY;
-        startEditorHeight = editorContainer.getBoundingClientRect().height;
-        panel.style.userSelect = 'none';
-        console.log('Início do resize', { startY, startEditorHeight, panelHeight });
+        startY = e.clientY;
+        
+        // Capturar alturas iniciais
+        startHeights = {
+            editor: editorContainer.offsetHeight,
+            textarea: textareaEditor.offsetHeight
+        };
+
+        // Adicionar classe global para controlar o cursor
+        document.body.classList.add('resizing');
+        
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
     });
 
     function onMouseMove(e) {
         if (!isResizing) return;
-        const dy = e.pageY - startY;
-        let newEditorHeight = Math.max(minHeight, Math.min(startEditorHeight + dy, panelHeight - minHeight - resizer.offsetHeight));
+
+        const dy = e.clientY - startY;
+        
+        // Calcular novas alturas mantendo as proporções
+        const newEditorHeight = Math.max(100, startHeights.editor + dy);
+        const newTextareaHeight = Math.max(100, startHeights.textarea - dy);
+
+        // Aplicar novas alturas
         editorContainer.style.height = `${newEditorHeight}px`;
-        let newTextareaHeight = panelHeight - newEditorHeight - resizer.offsetHeight;
         textareaEditor.style.height = `${newTextareaHeight}px`;
-        console.log('Resizing', { dy, newEditorHeight, newTextareaHeight });
     }
 
     function onMouseUp() {
         isResizing = false;
-        panel.style.userSelect = '';
-        console.log('Fim do resize');
+        document.body.classList.remove('resizing');
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     }
