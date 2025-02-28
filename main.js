@@ -1,7 +1,7 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
+const { app, BrowserWindow, globalShortcut, ipcMain, dialog } = require('electron')
 const path = require('node:path')
 const fs = require('fs')
 
@@ -123,6 +123,16 @@ app.on('will-quit', () => {
   globalShortcut.unregisterAll();
   database.fecharConexao();
 })
+
+ipcMain.on('save-content', (event, content) => {
+  dialog.showSaveDialog({
+    filters: [{ name: 'Documentos de texto', extensions: ['txt', 'html'] }]
+  }).then(result => {
+    if (!result.canceled && result.filePath) {
+      fs.writeFileSync(result.filePath, content);
+    }
+  });
+});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

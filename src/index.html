@@ -6,7 +6,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
   <link rel="stylesheet" href="styles.css">
-  <title>Modelos</title>
+
+  <link href="../node_modules/quill/dist/quill.snow.css" rel="stylesheet">
+  <script src="../node_modules/quill/dist/quill.js"></script>
+    <title>Modelos</title>
 </head>
 
 <body>
@@ -17,6 +20,7 @@
     </div>
     <div id="resizer-left"></div>
     <div class="editor-panel">
+      <div id="editor-container"></div>
       <div class="textarea-editor"></div>
     </div>
     <div id="resizer-right"></div>
@@ -28,6 +32,7 @@
   <script src="resizer.js"></script>
   <script src="renderer.js"></script>
   <script src="checklist-renderer.js"></script>
+  <script src="quill-script.js"></script>
 </body>
 
 </html>

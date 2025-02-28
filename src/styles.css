@@ -329,3 +329,7 @@ body {
     scrollbar-width: thin; /* Para Firefox */
     scrollbar-color: #c1c1c1 transparent; /* Para Firefox */
 }
+
+#editor-container {
+      height: 400px;
+}
