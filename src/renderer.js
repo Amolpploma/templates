@@ -143,11 +143,11 @@ function inserirModelo(texto) {
     const editor = document.querySelector('.textarea-editor');
     const modeloBox = createModeloBox(texto);
     
-    // Simplesmente adiciona a caixa ao final do editor
+    // Apenas adiciona a caixa ao final do editor, sem rolar a página
     editor.appendChild(modeloBox);
     
-    // Rolar para a posição do novo modelo
-    modeloBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Removida a linha que fazia o scroll automático:
+    // modeloBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // Atualizar o evento do botão inserir

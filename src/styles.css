@@ -32,6 +32,12 @@ body {
 .editor-panel {
     width: 40%;
     min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 .center-panel {
@@ -59,15 +65,28 @@ body {
     background-color: #999;
 }
 
-.textarea-editor {
-    width: 100%;
-    height: 100%;
-    padding: 10px;
+#editor-container {
+    flex: 0 0 auto;
+    height: 200px;
     border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    flex: 0 0 200px; /* Altura fixa para o editor Quill */
+}
+
+.textarea-editor {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Espaçamento entre as caixas */
+    gap: 10px;
+    background-color: white;
+    height: calc(100% - 210px); /* altura total menos altura do editor e margem */
+    position: relative; /* Garante que o conteúdo seja relativo a esta div */
+    min-height: 0; /* Permite que o flex funcione corretamente */
 }
 
 .textarea-editor:empty:before {
@@ -331,5 +350,5 @@ body {
 }
 
 #editor-container {
-      height: 400px;
+    height: 400px;
 }
