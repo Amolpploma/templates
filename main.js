@@ -43,8 +43,10 @@ const database = require('./src/database')(getDatabasePath());
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
+    width: 960,
     height: 600,
+    minWidth: 960,  // Tamanho mínimo
+    minHeight: 600, // Tamanho mínimo
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
