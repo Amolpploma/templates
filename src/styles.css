@@ -166,30 +166,11 @@ body {
     border-left: 4px solid #2196f3;
 }
 
-.resultado-nome .tag {
-    font-size: 0.6em;
-    color: #666;
-    background-color: #e0e0e0;
-    border-radius: 12px;
-    padding: 2px 8px;
-    align-self: flex-start;
-    display: inline-block;
-}
-
-.resultado-nome .tag:hover {
-    background-color: #d0d0d0;
-}
-
 .tags-container {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
     margin-top: 4px;
-}
-
-/* Remover estilos duplicados antigos da tag */
-.resultado-nome .tag {
-    margin-left: 0; /* Removendo margin-left anterior */
 }
 
 .checklist-item {
@@ -229,7 +210,7 @@ body {
 
 .checklist-text {
     flex-grow: 1;
-    font-size: 0.8em;
+    font-size: 12px;
     text-align: justify;
 }
 
@@ -238,7 +219,7 @@ body {
     padding: 20px;
     border-radius: 4px;
     font-family: 'Libre Baskerville', Baskerville, serif;
-    font-size: 0.8em;
+    font-size: 12px;
     line-height: 1.6;
     margin: 0; /* Remove margens para usar o gap do flex container */
 }
@@ -282,12 +263,12 @@ body {
 }
 
 .nome-modelo, .nome-texto {
-    font-size: 0.8em;
+    font-size: 12px;
     color: #333;
 }
 
 .resultado-modelo .tag, .resultado-checklist .tag {
-    font-size: 0.6em;
+    font-size: 10px;
     color: #666;
     background-color: #e0e0e0;
     border-radius: 12px;
@@ -299,7 +280,7 @@ body {
 .resultado-modelo-texto {
     white-space: pre-wrap;
     font-family: 'Libre Baskerville', Baskerville, serif;
-    font-size: 0.8em;
+    font-size: 12px;
     padding: 10px;
     margin-bottom: 10px;
     line-height: 1.6;
