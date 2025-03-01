@@ -95,9 +95,10 @@ function getRandomPastelColor() {
     return `hsl(${hue}, 70%, 95%)`;
 }
 
-function createModeloBox(texto, nome) {
+function createModeloBox(texto, nome, modeloId = '') {
     const div = document.createElement('div');
     div.className = 'modelo-box';
+    div.setAttribute('data-modelo_id', modeloId);
     const backgroundColor = getRandomPastelColor();
     div.style.backgroundColor = backgroundColor;
     
@@ -210,9 +211,9 @@ function createModeloBox(texto, nome) {
     return div;
 }
 
-function inserirModelo(texto, nome) {
+function inserirModelo(texto, nome, modeloId = '') {
     const editor = document.querySelector('.textarea-editor');
-    const modeloBox = createModeloBox(texto, nome);
+    const modeloBox = createModeloBox(texto, nome, modeloId);
     editor.appendChild(modeloBox);
 }
 

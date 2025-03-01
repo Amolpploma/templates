@@ -77,7 +77,10 @@ function exibirResultadosChecklist(resultados) {
                 const checklistHtml = checklist
                     .map(item => `
                         <div class="checklist-item">
-                            <div class="checklist-descricao" data-state="inactive">
+                            <div class="checklist-descricao" 
+                                 data-state="inactive"
+                                 data-modelo_id="${item.modelo_id || ''}"
+                                 data-checklist_id="${checklist.id || ''}">
                                 <span class="checklist-icon"></span>
                                 <span class="checklist-text">${item.descrição || item.descricao}</span>
                             </div>
@@ -94,8 +97,9 @@ function exibirResultadosChecklist(resultados) {
                 // Adicionar eventos de clique aos itens do checklist
                 const checklistItems = checklistResultsContent.querySelectorAll('.checklist-descricao');
                 checklistItems.forEach(item => {
-                    item.addEventListener('click', () => {
+                    item.addEventListener('click', async () => {
                         const currentState = item.dataset.state;
+                        const modeloId = item.dataset.modelo_id;
                         
                         if (currentState === 'inactive') {
                             // Primeiro clique: inativo -> ativo
@@ -107,6 +111,15 @@ function exibirResultadosChecklist(resultados) {
                                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                                 </svg>
                             `;
+                            
+                            // Verificar se todas as descrições estão ativas
+                            const todasAtivas = Array.from(checklistItems)
+                                .every(item => item.dataset.state === 'active');
+                            
+                            if (todasAtivas) {
+                                const checklistId = item.dataset.checklist_id;
+                                await inserirModeloAutomatico(checklistId);
+                            }
                         } else if (currentState === 'active') {
                             // Segundo clique: ativo -> desligado
                             item.dataset.state = 'disabled';
@@ -117,6 +130,10 @@ function exibirResultadosChecklist(resultados) {
                                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
                                 </svg>
                             `;
+                            
+                            if (modeloId) {
+                                await inserirModeloAutomatico(modeloId);
+                            }
                         } else if (currentState === 'disabled') {
                             // Terceiro clique: desligado -> ativo
                             item.dataset.state = 'active';
@@ -150,5 +167,24 @@ function exibirResultadosChecklist(resultados) {
                 <div class="resultado-texto">Nenhum resultado encontrado</div>
             </div>
         `;
+    }
+}
+
+async function inserirModeloAutomatico(modeloId) {
+    if (!modeloId) return;
+
+    // Verificar se já existe uma caixa com este modelo
+    const caixaExistente = document.querySelector(`.modelo-box[data-modelo_id="${modeloId}"]`);
+    if (caixaExistente) return;
+
+    try {
+        // Buscar o modelo no banco de dados
+        const modelo = await window.electronAPI.buscarModeloPorId(modeloId);
+        if (modelo) {
+            // Usar a função existente para inserir o modelo
+            inserirModelo(modelo.modelo, modelo.nome, modeloId);
+        }
+    } catch (error) {
+        console.error('Erro ao inserir modelo automático:', error);
     }
 }

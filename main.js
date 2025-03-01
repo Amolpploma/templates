@@ -92,6 +92,17 @@ function registerIpcHandlers() {
       return null;
     }
   });
+
+  ipcMain.handle('buscar-modelo-por-id', async (event, id) => {
+    try {
+      const modelo = await database.obterModeloPorId(id);
+      console.log('Modelo encontrado:', modelo); // Debug log
+      return modelo;
+    } catch (err) {
+      console.error('Erro ao buscar modelo por ID:', err);
+      return null;
+    }
+  });
 }
 
 // This method will be called when Electron has finished
@@ -119,6 +130,7 @@ app.on('will-quit', () => {
   ipcMain.removeHandler('buscar-checklists');
   ipcMain.removeHandler('buscar-documentos');
   ipcMain.removeHandler('salvar-documento');
+  ipcMain.removeHandler('buscar-modelo-por-id'); // Adicionar esta linha
   
   globalShortcut.unregisterAll();
   database.fecharConexao();
