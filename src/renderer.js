@@ -107,7 +107,7 @@ function createModeloBox(texto, nome) {
             <div class="modelo-actions">
                 <button class="modelo-action-btn" title="Enviar para o editor" type="button">
                     <svg viewBox="0 0 24 24">
-                        <path d="M8 12l4-4 4 4m-4-4v12"/>
+                        <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/>
                     </svg>
                 </button>
                 <button class="modelo-action-btn" title="Copiar" type="button">

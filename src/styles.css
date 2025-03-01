@@ -95,18 +95,17 @@ body {
 }
 
 .textarea-editor {
-    height: calc(50% - 16px); /* 50% menos a altura do resizer e margins */
+    flex: 1;
     min-height: 100px;
+    max-height: calc(50% - 16px);
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     background-color: white;
     position: relative; /* Garante que o conteúdo seja relativo a esta div */
-    min-height: 0; /* Permite que o flex funcione corretamente */
+    display: block; /* Mudado de flex para block */
+    overflow-y: auto !important; /* Força overflow vertical */
+    overflow-x: hidden; /* Prevenir scroll horizontal */
 }
 
 .textarea-editor:empty:before {
@@ -259,8 +258,9 @@ body {
     font-family: 'Libre Baskerville', Baskerville, serif;
     font-size: 12px;
     line-height: 1.6;
-    margin: 0; /* Remove margens para usar o gap do flex container */
+    margin: 0 0 10px 0; /* Adicionado margin-bottom para separar múltiplos modelos */
     overflow: hidden; /* Para garantir que a barra fique contida */
+    width: 100%;
 }
 
 .modelo-header {
@@ -287,8 +287,7 @@ body {
 }
 
 .modelo-title {
-    font-size: 11px; /* Fonte menor */
-    font-weight: bold;
+    /*font-size: 11px; /* Fonte menor */
     font-style: italic;
     color: rgba(0, 0, 0, 0.8); /* Cor mais escura para melhor contraste */
     white-space: nowrap;
@@ -344,11 +343,11 @@ body {
 }
 
 .modelo-action-btn[title="Enviar para o editor"] {
-    color: #2196F3;
+    color: #000; /* Mudando a cor para preto */
 }
 
 .modelo-action-btn[title="Enviar para o editor"]:hover {
-    color: #1976D2;
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .nome-modelo, .nome-texto {
