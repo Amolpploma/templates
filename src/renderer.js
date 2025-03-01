@@ -98,6 +98,11 @@ function createModeloBox(texto) {
     
     div.innerHTML = `
         <div class="modelo-actions">
+            <button class="modelo-action-btn" title="Enviar para o editor" type="button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M8 12l4-4 4 4m-4-4v12"/>
+                </svg>
+            </button>
             <button class="modelo-action-btn" title="Copiar" type="button">
                 <svg viewBox="0 0 24 24">
                     <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
@@ -113,6 +118,7 @@ function createModeloBox(texto) {
     `;
 
     const modeloContent = div.querySelector('.modelo-content');
+    const sendToEditorBtn = div.querySelector('.modelo-action-btn[title="Enviar para o editor"]');
     const copyBtn = div.querySelector('.modelo-action-btn[title="Copiar"]');
     const closeBtn = div.querySelector('.modelo-action-btn[title="Fechar"]');
 
@@ -121,6 +127,57 @@ function createModeloBox(texto) {
         e.preventDefault();
         const text = e.clipboardData.getData('text/plain');
         document.execCommand('insertText', false, text);
+    });
+
+    sendToEditorBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const content = modeloContent.innerHTML;
+        
+        if (window.quill) {
+            try {
+                const editor = window.quill;
+                let textLength = 0;
+                
+                // Tentar obter o texto usando diferentes métodos
+                if (typeof editor.getText === 'function') {
+                    textLength = editor.getText().length;
+                } else if (editor.root && typeof editor.root.innerText === 'string') {
+                    textLength = editor.root.innerText.length;
+                } else {
+                    console.warn('Não foi possível obter o comprimento do texto do editor.');
+                }
+                
+                // Adicionar quebras de linha se necessário
+                if (textLength > 1) {
+                    if (typeof editor.insertText === 'function') {
+                        editor.insertText(textLength - 1, '\n\n');
+                    } else {
+                        editor.root.innerHTML += '<br><br>';
+                    }
+                }
+                
+                // Inserir o conteúdo HTML
+                if (typeof editor.clipboard !== 'undefined' && typeof editor.clipboard.dangerouslyPasteHTML === 'function') {
+                    editor.clipboard.dangerouslyPasteHTML(textLength, content);
+                } else {
+                    editor.root.innerHTML += content;
+                }
+                
+                // Rolar para o final do editor
+                const editorElement = document.querySelector('.ql-editor');
+                if (editorElement) {
+                    setTimeout(() => {
+                        editorElement.scrollTop = editorElement.scrollHeight;
+                    }, 100);
+                }
+                
+                div.remove();
+            } catch (error) {
+                console.error('Erro ao inserir conteúdo no editor:', error);
+            }
+        } else {
+            console.error('Editor Quill não encontrado');
+        }
     });
 
     copyBtn.addEventListener('mousedown', (e) => {

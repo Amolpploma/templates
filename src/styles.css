@@ -296,6 +296,14 @@ body {
     fill: currentColor;
 }
 
+.modelo-action-btn[title="Enviar para o editor"] {
+    color: #2196F3;
+}
+
+.modelo-action-btn[title="Enviar para o editor"]:hover {
+    color: #1976D2;
+}
+
 .nome-modelo, .nome-texto {
     font-size: 12px;
     color: #333;
