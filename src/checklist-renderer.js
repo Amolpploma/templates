@@ -40,14 +40,13 @@ function exibirResultadosChecklist(resultados) {
                 const checklistData = typeof checklist.checklist === 'string' ? 
                     JSON.parse(checklist.checklist) : checklist.checklist;
 
-                const tagsHtml = tags
-                    .map(tag => `<span class="tag">${tag}</span>`)
-                    .join('');
-
                 return `
-                    <div class="resultado-checklist" data-id="${checklist.id}" data-checklist='${JSON.stringify(checklistData)}'>
+                    <div class="resultado-checklist" 
+                         data-id="${checklist.id}" 
+                         data-modelo_id="${checklist.modelo_id || ''}"
+                         data-checklist='${JSON.stringify(checklistData)}'>
                         <div class="nome-texto">${checklist.nome}</div>
-                        <div class="tags-container">${tagsHtml}</div>
+                        <div class="tags-container">${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
                     </div>
                 `;
             } catch (err) {
@@ -99,7 +98,6 @@ function exibirResultadosChecklist(resultados) {
                 checklistItems.forEach(item => {
                     item.addEventListener('click', async () => {
                         const currentState = item.dataset.state;
-                        const modeloId = item.dataset.modelo_id;
                         
                         if (currentState === 'inactive') {
                             // Primeiro clique: inativo -> ativo
@@ -117,8 +115,15 @@ function exibirResultadosChecklist(resultados) {
                                 .every(item => item.dataset.state === 'active');
                             
                             if (todasAtivas) {
-                                const checklistId = item.dataset.checklist_id;
-                                await inserirModeloAutomatico(checklistId);
+                                // Usar o modelo_id do checklist principal
+                                const checklistElement = document.querySelector('.resultado-checklist.selected');
+                                if (checklistElement) {
+                                    const modeloId = checklistElement.dataset.modelo_id;
+                                    if (modeloId) {
+                                        console.log('Inserindo modelo do checklist completo:', modeloId);
+                                        await inserirModeloAutomatico(modeloId);
+                                    }
+                                }
                             }
                         } else if (currentState === 'active') {
                             // Segundo clique: ativo -> desligado
@@ -127,12 +132,14 @@ function exibirResultadosChecklist(resultados) {
                             item.classList.add('inactive');
                             item.querySelector('.checklist-icon').innerHTML = `
                                 <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                                 </svg>
                             `;
                             
-                            if (modeloId) {
-                                await inserirModeloAutomatico(modeloId);
+                            // Usar o modelo_id do item individual
+                            const itemModeloId = item.dataset.modelo_id;
+                            if (itemModeloId) {
+                                await inserirModeloAutomatico(itemModeloId);
                             }
                         } else if (currentState === 'disabled') {
                             // Terceiro clique: desligado -> ativo
