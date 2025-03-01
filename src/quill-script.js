@@ -1,10 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        if (!window.QuillEditor) {
-            throw new Error('QuillEditor não está disponível');
-        }
-        
-        const quill = await window.QuillEditor.createEditor('#editor-container', {
+        // Configuração do Quill com fontes explícitas
+        const quill = new Quill('#editor-container', {
             theme: 'snow',
             modules: {
                 toolbar: [
@@ -14,15 +11,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     [{ 'font': [] }],
                     [{ 'align': [] }],
                     ['clean']
-                ],
-                history: {
-                    delay: 2000,
-                    maxStack: 500,
-                    userOnly: true
-                  }
+                ]
+            },
+            formats: ['bold', 'italic', 'underline', 'indent', 'size', 'font', 'align'],
+            defaultStyle: {
+                'font-family': 'inherit'
             }
         });
-        
+
+        // Sobrescrever o comportamento padrão dos formatos
+        const formats = ['bold', 'italic', 'underline'];
+        formats.forEach(format => {
+            quill.format(format, true, 'user');
+        });
+
         window.quill = quill;
         console.log('Quill inicializado com sucesso!');
     } catch (error) {

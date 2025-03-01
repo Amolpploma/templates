@@ -1,7 +1,12 @@
+/* Remover a font-family do seletor global */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Aplicar a fonte apenas onde necessário */
+body:not(.ql-editor *) {
     font-family: 'Libre Baskerville', Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif;
 }
 
@@ -413,4 +418,17 @@ body {
 
 .resizing * {
     cursor: row-resize !important;
+}
+
+/* Estilos específicos para o editor Quill */
+.ql-editor {
+    font-family: inherit;
+}
+
+.ql-editor strong,
+.ql-editor b,
+.ql-editor em,
+.ql-editor i,
+.ql-editor u {
+    font-family: inherit;
 }
