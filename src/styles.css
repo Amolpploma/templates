@@ -266,12 +266,12 @@ body {
 .modelo-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 6px 10px; /* Reduzido o padding vertical */
+    align-items: center; /* Alinha verticalmente os itens */
+    padding: 3px 12px; /* Ajustado padding para melhor espaçamento */
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    /* O background será definido dinamicamente via JavaScript */
     background-color: inherit;
     position: relative;
+    /*min-height: 36px; /* Altura mínima para garantir espaço suficiente */
 }
 
 /* Adicionar overlay escuro na header */
@@ -301,6 +301,8 @@ body {
     display: flex;
     gap: 5px;
     margin-left: auto; /* Empurra os botões para a direita */
+    position: relative; /* Mudado de absolute para relative */
+    z-index: 2; /* Mantém botões acima do overlay */
 }
 
 .modelo-content {
@@ -310,20 +312,12 @@ body {
     min-height: 1em; /* Garante altura mínima mesmo vazio */
 }
 
-.modelo-actions {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    display: flex;
-    gap: 5px;
-}
-
 .modelo-action-btn {
     background: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 3px;
-    width: 24px;
-    height: 24px;
+    width: 15px;
+    height: 15px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -337,8 +331,8 @@ body {
 }
 
 .modelo-action-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 10px;
+    height: 10px;
     fill: currentColor;
 }
 
