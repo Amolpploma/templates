@@ -7,26 +7,26 @@ const fs = require('fs')
 
 // Função para determinar o caminho correto do banco de dados
 function getDatabasePath() {
+    // Em desenvolvimento, usar o banco da pasta recursos
+    if (process.env.NODE_ENV === 'development' || !app.isPackaged) {
+        const devDbPath = path.join(__dirname, 'recursos', 'database.sqlite');
+        if (fs.existsSync(devDbPath)) {
+            return devDbPath;
+        }
+    }
+
+    // Em produção, continuar com o comportamento atual
     const userDataPath = app.getPath('userData');
     const dbPath = path.join(userDataPath, 'database.sqlite');
 
-    // Verificar se o banco já existe no diretório do usuário
     if (!fs.existsSync(dbPath)) {
         try {
-            // Em desenvolvimento
-            const devDbPath = path.join(__dirname, 'recursos', 'database.sqlite');
-            if (fs.existsSync(devDbPath)) {
-                fs.copyFileSync(devDbPath, dbPath);
-            } 
-            // Em produção
-            else {
-                const prodDbPath = path.join(process.resourcesPath, 'app.asar.unpacked', 'recursos', 'database.sqlite');
-                if (fs.existsSync(prodDbPath)) {
-                    fs.copyFileSync(prodDbPath, dbPath);
-                } else {
-                    console.error('Database not found:', { devDbPath, prodDbPath });
-                    throw new Error('Database file not found');
-                }
+            const prodDbPath = path.join(process.resourcesPath, 'app.asar.unpacked', 'recursos', 'database.sqlite');
+            if (fs.existsSync(prodDbPath)) {
+                fs.copyFileSync(prodDbPath, dbPath);
+            } else {
+                console.error('Database not found:', { prodDbPath });
+                throw new Error('Database file not found');
             }
         } catch (err) {
             console.error('Error copying database:', err);
