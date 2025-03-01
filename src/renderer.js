@@ -211,11 +211,7 @@ function createModeloBox(texto, nome, modeloId = '') {
     return div;
 }
 
-function inserirModelo(texto, nome, modeloId = '') {
-    const editor = document.querySelector('.textarea-editor');
-    const modeloBox = createModeloBox(texto, nome, modeloId);
-    editor.appendChild(modeloBox);
-}
+// Remover a função inserirModelo daqui pois ela agora está em shared-functions.js
 
 function atualizarBotaoInserir() {
     const btnInserir = resultsContent.querySelector('.btn-inserir');
@@ -225,7 +221,8 @@ function atualizarBotaoInserir() {
             if (modeloSelecionado) {
                 const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
                 const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
-                inserirModelo(modelo, nome);
+                const modeloId = modeloSelecionado.dataset.id;
+                window.inserirModelo(modelo, nome, modeloId); // Usar função global
             }
         });
     }

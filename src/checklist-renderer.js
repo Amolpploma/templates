@@ -180,16 +180,10 @@ function exibirResultadosChecklist(resultados) {
 async function inserirModeloAutomatico(modeloId) {
     if (!modeloId) return;
 
-    // Verificar se já existe uma caixa com este modelo
-    const caixaExistente = document.querySelector(`.modelo-box[data-modelo_id="${modeloId}"]`);
-    if (caixaExistente) return;
-
     try {
-        // Buscar o modelo no banco de dados
         const modelo = await window.electronAPI.buscarModeloPorId(modeloId);
         if (modelo) {
-            // Usar a função existente para inserir o modelo
-            inserirModelo(modelo.modelo, modelo.nome, modeloId);
+            await window.inserirModelo(modelo.modelo, modelo.nome, modelo.id); // Usar função global
         }
     } catch (error) {
         console.error('Erro ao inserir modelo automático:', error);
