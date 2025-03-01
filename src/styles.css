@@ -255,15 +255,40 @@ body {
 
 .modelo-box {
     position: relative;
-    padding: 20px;
     border-radius: 4px;
     font-family: 'Libre Baskerville', Baskerville, serif;
     font-size: 12px;
     line-height: 1.6;
     margin: 0; /* Remove margens para usar o gap do flex container */
+    overflow: hidden; /* Para garantir que a barra fique contida */
+}
+
+.modelo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modelo-title {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 100px); /* Espaço para os botões */
+}
+
+.modelo-actions {
+    display: flex;
+    gap: 5px;
+    margin-left: auto; /* Empurra os botões para a direita */
 }
 
 .modelo-content {
+    padding: 15px;
     text-align: justify;
     outline: none; /* Remove a borda ao focar */
     min-height: 1em; /* Garante altura mínima mesmo vazio */

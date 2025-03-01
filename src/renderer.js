@@ -96,23 +96,29 @@ function createModeloBox(texto) {
     div.className = 'modelo-box';
     div.style.backgroundColor = getRandomPastelColor();
     
+    // Extrair o título do texto (primeira linha)
+    const titulo = texto.split('\n')[0] || 'Sem título';
+    
     div.innerHTML = `
-        <div class="modelo-actions">
-            <button class="modelo-action-btn" title="Enviar para o editor" type="button">
-                <svg viewBox="0 0 24 24">
-                    <path d="M8 12l4-4 4 4m-4-4v12"/>
-                </svg>
-            </button>
-            <button class="modelo-action-btn" title="Copiar" type="button">
-                <svg viewBox="0 0 24 24">
-                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                </svg>
-            </button>
-            <button class="modelo-action-btn" title="Fechar" type="button">
-                <svg viewBox="0 0 24 24">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-            </button>
+        <div class="modelo-header">
+            <div class="modelo-title">${titulo}</div>
+            <div class="modelo-actions">
+                <button class="modelo-action-btn" title="Enviar para o editor" type="button">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8 12l4-4 4 4m-4-4v12"/>
+                    </svg>
+                </button>
+                <button class="modelo-action-btn" title="Copiar" type="button">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                </button>
+                <button class="modelo-action-btn" title="Fechar" type="button">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
         <div class="modelo-content" contenteditable="true">${texto}</div>
     `;
