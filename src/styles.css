@@ -267,18 +267,35 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 8px 10px;
+    padding: 6px 10px; /* Reduzido o padding vertical */
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    /* O background será definido dinamicamente via JavaScript */
+    background-color: inherit;
+    position: relative;
+}
+
+/* Adicionar overlay escuro na header */
+.modelo-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.1); /* Escurece levemente */
+    pointer-events: none;
 }
 
 .modelo-title {
-    font-size: 12px;
-    color: #333;
+    font-size: 11px; /* Fonte menor */
+    font-weight: bold;
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.8); /* Cor mais escura para melhor contraste */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: calc(100% - 100px); /* Espaço para os botões */
+    max-width: calc(100% - 100px);
+    z-index: 1; /* Garante que o texto fique acima do overlay */
 }
 
 .modelo-actions {

@@ -98,7 +98,8 @@ function getRandomPastelColor() {
 function createModeloBox(texto, nome) {
     const div = document.createElement('div');
     div.className = 'modelo-box';
-    div.style.backgroundColor = getRandomPastelColor();
+    const backgroundColor = getRandomPastelColor();
+    div.style.backgroundColor = backgroundColor;
     
     div.innerHTML = `
         <div class="modelo-header">
@@ -123,6 +124,12 @@ function createModeloBox(texto, nome) {
         </div>
         <div class="modelo-content" contenteditable="true">${texto}</div>
     `;
+
+    // Aplicar a mesma cor de fundo à header
+    const header = div.querySelector('.modelo-header');
+    if (header) {
+        header.style.backgroundColor = backgroundColor;
+    }
 
     const modeloContent = div.querySelector('.modelo-content');
     const sendToEditorBtn = div.querySelector('.modelo-action-btn[title="Enviar para o editor"]');
