@@ -1,7 +1,12 @@
+/* Remover a font-family do seletor global */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Aplicar a fonte apenas onde necessário */
+body:not(.ql-editor *) {
     font-family: 'Libre Baskerville', Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif;
 }
 
@@ -90,18 +95,17 @@ body {
 }
 
 .textarea-editor {
-    height: calc(50% - 16px); /* 50% menos a altura do resizer e margins */
+    flex: 1;
     min-height: 100px;
+    max-height: calc(50% - 16px);
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     background-color: white;
     position: relative; /* Garante que o conteúdo seja relativo a esta div */
-    min-height: 0; /* Permite que o flex funcione corretamente */
+    display: block; /* Mudado de flex para block */
+    overflow-y: auto !important; /* Força overflow vertical */
+    overflow-x: hidden; /* Prevenir scroll horizontal */
 }
 
 .textarea-editor:empty:before {
@@ -250,34 +254,70 @@ body {
 
 .modelo-box {
     position: relative;
-    padding: 20px;
     border-radius: 4px;
     font-family: 'Libre Baskerville', Baskerville, serif;
     font-size: 12px;
     line-height: 1.6;
-    margin: 0; /* Remove margens para usar o gap do flex container */
+    margin: 0 0 10px 0; /* Adicionado margin-bottom para separar múltiplos modelos */
+    overflow: hidden; /* Para garantir que a barra fique contida */
+    width: 100%;
 }
 
-.modelo-content {
-    text-align: justify;
-    outline: none; /* Remove a borda ao focar */
-    min-height: 1em; /* Garante altura mínima mesmo vazio */
+.modelo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Alinha verticalmente os itens */
+    padding: 3px 12px; /* Ajustado padding para melhor espaçamento */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: inherit;
+    position: relative;
+    /*min-height: 36px; /* Altura mínima para garantir espaço suficiente */
+}
+
+/* Adicionar overlay escuro na header */
+.modelo-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.1); /* Escurece levemente */
+    pointer-events: none;
+}
+
+.modelo-title {
+    /*font-size: 11px; /* Fonte menor */
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.8); /* Cor mais escura para melhor contraste */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 100px);
+    z-index: 1; /* Garante que o texto fique acima do overlay */
 }
 
 .modelo-actions {
-    position: absolute;
-    top: 5px;
-    right: 5px;
     display: flex;
     gap: 5px;
+    margin-left: auto; /* Empurra os botões para a direita */
+    position: relative; /* Mudado de absolute para relative */
+    z-index: 2; /* Mantém botões acima do overlay */
+}
+
+.modelo-content {
+    padding: 15px;
+    text-align: justify;
+    outline: none; /* Remove a borda ao focar */
+    min-height: 1em; /* Garante altura mínima mesmo vazio */
 }
 
 .modelo-action-btn {
     background: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 3px;
-    width: 24px;
-    height: 24px;
+    width: 15px;
+    height: 15px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -291,9 +331,17 @@ body {
 }
 
 .modelo-action-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 10px;
+    height: 10px;
     fill: currentColor;
+}
+
+.modelo-action-btn[title="Enviar para o editor"] {
+    color: #000; /* Mudando a cor para preto */
+}
+
+.modelo-action-btn[title="Enviar para o editor"]:hover {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .nome-modelo, .nome-texto {
@@ -405,4 +453,17 @@ body {
 
 .resizing * {
     cursor: row-resize !important;
+}
+
+/* Estilos específicos para o editor Quill */
+.ql-editor {
+    font-family: inherit;
+}
+
+.ql-editor strong,
+.ql-editor b,
+.ql-editor em,
+.ql-editor i,
+.ql-editor u {
+    font-family: inherit;
 }

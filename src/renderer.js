@@ -42,7 +42,10 @@ function exibirResultados(resultados) {
                     .join('');
 
                 return `
-                    <div class="resultado-modelo" data-id="${modelo.id}" data-modelo="${encodeURIComponent(modelo.modelo)}">
+                    <div class="resultado-modelo" 
+                         data-id="${modelo.id}" 
+                         data-nome="${encodeURIComponent(modelo.nome)}"
+                         data-modelo="${encodeURIComponent(modelo.modelo)}">
                         <div class="nome-modelo">${modelo.nome}</div>
                         <div class="tags-container">${tagsHtml}</div>
                     </div>
@@ -63,9 +66,10 @@ function exibirResultados(resultados) {
             item.classList.add('selected');
             
             const modelo = decodeURIComponent(item.dataset.modelo);
+            const nomeModelo = decodeURIComponent(item.dataset.nome);
             resultsContent.innerHTML = `
                 <div class="resultado-modelo-container">
-                    <div class="resultado-modelo-texto">${modelo}</div>
+                    <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">${modelo}</div>
                 </div>
                 <button class="btn-inserir">Inserir no modelo</button>
             `;
@@ -91,28 +95,44 @@ function getRandomPastelColor() {
     return `hsl(${hue}, 70%, 95%)`;
 }
 
-function createModeloBox(texto) {
+function createModeloBox(texto, nome) {
     const div = document.createElement('div');
     div.className = 'modelo-box';
-    div.style.backgroundColor = getRandomPastelColor();
+    const backgroundColor = getRandomPastelColor();
+    div.style.backgroundColor = backgroundColor;
     
     div.innerHTML = `
-        <div class="modelo-actions">
-            <button class="modelo-action-btn" title="Copiar" type="button">
-                <svg viewBox="0 0 24 24">
-                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                </svg>
-            </button>
-            <button class="modelo-action-btn" title="Fechar" type="button">
-                <svg viewBox="0 0 24 24">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-            </button>
+        <div class="modelo-header">
+            <div class="modelo-title">${nome}</div>
+            <div class="modelo-actions">
+                <button class="modelo-action-btn" title="Enviar para o editor" type="button">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/>
+                    </svg>
+                </button>
+                <button class="modelo-action-btn" title="Copiar" type="button">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                </button>
+                <button class="modelo-action-btn" title="Fechar" type="button">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
         <div class="modelo-content" contenteditable="true">${texto}</div>
     `;
 
+    // Aplicar a mesma cor de fundo à header
+    const header = div.querySelector('.modelo-header');
+    if (header) {
+        header.style.backgroundColor = backgroundColor;
+    }
+
     const modeloContent = div.querySelector('.modelo-content');
+    const sendToEditorBtn = div.querySelector('.modelo-action-btn[title="Enviar para o editor"]');
     const copyBtn = div.querySelector('.modelo-action-btn[title="Copiar"]');
     const closeBtn = div.querySelector('.modelo-action-btn[title="Fechar"]');
 
@@ -121,6 +141,57 @@ function createModeloBox(texto) {
         e.preventDefault();
         const text = e.clipboardData.getData('text/plain');
         document.execCommand('insertText', false, text);
+    });
+
+    sendToEditorBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const content = modeloContent.innerHTML;
+        
+        if (window.quill) {
+            try {
+                const editor = window.quill;
+                let textLength = 0;
+                
+                // Tentar obter o texto usando diferentes métodos
+                if (typeof editor.getText === 'function') {
+                    textLength = editor.getText().length;
+                } else if (editor.root && typeof editor.root.innerText === 'string') {
+                    textLength = editor.root.innerText.length;
+                } else {
+                    console.warn('Não foi possível obter o comprimento do texto do editor.');
+                }
+                
+                // Adicionar quebras de linha se necessário
+                if (textLength > 1) {
+                    if (typeof editor.insertText === 'function') {
+                        editor.insertText(textLength - 1, '\n\n');
+                    } else {
+                        editor.root.innerHTML += '<br><br>';
+                    }
+                }
+                
+                // Inserir o conteúdo HTML
+                if (typeof editor.clipboard !== 'undefined' && typeof editor.clipboard.dangerouslyPasteHTML === 'function') {
+                    editor.clipboard.dangerouslyPasteHTML(textLength, content);
+                } else {
+                    editor.root.innerHTML += content;
+                }
+                
+                // Rolar para o final do editor
+                const editorElement = document.querySelector('.ql-editor');
+                if (editorElement) {
+                    setTimeout(() => {
+                        editorElement.scrollTop = editorElement.scrollHeight;
+                    }, 100);
+                }
+                
+                div.remove();
+            } catch (error) {
+                console.error('Erro ao inserir conteúdo no editor:', error);
+            }
+        } else {
+            console.error('Editor Quill não encontrado');
+        }
     });
 
     copyBtn.addEventListener('mousedown', (e) => {
@@ -139,18 +210,12 @@ function createModeloBox(texto) {
     return div;
 }
 
-function inserirModelo(texto) {
+function inserirModelo(texto, nome) {
     const editor = document.querySelector('.textarea-editor');
-    const modeloBox = createModeloBox(texto);
-    
-    // Apenas adiciona a caixa ao final do editor, sem rolar a página
+    const modeloBox = createModeloBox(texto, nome);
     editor.appendChild(modeloBox);
-    
-    // Removida a linha que fazia o scroll automático:
-    // modeloBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Atualizar o evento do botão inserir
 function atualizarBotaoInserir() {
     const btnInserir = resultsContent.querySelector('.btn-inserir');
     if (btnInserir) {
@@ -158,7 +223,8 @@ function atualizarBotaoInserir() {
             const modeloSelecionado = document.querySelector('.resultado-modelo.selected');
             if (modeloSelecionado) {
                 const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
-                inserirModelo(modelo);
+                const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
+                inserirModelo(modelo, nome);
             }
         });
     }
