@@ -37,7 +37,7 @@ body {
 .editor-panel {
     display: grid;
     grid-template-rows: min-content auto 8px 1fr;
-    gap: 0;
+    gap: 5px; /* Adiciona espaçamento uniforme entre todos os elementos do grid */
     width: 40%;
     min-width: 400px;
     height: 100%;
@@ -82,13 +82,13 @@ body {
 #editor-resizer {
     grid-row: 3;
     width: 100%;
-    height: 8px;
+    height: 4px; /* Reduzir altura própria */
+    margin: 2px 0; /* Adicionar margem pequena */
     background: #ddd;
     cursor: row-resize;
     border-radius: 4px;
     user-select: none;
     touch-action: none;
-    margin: 0;
 }
 
 .textarea-editor {
@@ -358,7 +358,7 @@ body {
     font-family: 'Libre Baskerville', Baskerville, serif;
     font-size: 12px;
     padding: 10px;
-    margin-bottom: 10px;
+    /*margin-bottom: 10px;*/
     line-height: 1.6;
     text-align: justify;
 }
@@ -369,7 +369,7 @@ body {
     padding: 10px;
     border: 1px solid #eee;
     border-radius: 4px;
-    margin-bottom: 10px;
+    /*margin-bottom: 10px;*/
 }
 
 .resultado-texto {
