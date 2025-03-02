@@ -5,7 +5,10 @@ const path = require('path');
 module.exports = {
   packagerConfig: {
     asar: {
-      unpack: "**/recursos/database.sqlite"
+      unpack: [
+        "**/recursos/database.sqlite",
+        "**/node_modules/quill/**/*"  // Garantir que o Quill seja descompactado
+      ]
     },
     extraResource: [
       './recursos/database.sqlite'
