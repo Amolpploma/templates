@@ -77,6 +77,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 4px;
     overflow: auto;
+    flex-shrink: 0;
 }
 
 #editor-resizer {
@@ -88,6 +89,7 @@ body {
     margin: 4px 0;
     border-radius: 4px;
     user-select: none;
+    flex-shrink: 0;
 }
 
 #editor-resizer:hover {
@@ -106,6 +108,7 @@ body {
     display: block; /* Mudado de flex para block */
     overflow-y: auto !important; /* Força overflow vertical */
     overflow-x: hidden; /* Prevenir scroll horizontal */
+    flex-shrink: 0;
 }
 
 .textarea-editor:empty:before {
@@ -156,7 +159,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    width: calc(100% - 20px); /* 100% menos o padding dos lados */
+    width: calc(100% menos o padding dos lados);
     margin: 10px;
     padding: 10px;
     background-color: #4CAF50;
@@ -466,4 +469,9 @@ body {
 .ql-editor i,
 .ql-editor u {
     font-family: inherit;
+}
+
+.ql-toolbar.ql-snow {
+    flex-shrink: 0;
+    margin: 0;
 }
