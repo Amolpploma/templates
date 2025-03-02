@@ -1,6 +1,5 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     try {
-        // Configuração do Quill com fontes explícitas
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             modules: {
@@ -12,17 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     [{ 'align': [] }],
                     ['clean']
                 ]
-            },
-            formats: ['bold', 'italic', 'underline', 'indent', 'size', 'font', 'align'],
-            defaultStyle: {
-                'font-family': 'inherit'
             }
-        });
-
-        // Sobrescrever o comportamento padrão dos formatos
-        const formats = ['bold', 'italic', 'underline'];
-        formats.forEach(format => {
-            quill.format(format, true, 'user');
         });
 
         window.quill = quill;
