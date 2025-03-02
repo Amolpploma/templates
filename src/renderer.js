@@ -95,9 +95,10 @@ function getRandomPastelColor() {
     return `hsl(${hue}, 70%, 95%)`;
 }
 
-function createModeloBox(texto, nome) {
+function createModeloBox(texto, nome, modeloId = '') {
     const div = document.createElement('div');
     div.className = 'modelo-box';
+    div.setAttribute('data-modelo_id', modeloId);
     const backgroundColor = getRandomPastelColor();
     div.style.backgroundColor = backgroundColor;
     
@@ -210,11 +211,7 @@ function createModeloBox(texto, nome) {
     return div;
 }
 
-function inserirModelo(texto, nome) {
-    const editor = document.querySelector('.textarea-editor');
-    const modeloBox = createModeloBox(texto, nome);
-    editor.appendChild(modeloBox);
-}
+// Remover a função inserirModelo daqui pois ela agora está em shared-functions.js
 
 function atualizarBotaoInserir() {
     const btnInserir = resultsContent.querySelector('.btn-inserir');
@@ -224,7 +221,8 @@ function atualizarBotaoInserir() {
             if (modeloSelecionado) {
                 const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
                 const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
-                inserirModelo(modelo, nome);
+                const modeloId = modeloSelecionado.dataset.id;
+                window.inserirModelo(modelo, nome, modeloId); // Usar função global
             }
         });
     }
