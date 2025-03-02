@@ -46,25 +46,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const availableHeight = getUsablePanelHeight();
         
         if (editorHeight === null) {
+            // Divisão inicial igual
             editorHeight = Math.floor(availableHeight / 2);
+        } else {
+            // Durante o drag, garantir limites mínimo e máximo
+            const minHeight = 50;
+            const maxHeight = availableHeight - minHeight;
+            editorHeight = Math.max(minHeight, Math.min(editorHeight, maxHeight));
         }
 
-        // Limitar apenas altura máxima do editor
-        editorHeight = Math.min(editorHeight, availableHeight - 100);
-        
         // Calcular altura da textarea
         const textareaHeight = availableHeight - editorHeight;
 
         // Aplicar alturas sem definir minHeight
         editorContainer.style.height = `${editorHeight}px`;
-        editorContainer.style.flexShrink = '0';
-        
         textareaEditor.style.height = `${textareaHeight}px`;
-        textareaEditor.style.flexShrink = '0';
         
-        // Remover minHeight se existir
-        textareaEditor.style.removeProperty('min-height');
+        // Remover propriedades que possam interferir
         editorContainer.style.removeProperty('min-height');
+        textareaEditor.style.removeProperty('min-height');
         
         console.log('Alturas ajustadas:', {
             available: availableHeight,
@@ -77,21 +77,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let startY;
     let startEditorHeight;
 
-    resizer.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startY = e.clientY;
-        startEditorHeight = editorContainer.getBoundingClientRect().height;
-        document.body.classList.add('resizing');
-        
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    });
-
     function onMouseMove(e) {
         if (!isDragging) return;
-        const dy = e.clientY - startY;
-        const newEditorHeight = startEditorHeight + dy;
-        adjustHeights(newEditorHeight);
+        
+        const editorRect = editorContainer.getBoundingClientRect();
+        const panelRect = panel.getBoundingClientRect();
+        const availableHeight = panelRect.height - toolbar.offsetHeight - resizer.offsetHeight;
+        
+        // Calcular nova altura baseada na posição do mouse relativa ao painel
+        const mouseY = e.clientY - panelRect.top - toolbar.offsetHeight;
+        const newEditorHeight = Math.max(50, Math.min(mouseY, availableHeight - 50));
+        
+        // Aplicar as alturas diretamente
+        editorContainer.style.height = `${newEditorHeight}px`;
+        textareaEditor.style.height = `${availableHeight - newEditorHeight}px`;
+        
+        console.log('Resize:', {
+            mouseY,
+            newEditorHeight,
+            availableHeight
+        });
     }
 
     function onMouseUp() {
@@ -100,6 +105,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     }
+
+    resizer.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        startY = e.clientY;
+        startEditorHeight = editorContainer.offsetHeight;
+
+        document.body.classList.add('resizing');
+
+        // Adicionar os listeners no documento
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
 
     // Garantir que o ajuste inicial aconteça após todos os elementos estarem renderizados
     window.requestAnimationFrame(() => {
