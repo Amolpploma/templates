@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         panel.style.height = '100%';
         panel.style.overflow = 'hidden';
 
-        // Remover margens e paddings que possam interferir
+        // Remover margens que possam interferir
         toolbar.style.margin = '0';
         resizer.style.margin = '0';
         editorContainer.style.margin = '0';
@@ -46,31 +46,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const availableHeight = getUsablePanelHeight();
         
         if (editorHeight === null) {
-            // Divisão inicial exata
             editorHeight = Math.floor(availableHeight / 2);
         }
 
-        // Limites de altura
-        const minHeight = 50;
-        editorHeight = Math.max(minHeight, Math.min(editorHeight, availableHeight - minHeight));
+        // Limitar apenas altura máxima do editor
+        editorHeight = Math.min(editorHeight, availableHeight - 100);
         
-        // Calcular altura da textarea garantindo que soma seja exata
+        // Calcular altura da textarea
         const textareaHeight = availableHeight - editorHeight;
 
-        // Aplicar alturas e garantir que elementos ocupem espaço corretamente
+        // Aplicar alturas sem definir minHeight
         editorContainer.style.height = `${editorHeight}px`;
-        editorContainer.style.minHeight = `${editorHeight}px`;
         editorContainer.style.flexShrink = '0';
         
         textareaEditor.style.height = `${textareaHeight}px`;
-        textareaEditor.style.minHeight = `${textareaHeight}px`;
         textareaEditor.style.flexShrink = '0';
         
-        console.log('Alturas definidas:', {
+        // Remover minHeight se existir
+        textareaEditor.style.removeProperty('min-height');
+        editorContainer.style.removeProperty('min-height');
+        
+        console.log('Alturas ajustadas:', {
             available: availableHeight,
             editor: editorHeight,
-            textarea: textareaHeight,
-            total: editorHeight + textareaHeight
+            textarea: textareaHeight
         });
     }
 
