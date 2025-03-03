@@ -71,7 +71,7 @@ function exibirResultados(resultados) {
                 <div class="resultado-modelo-container">
                     <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">${modelo}</div>
                 </div>
-                <button class="btn-inserir">Inserir no modelo</button>
+                <button class="btn-inserir">Inserir modelo</button>
             `;
 
             atualizarBotaoInserir();

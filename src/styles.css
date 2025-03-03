@@ -52,14 +52,20 @@ body:not(.ql-editor *) {
     --input-border: #cccccc;
     --input-placeholder: #999999;
     --panel-bg: var(--bg-primary);
+    --scroll-thumb: #c1c1c1;
+    --scroll-thumb-hover: #a8a8a8;
+    --resizer-color: #ddd;
+    --resizer-hover: #999;
+    --btn-bg: #c1c1c1;
+    --btn-hover: #a8a8a8;
 }
 
 [data-theme="dark"] {
     --bg-primary: #1e1e1e;
     --bg-secondary: #2d2d2d;
-    --text-primary: #ffffff;
+    --text-primary: #cccccc;  /* Mudado de #ffffff para #cccccc */
     --text-secondary: #cccccc;
-    --border-color: #404040;
+    --border-color: #666666;  /* Ajustado para um tom mais claro */
     --titlebar-bg: #000000;
     --titlebar-text: #858585;
     --titlebar-active: #ffffff;
@@ -94,6 +100,12 @@ body:not(.ql-editor *) {
     --input-border: #404040;
     --input-placeholder: #666666;
     --panel-bg: #1e1e1e;
+    --scroll-thumb: #666666;
+    --scroll-thumb-hover: #808080;
+    --resizer-color: #666666;
+    --resizer-hover: #808080;
+    --btn-bg: #666666;
+    --btn-hover: #808080;
 }
 
 body {
@@ -151,7 +163,7 @@ body {
 #resizer-left, #resizer-right {
     width: 3px;
     height: 100%;
-    background-color: #ddd;
+    background-color: var(--resizer-color);
     cursor: col-resize;
     flex-shrink: 0;
     transition: all 0.2s ease;
@@ -162,7 +174,7 @@ body {
 #resizer-left.dragging,
 #resizer-right.dragging {
     width: 3px;
-    background-color: #999;
+    background-color: var(--resizer-hover);
 }
 
 #editor-container {
@@ -178,11 +190,16 @@ body {
     width: 100%;
     height: 4px; /* Reduzir altura própria */
     margin: 2px 0; /* Adicionar margem pequena */
-    background: #ddd;
+    background: var(--resizer-color);
     cursor: row-resize;
     border-radius: 4px;
     user-select: none;
     touch-action: none;
+}
+
+#editor-resizer:hover,
+#editor-resizer.dragging {
+    background: var(--resizer-hover);
 }
 
 .textarea-editor {
@@ -214,6 +231,7 @@ body {
     color: var(--input-text);
     border-radius: 4px;
     transition: all 0.2s ease;
+    font-family: inherit;
 }
 
 .search-input::placeholder, 
@@ -266,17 +284,18 @@ body {
     width: calc(100% menos o padding dos lados);
     margin: 10px;
     padding: 10px;
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1); /* Sombra sutil para separar do conteúdo */
+    font-family: inherit;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil para separar do conteúdo */
 }
 
 .btn-inserir:hover {
-    background-color: #45a049;
+    background-color: var(--btn-hover);
 }
 
 .resultado-modelo, .resultado-checklist {
@@ -524,12 +543,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
+    background: var(--scroll-thumb);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: var(--scroll-thumb-hover);
 }
 
 /* Ajustes específicos para containers com rolagem */
@@ -538,7 +557,7 @@ body {
 .resultado-modelo-container,
 .resultado-texto-container {
     scrollbar-width: thin; /* Para Firefox */
-    scrollbar-color: #c1c1c1 transparent; /* Para Firefox */
+    scrollbar-color: var(--scroll-thumb) transparent; /* Para Firefox */
 }
 
 #editor-container {
@@ -552,7 +571,7 @@ body {
 
 #editor-resizer {
     height: 3px; /* Aumentado para melhor área de clique */
-    background: #ddd;
+    background: var(--resizer-color);
     cursor: row-resize;
     margin: 4px 0;
     border-radius: 4px;
@@ -565,7 +584,7 @@ body {
 
 #editor-resizer:hover,
 #editor-resizer.dragging {
-    background: #999;
+    background: var(--resizer-hover);
 }
 
 .textarea-editor {
@@ -594,14 +613,38 @@ body {
 /* Estilos específicos para o editor Quill */
 .ql-editor {
     font-family: inherit;
+    color: var(--text-primary);  /* Adicionar cor do tema */
 }
 
 .ql-editor strong,
 .ql-editor b,
 .ql-editor em,
 .ql-editor i,
-.ql-editor u {
+.ql-editor u,
+.ql-editor p,
+.ql-editor span {
     font-family: inherit;
+    color: var(--text-primary);  /* Adicionar cor do tema */
+}
+
+/* Ajustar fundo e bordas do container Quill */
+.ql-container {
+    background-color: var(--panel-bg);
+    border-color: var(--border-color) !important;
+}
+
+.ql-toolbar {
+    background-color: var(--panel-bg);
+    border-color: var(--border-color) !important;
+}
+
+/* Ajustar cor dos ícones da toolbar */
+.ql-toolbar .ql-stroke {
+    stroke: var(--text-primary);
+}
+
+.ql-toolbar .ql-fill {
+    fill: var(--text-primary);
 }
 
 /* Estilos da nova barra */
