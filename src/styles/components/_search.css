@@ -20,7 +20,9 @@
 #search-checklist-results {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 65px); /* Ajustado para o novo tamanho total de input + refinamentos */
+    height: calc(100% - 62px); /* Ajustado: input (36px) + refinamentos (26px) */
+    margin-top: 0; /* Remover margem superior */
+    flex-shrink: 0; /* Impedir encolhimento */
 }
 
 /* Remover regras redundantes que já estão em _modelos.css e _checklists.css */
@@ -63,31 +65,39 @@
 
 .search-refinements {
     display: flex;
-    gap: 6px; /* Reduzido de 8px para 6px */
-    margin: 0 2px 6px 2px; /* Reduzido margin-bottom de 8px para 6px */
-    padding: 0;
-    min-height: 20px; /* Reduzido de 24px para 20px */
-    border-bottom: 1px solid var(--border-color); /* Nova borda inferior */
-    padding-bottom: 12px; /* Espaçamento para a borda */
+    align-items: center; /* Centralizar verticalmente */
+    gap: 6px;
+    padding: 6px 2px;
+    border-bottom: 1px solid var(--border-color);
+    height: 26px; /* Altura fixa menor */
+    flex: 0 0 26px; /* Forçar altura fixa sem compressão */
+    box-sizing: border-box;
 }
 
 .search-refinement-item {
-    display: flex;
+    display: inline-flex; /* Mudado para inline-flex */
     align-items: center;
-    gap: 2px; /* Reduzido de 3px para 2px */
+    gap: 2px;
+    height: 14px; /* Altura fixa para o item */
+    flex-shrink: 0; /* Impedir encolhimento */
     cursor: pointer;
     user-select: none;
 }
 
 .search-refinement-item input[type="checkbox"] {
+    margin: 0; /* Remover margens do checkbox */
     cursor: pointer;
-    width: 12px; /* Reduzido de 14px para 12px */
-    height: 12px; /* Reduzido de 14px para 12px */
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px; /* Forçar tamanho fixo */
 }
 
 .search-refinement-item label {
-    color: var(--text-primary);
     font-size: 11px;
+    line-height: 14px; /* Alinhar com altura do item */
+    display: inline-block;
+    vertical-align: middle;
+    color: var(--text-primary);
     cursor: pointer;
     line-height: 1;
 }

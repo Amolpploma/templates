@@ -1,20 +1,22 @@
 .search-container {
     position: relative;
     width: 100%;
-    margin-bottom: 6px; /* Reduzido de 10px para 6px */
+    height: 36px; /* Altura fixa para o container */
+    margin-bottom: 0; /* Removido margin-bottom */
 }
 
 .search-input,
 .search-checklist-input {
     width: 100%;
-    padding: 8px 30px 8px 8px; /* Aumentar padding direito para o botão */
-    margin-bottom: 6px;
+    height: 36px; /* Altura fixa para o input */
+    padding: 8px 30px 8px 8px;
     border: 1px solid var(--input-border);
     background-color: var(--input-bg);
     color: var(--input-text);
     border-radius: 4px;
     transition: all 0.2s ease;
     font-family: inherit;
+    margin: 0; /* Removido margin */
 }
 
 .search-input::placeholder,
@@ -32,8 +34,8 @@
 .clear-input {
     position: absolute;
     right: 8px;
-    top: 8px; /* Ajustado para alinhar com o input */
-    transform: none; /* Removido transform que estava causando desalinhamento */
+    top: 50%; /* Centralizar verticalmente */
+    transform: translateY(-50%); /* Centralizar verticalmente */
     width: 16px;
     height: 16px;
     border: none;
