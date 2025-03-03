@@ -47,6 +47,10 @@ const createWindow = () => {
     height: 600,
     minWidth: 960,  // Tamanho mínimo
     minHeight: 600, // Tamanho mínimo
+    frame: false, // Remove a barra padrão
+    titleBarStyle: 'hidden',   // Esconde a barra de título
+    autoHideMenuBar: true,     // Esconde a barra de menu
+    center: true,              // Centraliza a janela
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -56,6 +60,17 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js')  // Caminho atualizado para a raiz
     }
   })
+
+  // Adicionar handlers para controles da janela
+  ipcMain.on('minimize-window', () => mainWindow.minimize());
+  ipcMain.on('maximize-window', () => {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  });
+  ipcMain.on('close-window', () => mainWindow.close());
 
   // Ajustando o caminho para o index.html no diretório src
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'))
