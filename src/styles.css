@@ -18,10 +18,10 @@ body:not(.ql-editor *) {
     --text-primary: #000000;
     --text-secondary: #666666;
     --border-color: #cccccc;
-    --titlebar-bg: #1e1e1e;
-    --titlebar-text: #858585;
-    --titlebar-active: #ffffff;
-    --titlebar-hover: #2d2d2d;
+    --titlebar-bg: #f0f0f0;        /* Alterado para cinza claro */
+    --titlebar-text: #333333;      /* Alterado para texto escuro */
+    --titlebar-active: #000000;    /* Alterado para preto */
+    --titlebar-hover: #e0e0e0;     /* Alterado para cinza mais claro */
     --result-bg-odd: #f8f9fa;
     --result-bg-even: #ffffff;
     --result-hover-bg: #e9ecef;
@@ -58,6 +58,8 @@ body:not(.ql-editor *) {
     --resizer-hover: #999;
     --btn-bg: #c1c1c1;
     --btn-hover: #a8a8a8;
+    --tab-active-bg: #e0e0e0;      /* Nova variável para fundo da aba ativa */
+    --tab-active-border: #007acc;  /* Nova variável para borda da aba ativa */
 }
 
 [data-theme="dark"] {
@@ -66,10 +68,10 @@ body:not(.ql-editor *) {
     --text-primary: #cccccc;  /* Mudado de #ffffff para #cccccc */
     --text-secondary: #cccccc;
     --border-color: #666666;  /* Ajustado para um tom mais claro */
-    --titlebar-bg: #000000;
-    --titlebar-text: #858585;
-    --titlebar-active: #ffffff;
-    --titlebar-hover: #404040;
+    --titlebar-bg: #1e1e1e;        /* Mantido preto para tema escuro */
+    --titlebar-text: #858585;      /* Mantido cinza para tema escuro */
+    --titlebar-active: #ffffff;    /* Mantido branco para tema escuro */
+    --titlebar-hover: #2d2d2d;     /* Mantido escuro para tema escuro */
     --result-bg-odd: #2d2d2d;
     --result-bg-even: #1e1e1e;
     --result-hover-bg: #3d3d3d;
@@ -106,6 +108,8 @@ body:not(.ql-editor *) {
     --resizer-hover: #808080;
     --btn-bg: #666666;
     --btn-hover: #808080;
+    --tab-active-bg: #2d2d2d;      /* Fundo da aba ativa no tema escuro */
+    --tab-active-border: #007acc;  /* Borda da aba ativa no tema escuro */
 }
 
 body {
@@ -671,20 +675,20 @@ body {
     height: 100%;
     display: flex;
     align-items: center;
-    color: #858585;
+    color: var(--titlebar-text);
     text-decoration: none;
     font-size: 13px;
     -webkit-app-region: no-drag;
 }
 
 .tab:hover {
-    background-color: #2d2d2d;
+    background-color: var(--titlebar-hover);
 }
 
 .tab.active {
-    background-color: #2d2d2d;
-    color: #ffffff;
-    border-bottom: 2px solid #007acc;
+    background-color: var(--tab-active-bg);
+    color: var(--titlebar-active);
+    border-bottom: 2px solid var(--tab-active-border);
 }
 
 .window-controls {
@@ -698,13 +702,13 @@ body {
     height: 100%;
     border: none;
     background: transparent;
-    color: #858585;
+    color: var(--titlebar-text);
     font-size: 14px;
     cursor: pointer;
 }
 
 .window-controls button:hover {
-    background-color: #2d2d2d;
+    background-color: var(--titlebar-hover);
 }
 
 .close-button:hover {
