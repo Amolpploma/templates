@@ -1,0 +1,24 @@
+.search-input,
+.search-checklist-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.search-input::placeholder,
+.search-checklist-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.search-input:focus,
+.search-checklist-input:focus {
+    outline: none;
+    border-color: var(--result-selected-border);
+    box-shadow: 0 0 0 1px var(--result-selected-border);
+}

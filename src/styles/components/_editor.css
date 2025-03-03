@@ -1,0 +1,35 @@
+#editor-container {
+    grid-row: 2;
+    height: 50%;
+    min-height: 50px;
+    border: 0;
+    border-radius: 4px;
+    overflow: auto;
+}
+
+.textarea-editor {
+    grid-row: 4;
+    height: calc(50% - 16px);
+    min-height: 50px;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: var(--panel-bg);
+    color: var(--text-primary);
+    border-color: var(--textarea-border);
+}
+
+/* Quill Editor Styles */
+.ql-container, .ql-toolbar {
+    background-color: var(--panel-bg);
+    border-color: var(--border-color) !important;
+}
+
+.ql-toolbar .ql-stroke {
+    stroke: var(--text-primary);
+}
+
+.ql-toolbar .ql-fill {
+    fill: var(--text-primary);
+}
+
+/* Remover duplicatas de estilos de fonte que já estão em _typography.css */

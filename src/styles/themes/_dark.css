@@ -1,0 +1,41 @@
+[data-theme="dark"] {
+    /* Cores base */
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #cccccc;
+    --text-secondary: #cccccc;
+    --border-color: #666666;
+
+    /* Barra de título */
+    --titlebar-bg: #1e1e1e;
+    --titlebar-text: #858585;
+    --titlebar-active: #ffffff;
+    --titlebar-hover: #404040;
+    --tab-active-bg: #2d2d2d;
+    --tab-active-border: #007acc;
+
+    /* Resultados */
+    --result-bg-odd: #2d2d2d;
+    --result-bg-even: #1e1e1e;
+    --result-hover-bg: #3d3d3d;
+    --result-selected-bg: #004a77;
+    --result-selected-border: #0078d4;
+
+    /* Checklist */
+    --checklist-bg: #2d2d2d;
+    --checklist-hover: #3d3d3d;
+    --checklist-active-bg: #1b4d1b;
+    --checklist-active-color: #4caf50;
+    --checklist-inactive-bg: #4a1515;
+    --checklist-inactive-color: #ff5252;
+
+    /* Modelo Box */
+    --modelo-box-light-1: rgba(25, 118, 210, 0.15);
+    --modelo-box-light-2: rgba(56, 142, 60, 0.15);
+    --modelo-box-light-3: rgba(245, 124, 0, 0.15);
+    --modelo-box-light-4: rgba(123, 31, 162, 0.15);
+    --modelo-header-bg: rgba(255, 255, 255, 0.1);
+    --modelo-title-color: rgba(255, 255, 255, 0.8);
+    --modelo-btn-bg: rgba(0, 0, 0, 0.3);
+    --modelo-btn-hover: rgba(0, 0, 0, 0.5);
+}

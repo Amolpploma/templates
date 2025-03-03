@@ -1,0 +1,38 @@
+/* Manter a ordem de importação para evitar conflitos */
+@import 'base/_reset.css';        /* Reset primeiro */
+@import 'base/_variables.css';    /* Variáveis depois */
+@import 'base/_typography.css';   /* Tipografia depois */
+
+@import 'themes/_light.css';      /* Temas depois */
+@import 'themes/_dark.css';
+
+@import 'layout/_titlebar.css';   /* Layout depois */
+@import 'layout/_panels.css';
+@import 'layout/_resizers.css';
+
+@import 'components/_buttons.css'; /* Componentes por último */
+@import 'components/_inputs.css';
+@import 'components/_scrollbars.css';
+@import 'components/_tags.css';     /* Adicionar novo componente */
+@import 'components/_search.css';
+@import 'components/_editor.css';
+@import 'components/_modelos.css';
+@import 'components/_checklists.css';
+
+/* Apenas estilos globais essenciais */
+body {
+    margin: 0;
+    padding-top: 32px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}

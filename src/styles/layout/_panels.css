@@ -1,0 +1,23 @@
+.left-panel,
+.right-panel {
+    width: 30%;
+    min-width: 200px;
+    height: 100%;
+    padding: 10px;
+    background-color: var(--panel-bg);
+}
+
+.editor-panel {
+    width: 40%;
+    min-width: 400px;
+    height: 100%;
+    padding: 10px;
+    background-color: var(--panel-bg);
+    display: grid;
+    grid-template-rows: min-content auto 8px 1fr;
+    gap: 5px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Remover duplicata de .search-results-list e .search-results-content que já estão em _search.css */
