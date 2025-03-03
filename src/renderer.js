@@ -259,3 +259,36 @@ async function salvarDocumento() {
         console.error('Erro ao salvar:', err);
     }
 }
+
+// Controle dos checkboxes de refinamento
+function setupSearchRefinements(parentSelector, defaultCheckboxId) {
+    const checkboxes = document.querySelectorAll(`${parentSelector} .search-refinements input[type="checkbox"]`);
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            if (!e.target.checked) {
+                // Verificar se há outros checkboxes marcados no mesmo grupo
+                const anyChecked = Array.from(checkboxes)
+                    .some(cb => cb !== e.target && cb.checked);
+                
+                if (!anyChecked) {
+                    e.preventDefault();
+                    e.target.checked = true;
+                    return false;
+                }
+            }
+        });
+    });
+
+    // Garantir que o checkbox padrão esteja marcado na inicialização
+    const defaultCheckbox = document.getElementById(defaultCheckboxId);
+    if (defaultCheckbox) {
+        defaultCheckbox.checked = true;
+    }
+}
+
+// Inicializar os refinamentos de pesquisa com os seletores corretos
+document.addEventListener('DOMContentLoaded', () => {
+    setupSearchRefinements('.left-panel', 'checklist-nome');
+    setupSearchRefinements('.right-panel', 'modelo-nome');
+});
