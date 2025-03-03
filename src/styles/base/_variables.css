@@ -46,6 +46,10 @@
     /* Resizers & Borders */
     --resizer-color: #cccccc;
     --resizer-hover: #999999;
+
+    /* Buttons */
+    --btn-bg: #c1c1c1;
+    --btn-hover: #a8a8a8;
 }
 
 [data-theme="dark"] {
@@ -70,4 +74,8 @@
     --border-color: #404040;
     --resizer-color: #404040;
     --resizer-hover: #666666;
+
+    /* Buttons */
+    --btn-bg: #404040;
+    --btn-hover: #666666;
 }
