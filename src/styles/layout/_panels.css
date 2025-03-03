@@ -5,6 +5,9 @@
     height: 100%;
     padding: 10px;
     background-color: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Alterado de auto para hidden */
 }
 
 .editor-panel {
