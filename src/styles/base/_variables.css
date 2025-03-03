@@ -38,6 +38,14 @@
     --tag-bg: #e8e8e8;
     --tag-text: #505050;
     --tag-border: #d0d0d0;
+
+    /* Modelo Box Buttons */
+    --modelo-btn-bg: rgba(255, 255, 255, 0.2);
+    --modelo-btn-hover: rgba(255, 255, 255, 0.3);
+
+    /* Resizers & Borders */
+    --resizer-color: #cccccc;
+    --resizer-hover: #999999;
 }
 
 [data-theme="dark"] {
@@ -53,4 +61,13 @@
     --input-text: #cccccc;
     --input-border: #404040;
     --input-placeholder: #666666;
+
+    /* Modelo Box Buttons */
+    --modelo-btn-bg: rgba(0, 0, 0, 0.2);
+    --modelo-btn-hover: rgba(0, 0, 0, 0.3);
+
+    /* Resizers & Borders */
+    --border-color: #404040;
+    --resizer-color: #404040;
+    --resizer-hover: #666666;
 }
