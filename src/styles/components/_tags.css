@@ -1,0 +1,19 @@
+.tag {
+    font-size: 10px;
+    color: var(--tag-text);
+    background-color: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    border-radius: 12px;
+    padding: 2px 8px;
+    display: inline-block;
+    line-height: 1.2;
+    margin: 2px;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+    padding: 2px 0;
+}

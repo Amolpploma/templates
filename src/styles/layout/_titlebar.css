@@ -1,0 +1,75 @@
+.custom-titlebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background-color: var(--titlebar-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    -webkit-app-region: drag;
+    user-select: none;
+    z-index: 9999;
+}
+
+.titlebar-tabs {
+    display: flex;
+    height: 100%;
+}
+
+.tab {
+    padding: 0 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: var(--titlebar-text);
+    text-decoration: none;
+    font-size: 13px;
+    -webkit-app-region: no-drag;
+}
+
+.tab:hover {
+    background-color: var(--titlebar-hover);
+}
+
+.tab.active {
+    background-color: var(--tab-active-bg);
+    color: var(--titlebar-active);
+    border-bottom: 2px solid var(--tab-active-border);
+}
+
+.window-controls {
+    display: flex;
+    height: 100%;
+    -webkit-app-region: no-drag;
+}
+
+.window-controls button {
+    width: 46px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--titlebar-text);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: no-drag;
+    transition: background-color 0.2s;
+}
+
+.window-controls button:hover {
+    background-color: var(--titlebar-hover);
+}
+
+.close-button:hover {
+    background-color: #e81123 !important;
+    color: white !important;
+}
+
+/* Ajustes de fonte e alinhamento */
+.minimize-button { font-size: 20px; line-height: 1; padding-bottom: 4px; }
+.maximize-button { font-size: 14px; line-height: 1; }
+.close-button { font-size: 18px; line-height: 1; }

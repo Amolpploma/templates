@@ -1,0 +1,56 @@
+.search-results-list {
+    flex: 0 0 auto;
+    max-height: 40%;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: var(--panel-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.search-results-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--panel-bg);
+}
+
+#search-results, 
+#search-checklist-results {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 45px);
+}
+
+/* Remover regras redundantes que já estão em _modelos.css e _checklists.css */
+
+/* Estilos para resultados e tags */
+.resultado-modelo,
+.resultado-checklist {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--result-text);
+    background-color: var(--result-bg-even); /* Adicionar cor de fundo explícita */
+}
+
+/* Remover estilos duplicados de tag que agora estão em _tags.css */
+
+/* Hover e estados selecionados */
+.resultado-modelo:hover,
+.resultado-checklist:hover {
+    background-color: var(--result-hover-bg);
+    transform: translateX(5px);
+}
+
+.resultado-modelo.selected,
+.resultado-checklist.selected {
+    background-color: var(--result-selected-bg);
+    border-left: 4px solid var(--result-selected-border);
+}

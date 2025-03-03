@@ -1,0 +1,56 @@
+:root {
+    /* Cores base */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --border-color: #cccccc;
+
+    /* Interface */
+    --input-bg: #ffffff;
+    --input-text: #000000;
+    --input-border: #cccccc;
+    --input-placeholder: #999999;
+    --panel-bg: var(--bg-primary);
+    --scroll-thumb: #c1c1c1;
+    --scroll-thumb-hover: #a8a8a8;
+    --resizer-color: #ddd;
+    --resizer-hover: #999;
+    --btn-bg: #c1c1c1;
+    --btn-hover: #a8a8a8;
+
+    /* Barra de título */
+    --titlebar-bg: #f0f0f0;
+    --titlebar-text: #333333;
+    --titlebar-active: #000000;
+    --titlebar-hover: #e0e0e0;
+    --tab-active-bg: #e0e0e0;
+    --tab-active-border: #007acc;
+
+    /* Resultados */
+    --result-bg-odd: #f8f9fa;
+    --result-bg-even: #ffffff;
+    --result-hover-bg: #e9ecef;
+    --result-selected-bg: #e3f2fd;
+    --result-selected-border: #2196f3;
+
+    /* Tags */
+    --tag-bg: #e8e8e8;
+    --tag-text: #505050;
+    --tag-border: #d0d0d0;
+}
+
+[data-theme="dark"] {
+    /* ...existing code... */
+    
+    /* Tags */
+    --tag-bg: #404040;
+    --tag-text: #cccccc;
+    --tag-border: #505050;
+
+    /* Inputs */
+    --input-bg: #2d2d2d;
+    --input-text: #cccccc;
+    --input-border: #404040;
+    --input-placeholder: #666666;
+}

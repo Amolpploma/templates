@@ -1,0 +1,37 @@
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scroll-thumb-hover);
+}
+
+/* Firefox scrollbar */
+.textarea-editor,
+.search-results-list,
+.resultado-modelo-container,
+.resultado-texto-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) transparent;
+}
+
+.left-panel,
+.right-panel,
+.search-results-list,
+.resultado-modelo-container,
+.resultado-texto-container,
+.textarea-editor {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) transparent;
+    overflow-y: auto;
+}

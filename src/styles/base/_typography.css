@@ -1,0 +1,19 @@
+body:not(.ql-editor *) {
+    font-family: 'Libre Baskerville', Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.modelo-box {
+    font-family: 'Libre Baskerville', Baskerville, serif;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.tab {
+    font-size: 13px;
+}
+
+.btn-inserir {
+    font-size: 14px;
+}
