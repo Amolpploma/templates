@@ -1,14 +1,14 @@
 .search-container {
     position: relative;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 6px; /* Reduzido de 10px para 6px */
 }
 
 .search-input,
 .search-checklist-input {
     width: 100%;
     padding: 8px 30px 8px 8px; /* Aumentar padding direito para o botão */
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     border: 1px solid var(--input-border);
     background-color: var(--input-bg);
     color: var(--input-text);
