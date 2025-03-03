@@ -17,6 +17,16 @@ searchInput.addEventListener('input', (e) => {
     timeoutId = setTimeout(() => realizarBusca(e.target.value), 300);
 });
 
+// Adicionar funcionalidade aos botões de limpar
+document.querySelectorAll('.clear-input').forEach(button => {
+    button.addEventListener('click', (e) => {
+        const input = e.target.closest('.search-container').querySelector('input');
+        input.value = '';
+        input.dispatchEvent(new Event('input')); // Disparar evento de input para atualizar a busca
+        input.focus();
+    });
+});
+
 async function realizarBusca(termo) {
     if (termo.length < 2) {
         resultsList.innerHTML = '';

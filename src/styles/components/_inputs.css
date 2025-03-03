@@ -1,7 +1,13 @@
+.search-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
 .search-input,
 .search-checklist-input {
     width: 100%;
-    padding: 8px;
+    padding: 8px 30px 8px 8px; /* Aumentar padding direito para o botão */
     margin-bottom: 10px;
     border: 1px solid var(--input-border);
     background-color: var(--input-bg);
@@ -21,4 +27,37 @@
     outline: none;
     border-color: var(--result-selected-border);
     box-shadow: 0 0 0 1px var(--result-selected-border);
+}
+
+.clear-input {
+    position: absolute;
+    right: 8px;
+    top: 8px; /* Ajustado para alinhar com o input */
+    transform: none; /* Removido transform que estava causando desalinhamento */
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--input-text);
+    opacity: 0.6;
+    display: none; /* Inicialmente oculto */
+    padding: 0;
+    transition: opacity 0.2s;
+}
+
+.clear-input:hover {
+    opacity: 1;
+}
+
+.clear-input svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+/* Mostrar botão apenas quando houver texto no input */
+.search-input:not(:placeholder-shown) + .clear-input,
+.search-checklist-input:not(:placeholder-shown) + .clear-input {
+    display: block;
 }
