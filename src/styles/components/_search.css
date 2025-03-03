@@ -20,7 +20,7 @@
 #search-checklist-results {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 62px); /* Ajustado: input (36px) + refinamentos (26px) */
+    height: calc(100% - 66px); /* Ajustado: input (36px) + refinamentos (30px) */
     margin-top: 0; /* Remover margem superior */
     flex-shrink: 0; /* Impedir encolhimento */
 }
@@ -67,10 +67,10 @@
     display: flex;
     align-items: center; /* Centralizar verticalmente */
     gap: 6px;
-    padding: 6px 2px;
+    padding: 0px 2px; /* Aumentado de 6px para 8px */
     border-bottom: 1px solid var(--border-color);
-    height: 26px; /* Altura fixa menor */
-    flex: 0 0 26px; /* Forçar altura fixa sem compressão */
+    /*height: 40px; /* Aumentado de 26px para 30px */
+    flex: 0 0 40px; /* Ajustado para manter consistência */
     box-sizing: border-box;
 }
 
@@ -78,7 +78,7 @@
     display: inline-flex; /* Mudado para inline-flex */
     align-items: center;
     gap: 2px;
-    height: 14px; /* Altura fixa para o item */
+    height: 16px; /* Aumentado de 14px para 16px */
     flex-shrink: 0; /* Impedir encolhimento */
     cursor: pointer;
     user-select: none;
