@@ -10,6 +10,92 @@ body:not(.ql-editor *) {
     font-family: 'Libre Baskerville', Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif;
 }
 
+/* Temas */
+:root {
+    /* Tema claro (padrão) */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --border-color: #cccccc;
+    --titlebar-bg: #1e1e1e;
+    --titlebar-text: #858585;
+    --titlebar-active: #ffffff;
+    --titlebar-hover: #2d2d2d;
+    --result-bg-odd: #f8f9fa;
+    --result-bg-even: #ffffff;
+    --result-hover-bg: #e9ecef;
+    --result-selected-bg: #e3f2fd;
+    --result-selected-border: #2196f3;
+    --result-border: #e0e0e0;
+    --result-text: #333333;
+    --tag-bg: #e0e0e0;
+    --tag-text: #666666;
+    --checklist-bg: #f5f5f5;
+    --checklist-hover: #eeeeee;
+    --checklist-active-bg: #e8f5e9;
+    --checklist-active-color: #2e7d32;
+    --checklist-inactive-bg: #ffebee;
+    --checklist-inactive-color: #c62828;
+    --textarea-bg: #ffffff;
+    --textarea-border: #cccccc;
+    --modelo-box-light-1: rgba(227, 242, 253, 0.1);  /* Azul claro */
+    --modelo-box-light-2: rgba(232, 245, 233, 0.1);  /* Verde claro */
+    --modelo-box-light-3: rgba(255, 243, 224, 0.1);  /* Laranja claro */
+    --modelo-box-light-4: rgba(243, 229, 245, 0.1);  /* Roxo claro */
+    --modelo-header-bg: rgba(0, 0, 0, 0.1);
+    --modelo-title-color: rgba(0, 0, 0, 0.8);
+    --modelo-btn-bg: rgba(255, 255, 255, 0.9);
+    --modelo-btn-hover: rgba(255, 255, 255, 1);
+    --input-bg: #ffffff;
+    --input-text: #000000;
+    --input-border: #cccccc;
+    --input-placeholder: #999999;
+    --panel-bg: var(--bg-primary);
+}
+
+[data-theme="dark"] {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: #404040;
+    --titlebar-bg: #000000;
+    --titlebar-text: #858585;
+    --titlebar-active: #ffffff;
+    --titlebar-hover: #404040;
+    --result-bg-odd: #2d2d2d;
+    --result-bg-even: #1e1e1e;
+    --result-hover-bg: #3d3d3d;
+    --result-selected-bg: #004a77;
+    --result-selected-border: #0078d4;
+    --result-border: #404040;
+    --result-text: #cccccc;
+    --tag-bg: #404040;
+    --tag-text: #999999;
+    --checklist-bg: #2d2d2d;
+    --checklist-hover: #3d3d3d;
+    --checklist-active-bg: #1b4d1b;
+    --checklist-active-color: #4caf50;
+    --checklist-inactive-bg: #4a1515;
+    --checklist-inactive-color: #ff5252;
+    --textarea-bg: #1e1e1e; /* Ajustado para corresponder aos painéis */
+    --textarea-border: #404040;
+    --modelo-box-light-1: rgba(25, 118, 210, 0.15);   /* Azul escuro */
+    --modelo-box-light-2: rgba(56, 142, 60, 0.15);    /* Verde escuro */
+    --modelo-box-light-3: rgba(245, 124, 0, 0.15);    /* Laranja escuro */
+    --modelo-box-light-4: rgba(123, 31, 162, 0.15);   /* Roxo escuro */
+    --modelo-header-bg: rgba(255, 255, 255, 0.1);
+    --modelo-title-color: rgba(255, 255, 255, 0.8);
+    --modelo-btn-bg: rgba(0, 0, 0, 0.3);
+    --modelo-btn-hover: rgba(0, 0, 0, 0.5);
+    --input-bg: #2d2d2d;
+    --input-text: #ffffff;
+    --input-border: #404040;
+    --input-placeholder: #666666;
+    --panel-bg: #1e1e1e;
+}
+
 body {
     margin: 0;
     padding-top: 32px; /* Altura da titlebar */
@@ -17,6 +103,8 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 .container {
@@ -36,6 +124,7 @@ body {
     min-width: 200px;
     height: 100%;
     padding: 10px;
+    background-color: var(--panel-bg);
 }
 
 .editor-panel {
@@ -48,6 +137,7 @@ body {
     padding: 10px;
     box-sizing: border-box;
     overflow: hidden;
+    background-color: var(--panel-bg);
 }
 
 .center-panel {
@@ -101,9 +191,11 @@ body {
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
-    background-color: white;
+    background-color: var(--panel-bg); /* Usando a mesma variável dos painéis */
     overflow-y: auto;
     box-sizing: border-box;
+    color: var(--text-primary);
+    border-color: var(--textarea-border);
 }
 
 .textarea-editor:empty:before {
@@ -112,11 +204,28 @@ body {
 }
 
 /* Estilos compartilhados para inputs de pesquisa */
-.search-input, .search-checklist-input {
+.search-input, 
+.search-checklist-input {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.search-input::placeholder, 
+.search-checklist-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.search-input:focus, 
+.search-checklist-input:focus {
+    outline: none;
+    border-color: var(--result-selected-border);
+    box-shadow: 0 0 0 1px var(--result-selected-border);
 }
 
 #search-results, #search-checklist-results {
@@ -173,33 +282,34 @@ body {
 .resultado-modelo, .resultado-checklist {
     padding: 8px 12px;
     cursor: pointer;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--result-border);
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
     gap: 4px;
+    color: var(--result-text);
 }
 
 .resultado-modelo:nth-child(odd),
 .resultado-checklist:nth-child(odd) {
-    background-color: #f8f9fa;
+    background-color: var(--result-bg-odd);
 }
 
 .resultado-modelo:nth-child(even),
 .resultado-checklist:nth-child(even) {
-    background-color: #ffffff;
+    background-color: var(--result-bg-even);
 }
 
 .resultado-modelo:hover,
 .resultado-checklist:hover {
-    background-color: #e9ecef;
+    background-color: var(--result-hover-bg);
     transform: translateX(5px);
 }
 
 .resultado-modelo.selected,
 .resultado-checklist.selected {
-    background-color: #e3f2fd;
-    border-left: 4px solid #2196f3;
+    background-color: var(--result-selected-bg);
+    border-left: 4px solid var(--result-selected-border);
 }
 
 .tags-container {
@@ -215,7 +325,7 @@ body {
 
 .checklist-descricao {
     padding: 12px;
-    background-color: #f5f5f5;
+    background-color: var(--checklist-bg);
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -225,17 +335,17 @@ body {
 }
 
 .checklist-descricao:hover {
-    background-color: #eeeeee;
+    background-color: var(--checklist-hover);
 }
 
 .checklist-descricao.active {
-    background-color: #e8f5e9;
-    color: #2e7d32;
+    background-color: var(--checklist-active-bg);
+    color: var(--checklist-active-color);
 }
 
 .checklist-descricao.inactive {
-    background-color: #ffebee;
-    color: #c62828;
+    background-color: var(--checklist-inactive-bg);
+    color: var(--checklist-inactive-color);
 }
 
 .checklist-icon {
@@ -248,6 +358,7 @@ body {
     flex-grow: 1;
     font-size: 12px;
     text-align: justify;
+    color: var(--text-primary);
 }
 
 .modelo-box {
@@ -259,6 +370,22 @@ body {
     margin: 0 0 10px 0; /* Adicionado margin-bottom para separar múltiplos modelos */
     overflow: hidden; /* Para garantir que a barra fique contida */
     width: 100%;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.modelo-box:nth-child(4n+1) { 
+    background-color: var(--modelo-box-light-1); 
+}
+.modelo-box:nth-child(4n+2) { 
+    background-color: var(--modelo-box-light-2); 
+}
+.modelo-box:nth-child(4n+3) { 
+    background-color: var(--modelo-box-light-3); 
+}
+.modelo-box:nth-child(4n+4) { 
+    background-color: var(--modelo-box-light-4); 
 }
 
 .modelo-header {
@@ -280,14 +407,14 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.1); /* Escurece levemente */
+    background-color: var(--modelo-header-bg);
     pointer-events: none;
 }
 
 .modelo-title {
     /*font-size: 11px; /* Fonte menor */
     font-style: italic;
-    color: rgba(0, 0, 0, 0.8); /* Cor mais escura para melhor contraste */
+    color: var(--modelo-title-color); /* Cor mais escura para melhor contraste */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -308,6 +435,7 @@ body {
     text-align: justify;
     outline: none; /* Remove a borda ao focar */
     min-height: 1em; /* Garante altura mínima mesmo vazio */
+    color: var(--text-primary);
 }
 
 .modelo-action-btn {
@@ -321,11 +449,14 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    background: var(--modelo-btn-bg);
+    color: var(--text-primary);
 }
 
 .modelo-action-btn:hover {
     background: rgba(255, 255, 255, 1);
     transform: scale(1.1);
+    background: var(--modelo-btn-hover);
 }
 
 .modelo-action-btn svg {
@@ -344,13 +475,13 @@ body {
 
 .nome-modelo, .nome-texto {
     font-size: 12px;
-    color: #333;
+    color: var(--result-text);
 }
 
 .resultado-modelo .tag, .resultado-checklist .tag {
     font-size: 10px;
-    color: #666;
-    background-color: #e0e0e0;
+    color: var(--tag-text);
+    background-color: var(--tag-bg);
     border-radius: 12px;
     padding: 2px 8px;
     align-self: flex-start;
@@ -444,8 +575,10 @@ body {
     border-radius: 4px;
     padding: 10px;
     overflow-y: auto;
-    background-color: white;
+    background-color: var(--panel-bg); /* Usando a mesma variável dos painéis */
     min-height: 50px; /* Altura mínima via CSS */
+    color: var(--text-primary);
+    border-color: var(--textarea-border);
 }
 
 /* Ajustes para o redimensionamento */
@@ -478,7 +611,7 @@ body {
     left: 0;
     right: 0;
     height: 32px;
-    background-color: #1e1e1e;
+    background-color: var(--titlebar-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -545,4 +678,45 @@ body {
 .ql-toolbar.ql-snow {
     flex-shrink: 0;
     margin: 0;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    color: var(--titlebar-text);
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    margin: 0 20px;
+}
+
+.theme-toggle:hover {
+    background-color: var(--titlebar-hover);
+}
+
+.theme-toggle svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.theme-icon-light {
+    display: block;
+}
+
+.theme-icon-dark {
+    display: none;
+}
+
+[data-theme="dark"] .theme-icon-light {
+    display: none;
+}
+
+[data-theme="dark"] .theme-icon-dark {
+    display: block;
 }
