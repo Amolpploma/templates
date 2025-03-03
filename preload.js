@@ -6,7 +6,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     buscarDocumentos: (termo) => ipcRenderer.invoke('buscar-documentos', termo),
     salvarDocumento: (dados) => ipcRenderer.invoke('salvar-documento', dados),
     buscarChecklists: (termo) => ipcRenderer.invoke('buscar-checklists', termo),
-    buscarModeloPorId: (id) => ipcRenderer.invoke('buscar-modelo-por-id', id)
+    buscarModeloPorId: (id) => ipcRenderer.invoke('buscar-modelo-por-id', id),
+    minimizeWindow: () => ipcRenderer.send('minimize-window'),
+    maximizeWindow: () => ipcRenderer.send('maximize-window'),
+    closeWindow: () => ipcRenderer.send('close-window')
 });
 
 // Expor Quill para o renderer process

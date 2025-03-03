@@ -71,7 +71,7 @@ function exibirResultados(resultados) {
                 <div class="resultado-modelo-container">
                     <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">${modelo}</div>
                 </div>
-                <button class="btn-inserir">Inserir no modelo</button>
+                <button class="btn-inserir">Inserir modelo</button>
             `;
 
             atualizarBotaoInserir();
@@ -91,14 +91,24 @@ function exibirResultados(resultados) {
 }
 
 function getRandomPastelColor() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const hue = Math.floor(Math.random() * 360);
-    return `hsl(${hue}, 70%, 95%)`;
+    
+    if (isDark) {
+        // Cores mais escuras para o tema escuro, com baixa saturação e luminosidade
+        return `hsla(${hue}, 30%, 25%, 0.3)`;
+    } else {
+        // Cores pasteis claras para o tema claro
+        return `hsla(${hue}, 70%, 95%, 0.3)`;
+    }
 }
 
 function createModeloBox(texto, nome, modeloId = '') {
     const div = document.createElement('div');
     div.className = 'modelo-box';
     div.setAttribute('data-modelo_id', modeloId);
+    
+    // Aplicar cor de fundo baseada no tema atual
     const backgroundColor = getRandomPastelColor();
     div.style.backgroundColor = backgroundColor;
     
