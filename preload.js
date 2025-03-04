@@ -10,7 +10,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     buscarModeloPorId: (id) => ipcRenderer.invoke('buscar-modelo-por-id', id),
     minimizeWindow: () => ipcRenderer.send('minimize-window'),
     maximizeWindow: () => ipcRenderer.send('maximize-window'),
-    closeWindow: () => ipcRenderer.send('close-window')
+    closeWindow: () => ipcRenderer.send('close-window'),
+    apagarModelo: (id) => ipcRenderer.invoke('apagar-modelo', id)
 });
 
 // Expor Quill para o renderer process

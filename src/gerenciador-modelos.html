@@ -80,7 +80,17 @@
                     <label for="modelo-conteudo">conteúdo</label>
                 </div>
             </div>
-            <div id="search-results"></div>
+            <div id="search-results">
+                <div class="resultado-modelo-container">
+                    <div class="resultado-texto" data-nome="${encodeURIComponent(nomeModelo)}">
+                        ${highlightText(modeloSelecionado, searchInput.value, filtros.conteudo)}
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-inserir">Inserir modelo</button>
+                    <button class="btn-danger">Apagar</button>
+                </div>
+            </div>
         </div>
     </div>
     <script src="resizer.js"></script>

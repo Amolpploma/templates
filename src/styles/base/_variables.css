@@ -54,6 +54,10 @@
     /* Highlight */
     --highlight-bg: #ffeb3b;
     --highlight-text: #000000;
+
+    /* Botões de ação */
+    --btn-danger-bg: #dc3545;
+    --btn-danger-hover: #c82333;
 }
 
 [data-theme="dark"] {
@@ -86,4 +90,8 @@
     /* Highlight */
     --highlight-bg-dark: #ffd700;
     --highlight-text-dark: #000000;
+
+    /* Botões de ação */
+    --btn-danger-bg: #bd2130;
+    --btn-danger-hover: #a71d2a;
 }

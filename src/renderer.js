@@ -93,14 +93,36 @@ if (searchInput && searchResults) {
                 
                 const modeloSelecionado = decodeURIComponent(item.dataset.modelo);
                 const nomeModelo = decodeURIComponent(item.dataset.nome);
+                
+                // Verificar se estamos na página de edição
+                const isEditorPage = document.body.getAttribute('data-page') === 'editor';
+                
                 resultsContent.innerHTML = `
                     <div class="resultado-modelo-container">
                         <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">
                             ${highlightText(modeloSelecionado, searchInput.value, filtros.conteudo)}
                         </div>
                     </div>
-                    <button class="btn-inserir">Inserir modelo</button>
+                    <div class="button-container">
+                        <button class="btn-inserir">Inserir modelo</button>
+                        ${isEditorPage ? '<button class="btn-danger">Apagar</button>' : ''}
+                    </div>
                 `;
+
+                if (isEditorPage) {
+                    const btnApagar = resultsContent.querySelector('.btn-danger');
+                    btnApagar.addEventListener('click', async () => {
+                        if (confirm('Tem certeza que deseja apagar este modelo?')) {
+                            try {
+                                await window.electronAPI.apagarModelo(item.dataset.id);
+                                // Atualizar a lista após apagar
+                                realizarBusca(searchInput.value);
+                            } catch (err) {
+                                console.error('Erro ao apagar modelo:', err);
+                            }
+                        }
+                    });
+                }
 
                 atualizarBotaoInserir();
             });

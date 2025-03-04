@@ -118,6 +118,15 @@ function registerIpcHandlers() {
       return null;
     }
   });
+  
+  ipcMain.handle('apagar-modelo', async (event, id) => {
+    try {
+      return await database.deletarModelo(id);
+    } catch (err) {
+      console.error('Erro ao apagar modelo:', err);
+      return null;
+    }
+  });
 }
 
 // This method will be called when Electron has finished
