@@ -50,12 +50,18 @@ async function realizarBusca(termo) {
 }
 
 function exibirResultados(resultados) {
+    const filtros = {
+        nome: document.getElementById('modelo-nome').checked,
+        etiqueta: document.getElementById('modelo-etiqueta').checked,
+        conteudo: document.getElementById('modelo-conteudo').checked
+    };
+
     resultsList.innerHTML = resultados
         .map(modelo => {
             try {
                 const tags = Array.isArray(modelo.tag) ? modelo.tag : JSON.parse(modelo.tag || '[]');
                 const tagsHtml = tags
-                    .map(tag => `<span class="tag">${highlightText(tag, searchInput.value)}</span>`)
+                    .map(tag => `<span class="tag">${highlightText(tag, searchInput.value, filtros.etiqueta)}</span>`)
                     .join('');
 
                 return `
@@ -63,7 +69,9 @@ function exibirResultados(resultados) {
                          data-id="${modelo.id}" 
                          data-nome="${encodeURIComponent(modelo.nome)}"
                          data-modelo="${encodeURIComponent(modelo.modelo)}">
-                        <div class="nome-modelo">${highlightText(modelo.nome, searchInput.value)}</div>
+                        <div class="nome-modelo">
+                            ${highlightText(modelo.nome, searchInput.value, filtros.nome)}
+                        </div>
                         <div class="tags-container">${tagsHtml}</div>
                     </div>
                 `;
@@ -87,7 +95,7 @@ function exibirResultados(resultados) {
             resultsContent.innerHTML = `
                 <div class="resultado-modelo-container">
                     <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">
-                        ${highlightText(modeloSelecionado, searchInput.value)}
+                        ${highlightText(modeloSelecionado, searchInput.value, filtros.conteudo)}
                     </div>
                 </div>
                 <button class="btn-inserir">Inserir modelo</button>

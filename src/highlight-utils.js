@@ -1,5 +1,5 @@
-function highlightText(text, searchTerm) {
-    if (!searchTerm) return text;
+function highlightText(text, searchTerm, shouldHighlight = true) {
+    if (!searchTerm || !shouldHighlight) return text;
     
     const terms = searchTerm.trim().split(/\s+/);
     let highlightedText = text;
