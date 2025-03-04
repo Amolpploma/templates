@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     width: calc(100% menos o padding dos lados);
-    margin: 10px 10px 0px 10px;
+    margin: 0px 10px 0px 10px;
     padding: 10px;
     background-color: var(--btn-bg);
     color: var(--text-primary);

@@ -17,6 +17,16 @@ searchInput.addEventListener('input', (e) => {
     timeoutId = setTimeout(() => realizarBusca(e.target.value), 300);
 });
 
+// Adicionar funcionalidade aos botões de limpar
+document.querySelectorAll('.clear-input').forEach(button => {
+    button.addEventListener('click', (e) => {
+        const input = e.target.closest('.search-container').querySelector('input');
+        input.value = '';
+        input.dispatchEvent(new Event('input')); // Disparar evento de input para atualizar a busca
+        input.focus();
+    });
+});
+
 async function realizarBusca(termo) {
     if (termo.length < 2) {
         resultsList.innerHTML = '';
@@ -25,7 +35,14 @@ async function realizarBusca(termo) {
     }
 
     try {
-        const resultados = await window.electronAPI.buscarDocumentos(termo);
+        // Obter estado dos checkboxes de filtro
+        const filtros = {
+            nome: document.getElementById('modelo-nome').checked,
+            etiqueta: document.getElementById('modelo-etiqueta').checked,
+            conteudo: document.getElementById('modelo-conteudo').checked
+        };
+
+        const resultados = await window.electronAPI.buscarDocumentos(termo, filtros);
         exibirResultados(resultados);
     } catch (err) {
         console.error('Erro na busca:', err);
@@ -33,12 +50,18 @@ async function realizarBusca(termo) {
 }
 
 function exibirResultados(resultados) {
+    const filtros = {
+        nome: document.getElementById('modelo-nome').checked,
+        etiqueta: document.getElementById('modelo-etiqueta').checked,
+        conteudo: document.getElementById('modelo-conteudo').checked
+    };
+
     resultsList.innerHTML = resultados
         .map(modelo => {
             try {
                 const tags = Array.isArray(modelo.tag) ? modelo.tag : JSON.parse(modelo.tag || '[]');
                 const tagsHtml = tags
-                    .map(tag => `<span class="tag">${tag}</span>`)
+                    .map(tag => `<span class="tag">${highlightText(tag, searchInput.value, filtros.etiqueta)}</span>`)
                     .join('');
 
                 return `
@@ -46,7 +69,9 @@ function exibirResultados(resultados) {
                          data-id="${modelo.id}" 
                          data-nome="${encodeURIComponent(modelo.nome)}"
                          data-modelo="${encodeURIComponent(modelo.modelo)}">
-                        <div class="nome-modelo">${modelo.nome}</div>
+                        <div class="nome-modelo">
+                            ${highlightText(modelo.nome, searchInput.value, filtros.nome)}
+                        </div>
                         <div class="tags-container">${tagsHtml}</div>
                     </div>
                 `;
@@ -65,11 +90,13 @@ function exibirResultados(resultados) {
             
             item.classList.add('selected');
             
-            const modelo = decodeURIComponent(item.dataset.modelo);
+            const modeloSelecionado = decodeURIComponent(item.dataset.modelo);
             const nomeModelo = decodeURIComponent(item.dataset.nome);
             resultsContent.innerHTML = `
                 <div class="resultado-modelo-container">
-                    <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">${modelo}</div>
+                    <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">
+                        ${highlightText(modeloSelecionado, searchInput.value, filtros.conteudo)}
+                    </div>
                 </div>
                 <button class="btn-inserir">Inserir modelo</button>
             `;
@@ -249,3 +276,36 @@ async function salvarDocumento() {
         console.error('Erro ao salvar:', err);
     }
 }
+
+// Controle dos checkboxes de refinamento
+function setupSearchRefinements(parentSelector, defaultCheckboxId) {
+    const checkboxes = document.querySelectorAll(`${parentSelector} .search-refinements input[type="checkbox"]`);
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            if (!e.target.checked) {
+                // Verificar se há outros checkboxes marcados no mesmo grupo
+                const anyChecked = Array.from(checkboxes)
+                    .some(cb => cb !== e.target && cb.checked);
+                
+                if (!anyChecked) {
+                    e.preventDefault();
+                    e.target.checked = true;
+                    return false;
+                }
+            }
+        });
+    });
+
+    // Garantir que o checkbox padrão esteja marcado na inicialização
+    const defaultCheckbox = document.getElementById(defaultCheckboxId);
+    if (defaultCheckbox) {
+        defaultCheckbox.checked = true;
+    }
+}
+
+// Inicializar os refinamentos de pesquisa com os seletores corretos
+document.addEventListener('DOMContentLoaded', () => {
+    setupSearchRefinements('.left-panel', 'checklist-nome');
+    setupSearchRefinements('.right-panel', 'modelo-nome');
+});

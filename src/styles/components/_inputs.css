@@ -1,14 +1,24 @@
+.search-container {
+    position: relative;
+    width: 100%;
+    height: 36px;
+    padding: 0 20px 0 10px; /* Padding padrão que será referência */
+    margin-bottom: 0;
+    box-sizing: border-box;
+}
+
 .search-input,
 .search-checklist-input {
     width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
+    height: 36px; /* Altura fixa para o input */
+    padding: 8px 30px 8px 8px;
     border: 1px solid var(--input-border);
     background-color: var(--input-bg);
     color: var(--input-text);
     border-radius: 4px;
     transition: all 0.2s ease;
     font-family: inherit;
+    margin: 0; /* Removido margin */
 }
 
 .search-input::placeholder,
@@ -21,4 +31,37 @@
     outline: none;
     border-color: var(--result-selected-border);
     box-shadow: 0 0 0 1px var(--result-selected-border);
+}
+
+.clear-input {
+    position: absolute;
+    right: 25px;
+    top: 50%; /* Centralizar verticalmente */
+    transform: translateY(-50%); /* Centralizar verticalmente */
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--input-text);
+    opacity: 0.6;
+    display: none; /* Inicialmente oculto */
+    padding: 0;
+    transition: opacity 0.2s;
+}
+
+.clear-input:hover {
+    opacity: 1;
+}
+
+.clear-input svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+/* Mostrar botão apenas quando houver texto no input */
+.search-input:not(:placeholder-shown) + .clear-input,
+.search-checklist-input:not(:placeholder-shown) + .clear-input {
+    display: block;
 }

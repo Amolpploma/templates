@@ -1,10 +1,11 @@
 .search-results-list {
     flex: 0 0 auto;
-    max-height: 40%;
+    max-height: calc(35% - 10px); /* Ajustar para considerar padding */
     overflow-y: auto;
-    padding: 10px;
+    padding: 10px;  /* Padding uniforme */
     background-color: var(--panel-bg);
-    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 5px; /* Aumentado o espaçamento sem a borda */
+    margin-right: 0; /* Garante que não há margem interferindo */
 }
 
 .search-results-content {
@@ -12,16 +13,23 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    height: 100%;
+    height: calc(65% - 5px); /* Ajustar para considerar margin do elemento anterior */
     overflow: hidden;
     background-color: var(--panel-bg);
+    padding: 10px 0 10px 10px; /* Alinhar com o padding do resultado-modelo */
+    padding-top: 10px;
 }
 
 #search-results, 
 #search-checklist-results {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 45px);
+    height: calc(100% - 66px);
+    margin-top: 0;
+    flex-shrink: 0;
+    padding-bottom: 10px; /* Adicionar padding inferior */
+    box-sizing: border-box;
+    padding-right: 0; /* Remove padding direito do container principal */
 }
 
 /* Remover regras redundantes que já estão em _modelos.css e _checklists.css */
@@ -29,7 +37,7 @@
 /* Estilos para resultados e tags */
 .resultado-modelo,
 .resultado-checklist {
-    padding: 8px 12px;
+    padding: 8px 10px; /* Alinhado com o padding do container */
     cursor: pointer;
     border-bottom: 1px solid var(--border-color);
     transition: all 0.2s ease;
@@ -37,10 +45,19 @@
     flex-direction: column;
     gap: 4px;
     color: var(--result-text);
-    background-color: var(--result-bg-even); /* Adicionar cor de fundo explícita */
+    background-color: var(--result-bg-even);
 }
 
-/* Remover estilos duplicados de tag que agora estão em _tags.css */
+.resultado-modelo-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 0; /* Remover margin que estava causando scroll extra */
+    margin-right: 0; /* Garante que não há margem interferindo */
+}
+
+.btn-inserir {
+    margin: 0 20px 10px 10px;
+}
 
 /* Hover e estados selecionados */
 .resultado-modelo:hover,
@@ -53,4 +70,61 @@
 .resultado-checklist.selected {
     background-color: var(--result-selected-bg);
     border-left: 4px solid var(--result-selected-border);
+}
+
+.search-refinements {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid var(--border-color);
+    flex: 0 0 40px;
+    box-sizing: border-box;
+    margin: 0 20px 0 10px;
+}
+
+.search-refinement-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.search-refinement-item input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px;
+}
+
+.search-refinement-item label {
+    font-size: 11px;
+    line-height: 14px;
+    display: inline-block;
+    vertical-align: middle;
+    color: var(--text-primary);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.resultado-modelo-texto {
+    padding: 15px;
+    background-color: var(--bg-secondary);
+    margin-right: 10px; /* Adiciona margem para compensar o padding removido */
+}
+
+mark {
+    background-color: var(--highlight-bg, #ffeb3b);
+    color: var(--highlight-text, #000000);
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: normal;
+}
+
+[data-theme="dark"] mark {
+    background-color: var(--highlight-bg-dark, #ffd700);
+    color: var(--highlight-text-dark, #000000);
 }

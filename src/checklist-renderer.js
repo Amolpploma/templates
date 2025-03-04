@@ -33,10 +33,19 @@ async function realizarBuscaChecklist(termo) {
 }
 
 function exibirResultadosChecklist(resultados) {
+    const filtros = {
+        nome: document.getElementById('checklist-nome').checked,
+        etiqueta: document.getElementById('checklist-etiqueta').checked
+    };
+
     checklistResultsList.innerHTML = resultados
         .map(checklist => {
             try {
                 const tags = Array.isArray(checklist.tag) ? checklist.tag : JSON.parse(checklist.tag || '[]');
+                const tagsHtml = tags
+                    .map(tag => `<span class="tag">${highlightText(tag, searchChecklistInput.value, filtros.etiqueta)}</span>`)
+                    .join('');
+
                 const checklistData = typeof checklist.checklist === 'string' ? 
                     JSON.parse(checklist.checklist) : checklist.checklist;
                 
@@ -48,8 +57,10 @@ function exibirResultadosChecklist(resultados) {
                          data-id="${checklist.id}" 
                          data-modelo_id="${checklist.modelo_id || ''}"
                          data-checklist='${JSON.stringify(checklistData)}'>
-                        <div class="nome-texto">${checklist.nome}</div>
-                        <div class="tags-container">${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+                        <div class="nome-texto">
+                            ${highlightText(checklist.nome, searchChecklistInput.value, filtros.nome)}
+                        </div>
+                        <div class="tags-container">${tagsHtml}</div>
                     </div>
                 `;
             } catch (err) {

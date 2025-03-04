@@ -5,6 +5,9 @@
     height: 100%;
     padding: 10px;
     background-color: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Alterado de auto para hidden */
 }
 
 .editor-panel {
@@ -19,5 +22,3 @@
     overflow: hidden;
     box-sizing: border-box;
 }
-
-/* Remover duplicata de .search-results-list e .search-results-content que já estão em _search.css */
