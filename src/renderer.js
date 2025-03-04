@@ -35,7 +35,14 @@ async function realizarBusca(termo) {
     }
 
     try {
-        const resultados = await window.electronAPI.buscarDocumentos(termo);
+        // Obter estado dos checkboxes de filtro
+        const filtros = {
+            nome: document.getElementById('modelo-nome').checked,
+            etiqueta: document.getElementById('modelo-etiqueta').checked,
+            conteudo: document.getElementById('modelo-conteudo').checked
+        };
+
+        const resultados = await window.electronAPI.buscarDocumentos(termo, filtros);
         exibirResultados(resultados);
     } catch (err) {
         console.error('Erro na busca:', err);

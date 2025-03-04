@@ -90,9 +90,9 @@ function registerIpcHandlers() {
     }
   });
 
-  ipcMain.handle('buscar-documentos', async (event, termo) => {
+  ipcMain.handle('buscar-documentos', async (event, termo, filtros) => {
     try {
-      return await database.buscarModelos(termo);
+      return await database.buscarModelos(termo, filtros);
     } catch (err) {
       console.error('Erro na busca:', err);
       return [];
