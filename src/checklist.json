@@ -8,38 +8,31 @@
     "checklist": [
       {
         "descrição": "A inicial foi endereçada a este juízo?",
-        "modelo_id": 3,
-        "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento."
+        "modelo_id": 3
       },
       {
         "descrição": "O endereço do requerido é na comarca?",
-        "modelo_id": 4,
-        "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento, advertindo-o ainda que no caso de silêncio, será realizado o declínio de competência."
+        "modelo_id": 4
       },
       {
         "descrição": "O advogado que assinou a inicial possui procuração ou substabelecimento válido?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, juntando procuração ou substabelecimento válido."
+        "modelo_id": 3
       },
       {
         "descrição": "Foi anexado o contrato com cláusula de alienação fiduciária assinado pelo devedor?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, juntando o contrato assinado pelo devedor."
+        "modelo_id": 4
       },
       {
         "descrição": "O endereço da notificação é o mesmo contido no contrato?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, juntando a notificação extrajudicial válida."
+        "modelo_id": 3
       },
       {
         "descrição": "O veículo descrito no contrato é o mesmo descrito na petição inicial?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, corrigindo a descrição do bem objeto da ação."
+        "modelo_id": 4
       },
       {
         "descrição": "Foram recolhidas as custas iniciais?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, juntando o comprovante de recolhimento das custas iniciais."
+        "modelo_id": 3
       }
     ]
   },
@@ -51,55 +44,45 @@
     ],
     "checklist": [
       {
-        "descrição": "A inicial foi endereçada a este juízo?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento."
+          "descrição": "A inicial foi endereçada a este juízo?",
+          "modelo_id": 3
       },
       {
-        "descrição": "O imóvel é situado na comarca?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, esclarecendo se houve equívoco no peticionamento, advertindo-o ainda que no caso de silêncio, será realizado o declínio de competência."
+          "descrição": "O imóvel é situado na comarca?",
+          "modelo_id": 4
       },
       {
-        "descrição": "O advogado que assinou a inicial possui procuração ou substabelecimento válido?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, juntando procuração ou substabelecimento válido."
+          "descrição": "O advogado que assinou a inicial possui procuração ou substabelecimento válido?",
+          "modelo_id": 3
       },
       {
-        "descrição": "Foi anexado memorial descritivo assinado por profissional habilitado?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, juntando o memorial descritivo."
+          "descrição": "Foi anexado memorial descritivo assinado por profissional habilitado?",
+          "modelo_id": 4
       },
       {
-        "descrição": "Foi anexada planta georreferenciada do imóvel assinada por profissional habilitado?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, juntando a planta."
+          "descrição": "Foi anexada planta georreferenciada do imóvel assinada por profissional habilitado?",
+          "modelo_id": 3
       },
       {
-        "descrição": "Foi anexada a certidão de matrícula do imóvel, ou no caso de este não ser registrado, certidões negativas para fins de usucapião dos cartórios de registro de imóveis da comarca?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para juntar aos autos as certidões."
+          "descrição": "Foi anexada a certidão de matrícula do imóvel, ou no caso de este não ser registrado, certidões negativas para fins de usucapião dos cartórios de registro de imóveis da comarca?",
+          "modelo_id": 4
       },
       {
-        "descrição": "No caso de serem apresentadas certidões negativas, a descrição é idêntica à que consta no memorial descritivo?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para esclarecer esse ponto, apresentando, se for o caso, novas certidões ou novo memorial descritivo."
+          "descrição": "No caso de serem apresentadas certidões negativas, a descrição é idêntica à que consta no memorial descritivo?",
+          "modelo_id": 3
       },
       {
-        "descrição": "Foram recolhidas as custas iniciais (sem pedido de gratuidade judiciária)?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, juntando o comprovante de recolhimento das custas iniciais."
+          "descrição": "Foram recolhidas as custas iniciais (sem pedido de gratuidade judiciária)?",
+          "modelo_id": 4
       },
       {
-        "descrição": "Foi anexada declaração de hipossuficiência econômica? (com pedido de gratudiodade judiciária)",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar juntar aos autos declaração de hipossuficiência."
+          "descrição": "Foi anexada declaração de hipossuficiência econômica? (com pedido de gratudiodade judiciária)",
+          "modelo_id": 3
       },
       {
-        "descrição": "Há indícios de que o autor não atende aos requisitos para obter a gratuidade judiciária?",
-        "modelo_id": null,
-        "solução": "Intimar o autor para emendar a inicial, comprovando fazer jus aos requisitos."
+          "descrição": "Há indícios de que o autor não atende aos requisitos para obter a gratuidade judiciária?",
+          "modelo_id": 4
       }
-    ]
+  ]
   }
 ]
