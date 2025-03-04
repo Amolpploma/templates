@@ -31,5 +31,6 @@
 .textarea-editor {
     scrollbar-width: thin;
     scrollbar-color: var(--scroll-thumb) transparent;
+    scrollbar-gutter: stable;
     overflow-y: auto;
 }

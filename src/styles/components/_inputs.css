@@ -1,8 +1,10 @@
 .search-container {
     position: relative;
     width: 100%;
-    height: 36px; /* Altura fixa para o container */
-    margin-bottom: 0; /* Removido margin-bottom */
+    height: 36px;
+    padding: 0 20px 0 10px; /* Padding padrão que será referência */
+    margin-bottom: 0;
+    box-sizing: border-box;
 }
 
 .search-input,

@@ -22,5 +22,3 @@
     overflow: hidden;
     box-sizing: border-box;
 }
-
-/* Remover duplicata de .search-results-list e .search-results-content que já estão em _search.css */
