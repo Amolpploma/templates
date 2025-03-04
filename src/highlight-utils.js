@@ -1,4 +1,5 @@
-function highlightText(text, searchTerm, shouldHighlight = true) {
+// Disponibilizar a função globalmente ao invés de usar module.exports
+window.highlightText = function(text, searchTerm, shouldHighlight = true) {
     if (!searchTerm || !shouldHighlight) return text;
     
     const terms = searchTerm.trim().split(/\s+/);
@@ -10,6 +11,4 @@ function highlightText(text, searchTerm, shouldHighlight = true) {
     });
     
     return highlightedText;
-}
-
-module.exports = { highlightText };
+};
