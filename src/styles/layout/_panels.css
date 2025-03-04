@@ -22,3 +22,19 @@
     overflow: hidden;
     box-sizing: border-box;
 }
+
+/* Estilo específico para página de edição */
+body[data-page="editor"] .container {
+    justify-content: center;
+    padding: 0 20px;
+}
+
+body[data-page="editor"] .editor-panel {
+    min-width: 400px;
+    max-width: 800px;
+}
+
+body[data-page="editor"] .right-panel {
+    min-width: 200px;
+    max-width: 400px;
+}

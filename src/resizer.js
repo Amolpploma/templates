@@ -14,11 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
         isResizing = true;
         currentResizer = e.target;
         startX = e.clientX;
-        startWidths = {
-            left: leftPanel.offsetWidth,
-            editor: editorPanel.offsetWidth,
-            right: rightPanel.offsetWidth
-        };
+
+        // Inicializar larguras apenas para os painéis que existem
+        startWidths = {};
+        
+        if (leftPanel) startWidths.left = leftPanel.offsetWidth;
+        if (editorPanel) startWidths.editor = editorPanel.offsetWidth;
+        if (rightPanel) startWidths.right = rightPanel.offsetWidth;
+
         currentResizer.classList.add('dragging');
         document.addEventListener('mousemove', resize);
         document.addEventListener('mouseup', stopResize);
@@ -26,15 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resize(e) {
         if (!isResizing) return;
+
         const diff = e.clientX - startX;
-        if (currentResizer.id === 'resizer-left') {
+
+        if (currentResizer.id === 'resizer-left' && leftPanel && editorPanel) {
             const newLeftWidth = startWidths.left + diff;
             const newEditorWidth = startWidths.editor - diff;
             if (newLeftWidth > 200 && newEditorWidth > 200) {
                 leftPanel.style.width = `${newLeftWidth}px`;
                 editorPanel.style.width = `${newEditorWidth}px`;
             }
-        } else {
+        } else if (currentResizer.id === 'resizer-right' && editorPanel && rightPanel) {
             const newEditorWidth = startWidths.editor + diff;
             const newRightWidth = startWidths.right - diff;
             if (newEditorWidth > 200 && newRightWidth > 200) {
@@ -46,20 +51,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function stopResize() {
         isResizing = false;
-        currentResizer?.classList.remove('dragging');
+        if (currentResizer) {
+            currentResizer.classList.remove('dragging');
+        }
         document.removeEventListener('mousemove', resize);
         document.removeEventListener('mouseup', stopResize);
     }
 
-    if (resizerLeft) {
+    // Adicionar listeners apenas se os elementos existirem
+    if (resizerLeft && leftPanel) {
         resizerLeft.addEventListener('mousedown', initResize);
-    } else {
-        console.error('Elemento "resizer-left" não encontrado.');
     }
 
-    if (resizerRight) {
+    if (resizerRight && rightPanel) {
         resizerRight.addEventListener('mousedown', initResize);
-    } else {
-        console.error('Elemento "resizer-right" não encontrado.');
     }
 });
+
+function initializeResizers() {
+    // Setup do resizer esquerdo (se existir)
+    const resizerLeft = document.getElementById('resizer-left');
+    if (resizerLeft) {
+        const leftPanel = resizerLeft.previousElementSibling;
+        setupResizer(resizerLeft, leftPanel, 'width', 200);
+    }
+
+    // Setup do resizer direito (sempre presente)
+    const resizerRight = document.getElementById('resizer-right');
+    if (resizerRight) {
+        const rightPanel = resizerRight.nextElementSibling;
+        setupResizer(resizerRight, rightPanel, 'width', 200);
+    }
+}
+
+function setupResizer(resizer, panel, dimension, minSize) {
+    if (!resizer || !panel) return; // Proteção extra
+
+    let x = 0;
+    let panelSize = 0;
+
+    function mouseDownHandler(e) {
+        x = e.clientX;
+        panelSize = parseInt(getComputedStyle(panel)[dimension], 10);
+
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+
+        resizer.classList.add('resizing');
+    }
+
+    /* ...existing code... */
+}
+
+// Inicializar os resizers quando o documento estiver pronto
+document.addEventListener('DOMContentLoaded', initializeResizers);
+
+/* ...existing code... */
