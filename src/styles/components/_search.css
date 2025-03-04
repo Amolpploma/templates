@@ -75,11 +75,11 @@
 .search-refinements {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 0 10px; /* Mesmo padding do input */
+    gap: 15px;
     border-bottom: 1px solid var(--border-color);
     flex: 0 0 40px;
     box-sizing: border-box;
+    margin: 0 20px 0 10px;
 }
 
 .search-refinement-item {
