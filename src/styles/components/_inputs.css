@@ -71,6 +71,7 @@
     gap: 10px;
     padding: 0 20px 0 10px;
     margin-bottom: 10px;
+    align-items: center; /* Alinhar verticalmente com os inputs */
 }
 
 .editor-inputs .input-container {
@@ -98,4 +99,25 @@
     outline: none;
     border-color: var(--result-selected-border);
     box-shadow: 0 0 0 1px var(--result-selected-border);
+}
+
+.btn-salvar {
+    height: 36px;
+    padding: 0 16px;
+    background-color: var(--btn-bg); /* Usando a mesma variável do btn-inserir */
+    color: var(--text-primary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-salvar:hover {
+    background-color: var(--btn-hover); /* Usando a mesma variável do btn-inserir */
+}
+
+.btn-salvar:active {
+    transform: translateY(1px);
 }

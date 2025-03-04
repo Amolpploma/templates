@@ -54,6 +54,11 @@
     /* Highlight */
     --highlight-bg: #ffeb3b;
     --highlight-text: #000000;
+
+    /* Botões primários */
+    --btn-primary-bg: #4CAF50;
+    --btn-primary-text: #ffffff;
+    --btn-primary-hover-bg: #45a049;
 }
 
 [data-theme="dark"] {
@@ -86,4 +91,9 @@
     /* Highlight */
     --highlight-bg-dark: #ffd700;
     --highlight-text-dark: #000000;
+
+    /* Botões primários */
+    --btn-primary-bg: #2e7d32;
+    --btn-primary-text: #ffffff;
+    --btn-primary-hover-bg: #1b5e20;
 }
