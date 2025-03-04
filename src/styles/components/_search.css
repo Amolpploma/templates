@@ -115,3 +115,16 @@
     background-color: var(--bg-secondary);
     margin-right: 10px; /* Adiciona margem para compensar o padding removido */
 }
+
+mark {
+    background-color: var(--highlight-bg, #ffeb3b);
+    color: var(--highlight-text, #000000);
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: normal;
+}
+
+[data-theme="dark"] mark {
+    background-color: var(--highlight-bg-dark, #ffd700);
+    color: var(--highlight-text-dark, #000000);
+}

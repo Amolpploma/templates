@@ -55,7 +55,7 @@ function exibirResultados(resultados) {
             try {
                 const tags = Array.isArray(modelo.tag) ? modelo.tag : JSON.parse(modelo.tag || '[]');
                 const tagsHtml = tags
-                    .map(tag => `<span class="tag">${tag}</span>`)
+                    .map(tag => `<span class="tag">${highlightText(tag, searchInput.value)}</span>`)
                     .join('');
 
                 return `
@@ -63,7 +63,7 @@ function exibirResultados(resultados) {
                          data-id="${modelo.id}" 
                          data-nome="${encodeURIComponent(modelo.nome)}"
                          data-modelo="${encodeURIComponent(modelo.modelo)}">
-                        <div class="nome-modelo">${modelo.nome}</div>
+                        <div class="nome-modelo">${highlightText(modelo.nome, searchInput.value)}</div>
                         <div class="tags-container">${tagsHtml}</div>
                     </div>
                 `;
@@ -82,11 +82,13 @@ function exibirResultados(resultados) {
             
             item.classList.add('selected');
             
-            const modelo = decodeURIComponent(item.dataset.modelo);
+            const modeloSelecionado = decodeURIComponent(item.dataset.modelo);
             const nomeModelo = decodeURIComponent(item.dataset.nome);
             resultsContent.innerHTML = `
                 <div class="resultado-modelo-container">
-                    <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">${modelo}</div>
+                    <div class="resultado-modelo-texto" data-nome="${encodeURIComponent(nomeModelo)}">
+                        ${highlightText(modeloSelecionado, searchInput.value)}
+                    </div>
                 </div>
                 <button class="btn-inserir">Inserir modelo</button>
             `;
