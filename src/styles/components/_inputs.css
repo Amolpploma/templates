@@ -35,7 +35,7 @@
 
 .clear-input {
     position: absolute;
-    right: 8px;
+    right: 25px;
     top: 50%; /* Centralizar verticalmente */
     transform: translateY(-50%); /* Centralizar verticalmente */
     width: 16px;
