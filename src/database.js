@@ -101,49 +101,44 @@ class Database {
         });
     }
 
-    async buscarChecklists(termo) {
+    async buscarChecklists(termo, filtros = { nome: true, etiqueta: false }) {
+        if (!filtros.nome && !filtros.etiqueta) {
+            filtros.nome = true; // Garantir pelo menos um filtro ativo
+        }
+
         return new Promise((resolve, reject) => {
+            const conditions = [];
+            const params = [];
+
+            if (filtros.nome) {
+                conditions.push('c.nome LIKE ?');
+                params.push(`%${termo}%`);
+            }
+
+            if (filtros.etiqueta) {
+                conditions.push(`EXISTS (
+                    SELECT 1 FROM json_each(c.tag) 
+                    WHERE value LIKE ?
+                )`);
+                params.push(`%${termo}%`);
+            }
+
+            const whereClause = conditions.length > 0
+                ? 'WHERE ' + conditions.join(' OR ')
+                : '';
+
             this.db.all(`
-                WITH RECURSIVE
-                split_tags(id, nome, tag_value, checklist, modelo_id) AS (
-                    SELECT 
-                        id,
-                        nome,
-                        json_each.value,
-                        checklist,
-                        modelo_id
-                    FROM checklists, json_each(checklists.tag)
-                )
                 SELECT DISTINCT
                     c.id,
                     c.nome,
                     c.tag,
                     c.checklist,
-                    c.modelo_id,
-                    CASE 
-                        WHEN c.nome LIKE ? THEN 3
-                        WHEN st.tag_value LIKE ? THEN 2
-                        ELSE 1
-                    END as relevance
+                    c.modelo_id
                 FROM checklists c
-                LEFT JOIN split_tags st ON c.id = st.id
-                WHERE 
-                    c.nome LIKE ? OR
-                    st.tag_value LIKE ? OR
-                    EXISTS (
-                        SELECT 1
-                        FROM json_each(c.checklist) checklist_items
-                        WHERE 
-                            json_extract(checklist_items.value, '$.descrição') LIKE ? OR
-                            json_extract(checklist_items.value, '$.descricao') LIKE ?
-                    )
-                ORDER BY relevance DESC, c.nome COLLATE NOCASE
+                ${whereClause}
+                ORDER BY c.nome COLLATE NOCASE
                 LIMIT 100
-            `, [
-                `%${termo}%`, `%${termo}%`,
-                `%${termo}%`, `%${termo}%`,
-                `%${termo}%`, `%${termo}%`
-            ], (err, rows) => {
+            `, params, (err, rows) => {
                 if (err) reject(err);
                 else resolve(rows);
             });

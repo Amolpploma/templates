@@ -27,7 +27,13 @@ if (searchChecklistInput && searchChecklistResults) {
         }
 
         try {
-            const resultados = await window.electronAPI.buscarChecklists(termo);
+            // Obter estado dos checkboxes de filtro
+            const filtros = {
+                nome: document.getElementById('checklist-nome').checked,
+                etiqueta: document.getElementById('checklist-etiqueta').checked
+            };
+
+            const resultados = await window.electronAPI.buscarChecklists(termo, filtros);
             exibirResultadosChecklist(resultados);
         } catch (err) {
             console.error('Erro na busca de checklists:', err);

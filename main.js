@@ -80,9 +80,9 @@ const createWindow = () => {
 }
 
 function registerIpcHandlers() {
-  ipcMain.handle('buscar-checklists', async (event, termo) => {
+  ipcMain.handle('buscar-checklists', async (event, termo, filtros) => {
     try {
-      const resultados = await database.buscarChecklists(termo);
+      const resultados = await database.buscarChecklists(termo, filtros);
       return resultados;
     } catch (err) {
       console.error('Erro na busca de checklists:', err);
