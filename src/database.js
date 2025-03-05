@@ -180,37 +180,35 @@ class Database {
         return Array.isArray(data) ? data : [data];
     }
 
-    buscarChecklists(termo) {
+    async verificarModeloExistente(nome) {
         return new Promise((resolve, reject) => {
-            this.db.all(
-                `SELECT * FROM checklists 
-                WHERE nome LIKE ? 
-                OR EXISTS (
-                    SELECT 1 
-                    FROM json_each(tag) 
-                    WHERE value LIKE ?
-                )
-                ORDER BY nome COLLATE NOCASE`,
-                [`%${termo}%`, `%${termo}%`],
-                (err, rows) => {
+            this.db.get(
+                'SELECT * FROM modelos WHERE nome = ?',
+                [nome],
+                (err, row) => {
                     if (err) reject(err);
-                    else resolve(rows);
+                    else resolve(row);
                 }
             );
         });
     }
 
-    atualizarModelo(id, nome, tag, modelo) {
-        return new Promise((resolve, reject) => {
-            this.db.run(
-                'UPDATE modelos SET nome = ?, tag = ?, modelo = ? WHERE id = ?',
-                [nome, tag, modelo, id],
-                function(err) {
-                    if (err) reject(err);
-                    else resolve(this.changes);
-                }
-            );
-        });
+    async atualizarModelo(id, nome, tag, modelo) {
+        try {
+            const tagArray = this.#validarJSON(tag);
+            return new Promise((resolve, reject) => {
+                this.db.run(
+                    'UPDATE modelos SET nome = ?, tag = ?, modelo = ? WHERE id = ?',
+                    [nome, JSON.stringify(tagArray), modelo, id],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve(this.changes);
+                    }
+                );
+            });
+        } catch (err) {
+            throw new Error(`Erro ao validar JSON: ${err.message}`);
+        }
     }
 
     deletarModelo(id) {

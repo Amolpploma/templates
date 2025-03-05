@@ -127,6 +127,24 @@ function registerIpcHandlers() {
       return null;
     }
   });
+
+  ipcMain.handle('verificar-modelo', async (event, nome) => {
+    try {
+      return await database.verificarModeloExistente(nome);
+    } catch (err) {
+      console.error('Erro ao verificar modelo:', err);
+      return null;
+    }
+  });
+
+  ipcMain.handle('atualizar-modelo', async (event, { id, nome, tag, modelo }) => {
+    try {
+      return await database.atualizarModelo(id, nome, tag, modelo);
+    } catch (err) {
+      console.error('Erro ao atualizar modelo:', err);
+      return null;
+    }
+  });
 }
 
 // This method will be called when Electron has finished

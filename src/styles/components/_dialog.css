@@ -1,0 +1,81 @@
+.custom-dialog {
+    position: fixed;
+    inset: 0; /* Shorthand para top/right/bottom/left: 0 */
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.dialog-content {
+    background-color: var(--panel-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 400px;
+    transform: translateY(0);
+    opacity: 1;
+    animation: dialogFadeIn 0.2s ease-out;
+    margin: 0; /* Removido margin que estava causando o deslocamento */
+}
+
+@keyframes dialogFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dialog-content h2 {
+    margin: 0 0 15px 0;
+    color: var(--text-primary);
+}
+
+.dialog-content p {
+    margin: 0 0 20px 0;
+    color: var(--text-secondary);
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-secondary {
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
+}
+
+.btn-primary {
+    background-color: var(--btn-hover);
+    color: var(--text-primary);
+}
+
+.btn-secondary,
+.btn-primary {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover,
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* Prevenir scroll do body quando o diálogo estiver aberto */
+body.dialog-open {
+    overflow: hidden;
+}
