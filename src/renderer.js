@@ -62,7 +62,7 @@ if (searchInput && searchResults) {
                 try {
                     const tags = Array.isArray(modelo.tag) ? modelo.tag : JSON.parse(modelo.tag || '[]');
                     const tagsHtml = tags
-                        .map(tag => `<span class="tag">${highlightText(tag, searchInput.value, filtros.etiqueta)}</span>`)
+                        .map(tag => `<span class="tag" data-tag="${encodeURIComponent(tag)}">${highlightText(tag, searchInput.value, filtros.etiqueta)}</span>`)
                         .join('');
 
                     return `
@@ -105,7 +105,10 @@ if (searchInput && searchResults) {
                     </div>
                     <div class="button-container">
                         <button class="btn-inserir">Inserir modelo</button>
-                        ${isEditorPage ? '<button class="btn-danger">Apagar</button>' : ''}
+                        ${isEditorPage ? `
+                            <button class="btn-editar">Editar</button>
+                            <button class="btn-danger">Apagar</button>
+                        ` : ''}
                     </div>
                 `;
 
@@ -275,14 +278,40 @@ if (searchInput && searchResults) {
 
     function atualizarBotaoInserir() {
         const btnInserir = resultsContent.querySelector('.btn-inserir');
+        const btnEditar = resultsContent.querySelector('.btn-editar');
+        const modeloSelecionado = document.querySelector('.resultado-modelo.selected');
+
         if (btnInserir) {
             btnInserir.addEventListener('click', () => {
-                const modeloSelecionado = document.querySelector('.resultado-modelo.selected');
                 if (modeloSelecionado) {
                     const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
                     const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
                     const modeloId = modeloSelecionado.dataset.id;
-                    window.inserirModelo(modelo, nome, modeloId); // Usar função global
+                    window.inserirModelo(modelo, nome, modeloId);
+                }
+            });
+        }
+
+        if (btnEditar) {
+            btnEditar.addEventListener('click', () => {
+                if (modeloSelecionado) {
+                    const nomeInput = document.getElementById('nome-input');
+                    const tagInput = document.getElementById('tag-input');
+                    
+                    // Obter nome
+                    const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
+                    
+                    // Obter tags dos atributos data-tag
+                    const tags = Array.from(modeloSelecionado.querySelectorAll('.tag'))
+                        .map(tag => decodeURIComponent(tag.dataset.tag));
+                    
+                    // Obter conteúdo do modelo
+                    const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
+                    
+                    // Preencher os campos
+                    nomeInput.value = nome;
+                    tagInput.value = tags.join(', ');
+                    window.quill.root.innerHTML = modelo;
                 }
             });
         }

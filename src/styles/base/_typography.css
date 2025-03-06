@@ -14,6 +14,7 @@ body:not(.ql-editor *) {
     font-size: 13px;
 }
 
-.btn-inserir {
-    font-size: 14px;
+.btn-inserir,.btn-danger,.btn-editar {
+    font-family: inherit;
+    font-size: 12px;
 }

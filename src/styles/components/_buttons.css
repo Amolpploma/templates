@@ -1,14 +1,12 @@
 .btn-inserir {
     position: static; /* Remover posicionamento absoluto */
     margin: 0; /* Remover margens */
-    padding: 8px 16px; /* Ajustar padding */
+    padding: 8px 8px; /* Ajustar padding */
     background-color: var(--btn-bg);
     color: var(--text-primary);
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
-    font-family: inherit;
     box-shadow: none; /* Remover sombra */
     width: 100%; /* Ajustar largura */
 }
@@ -77,11 +75,10 @@
 .btn-danger {
     background-color: var(--btn-danger-bg);
     color: white;
-    padding: 8px 16px;
+    padding: 8px 8px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
     transition: background-color 0.2s;
     margin: 0; /* Remover margens */
 }
@@ -91,6 +88,25 @@
 }
 
 .btn-danger:active {
+    transform: translateY(1px);
+}
+
+.btn-editar {
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
+    padding: 8px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin: 0;
+}
+
+.btn-editar:hover {
+    background-color: var(--btn-hover);
+}
+
+.btn-editar:active {
     transform: translateY(1px);
 }
 

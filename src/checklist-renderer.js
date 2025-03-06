@@ -51,7 +51,7 @@ if (searchChecklistInput && searchChecklistResults) {
                 try {
                     const tags = Array.isArray(checklist.tag) ? checklist.tag : JSON.parse(checklist.tag || '[]');
                     const tagsHtml = tags
-                        .map(tag => `<span class="tag">${highlightText(tag, searchChecklistInput.value, filtros.etiqueta)}</span>`)
+                        .map(tag => `<span class="tag" data-tag="${encodeURIComponent(tag)}">${highlightText(tag, searchChecklistInput.value, filtros.etiqueta)}</span>`)
                         .join('');
 
                     const checklistData = typeof checklist.checklist === 'string' ? 
