@@ -15,6 +15,12 @@
 .modelo-box:nth-child(4n+3) { background-color: var(--modelo-box-light-3); }
 .modelo-box:nth-child(4n+4) { background-color: var(--modelo-box-light-4); }
 
+/* Classes para cores aleatórias */
+.modelo-box-color-1 { background-color: var(--modelo-box-light-1); }
+.modelo-box-color-2 { background-color: var(--modelo-box-light-2); }
+.modelo-box-color-3 { background-color: var(--modelo-box-light-3); }
+.modelo-box-color-4 { background-color: var(--modelo-box-light-4); }
+
 .modelo-header {
     display: flex;
     justify-content: space-between;
@@ -73,6 +79,11 @@
 .modelo-action-btn:hover {
     transform: scale(1.1);
     background: var(--modelo-btn-hover);
+}
+
+/* Estado de sucesso para o botão de copiar */
+.modelo-action-btn.copy-success {
+    color: var(--checklist-active-color);
 }
 
 .modelo-content {
