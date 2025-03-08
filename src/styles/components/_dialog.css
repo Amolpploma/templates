@@ -68,6 +68,7 @@
     cursor: pointer;
     font-size: 14px;
     transition: all 0.2s;
+    min-width: 80px; /* Garantir largura mínima para os botões */
 }
 
 .btn-secondary:hover,
