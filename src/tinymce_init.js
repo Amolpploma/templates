@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusbar: true,
         elementpath: false,
         toolbar: "charmap | undo redo selectall copy| searchreplace | numlist bullist | fontfamily fontsize | bold italic underline | align outdent indent| lineheight | forecolor backcolor removeformat",
-        //content_style: 'body { font-family:times new roman,times; font-size:14px }',
+        content_style: 'body { font-family:times new roman,times; font-size:14px }',
         license_key: 'gpl'
     });
 
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         statusbar: true,
                         elementpath: false,
                         toolbar: "charmap | undo redo selectall copy| searchreplace | numlist bullist | fontfamily fontsize | bold italic underline | align outdent indent| lineheight | forecolor backcolor removeformat",
-                        //content_style: 'body { font-family:times new roman,times; font-size:14px }',
+                        content_style: 'body { font-family:times new roman,times; font-size:14px }',
                         license_key: 'gpl'
                     });
                 }

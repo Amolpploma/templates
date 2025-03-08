@@ -3,9 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const nomeInput = document.getElementById('nome-input');
     const tagInput = document.getElementById('tag-input');
 
-    const waitForQuill = setInterval(() => {
-        if (window.quill) {
-            clearInterval(waitForQuill);
+    // Remover o check pelo Quill e usar TinyMCE
+    const waitForEditor = setInterval(() => {
+        if (window.tinymce?.activeEditor) {
+            clearInterval(waitForEditor);
             setupSaveHandler();
         }
     }, 100);
@@ -13,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function limparCampos() {
         nomeInput.value = '';
         tagInput.value = '';
-        window.quill.setText('');
+        tinymce.activeEditor.setContent('');
     }
 
     function showDialog(message) {
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .split(',')
                 .map(tag => tag.trim())
                 .filter(tag => tag.length > 0);
-            const modeloContent = window.quill.root.innerHTML;
+            const modeloContent = tinymce.activeEditor.getContent();
 
             if (!nome) {
                 alert('Por favor, insira um nome para o modelo');

@@ -127,7 +127,8 @@ if (searchInput && searchResults) {
                     });
                 }
 
-                atualizarBotaoInserir();
+                // Atualizar para usar a função global
+                window.atualizarBotaoInserir(resultsContent);
             });
         });
 
@@ -264,47 +265,6 @@ if (searchInput && searchResults) {
     }
 
     // Remover a função inserirModelo daqui pois ela agora está em shared-functions.js
-
-    function atualizarBotaoInserir() {
-        const btnInserir = resultsContent.querySelector('.btn-inserir');
-        const btnEditar = resultsContent.querySelector('.btn-editar');
-        const modeloSelecionado = document.querySelector('.resultado-modelo.selected');
-
-        if (btnInserir) {
-            btnInserir.addEventListener('click', () => {
-                if (modeloSelecionado) {
-                    const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
-                    const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
-                    const modeloId = modeloSelecionado.dataset.id;
-                    window.inserirModelo(modelo, nome, modeloId);
-                }
-            });
-        }
-
-        if (btnEditar) {
-            btnEditar.addEventListener('click', () => {
-                if (modeloSelecionado) {
-                    const nomeInput = document.getElementById('nome-input');
-                    const tagInput = document.getElementById('tag-input');
-                    
-                    // Obter nome
-                    const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
-                    
-                    // Obter tags dos atributos data-tag
-                    const tags = Array.from(modeloSelecionado.querySelectorAll('.tag'))
-                        .map(tag => decodeURIComponent(tag.dataset.tag));
-                    
-                    // Obter conteúdo do modelo
-                    const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
-                    
-                    // Preencher os campos
-                    nomeInput.value = nome;
-                    tagInput.value = tags.join(', ');
-                    window.quill.root.innerHTML = modelo;
-                }
-            });
-        }
-    }
 
     async function salvarDocumento() {
         const modelo = textArea.value;
