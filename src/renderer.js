@@ -211,50 +211,35 @@ if (searchInput && searchResults) {
             e.preventDefault();
             const content = modeloContent.innerHTML;
             
-            if (window.quill) {
+            // Usar TinyMCE em vez de Quill
+            if (window.tinymce && window.tinymce.activeEditor) {
                 try {
-                    const editor = window.quill;
-                    let textLength = 0;
+                    const editor = window.tinymce.activeEditor;
+                    const currentContent = editor.getContent();
                     
-                    // Tentar obter o texto usando diferentes métodos
-                    if (typeof editor.getText === 'function') {
-                        textLength = editor.getText().length;
-                    } else if (editor.root && typeof editor.root.innerText === 'string') {
-                        textLength = editor.root.innerText.length;
-                    } else {
-                        console.warn('Não foi possível obter o comprimento do texto do editor.');
-                    }
+                    // Adicionar quebras de linha se já houver conteúdo
+                    const newContent = currentContent 
+                        ? currentContent + '<p>&nbsp;</p>' + content 
+                        : content;
                     
-                    // Adicionar quebras de linha se necessário
-                    if (textLength > 1) {
-                        if (typeof editor.insertText === 'function') {
-                            editor.insertText(textLength - 1, '\n\n');
-                        } else {
-                            editor.root.innerHTML += '<br><br>';
-                        }
-                    }
+                    // Inserir o conteúdo
+                    editor.setContent(newContent);
                     
-                    // Inserir o conteúdo HTML
-                    if (typeof editor.clipboard !== 'undefined' && typeof editor.clipboard.dangerouslyPasteHTML === 'function') {
-                        editor.clipboard.dangerouslyPasteHTML(textLength, content);
-                    } else {
-                        editor.root.innerHTML += content;
-                    }
+                    // Mover o cursor para o final
+                    editor.selection.select(editor.getBody(), true);
+                    editor.selection.collapse(false);
                     
-                    // Rolar para o final do editor
-                    const editorElement = document.querySelector('.ql-editor');
-                    if (editorElement) {
-                        setTimeout(() => {
-                            editorElement.scrollTop = editorElement.scrollHeight;
-                        }, 100);
-                    }
+                    // Rolar para o final
+                    const body = editor.getBody();
+                    body.scrollTop = body.scrollHeight;
                     
+                    // Remover a caixa do modelo
                     div.remove();
                 } catch (error) {
                     console.error('Erro ao inserir conteúdo no editor:', error);
                 }
             } else {
-                console.error('Editor Quill não encontrado');
+                console.error('Editor TinyMCE não encontrado');
             }
         });
 
