@@ -101,49 +101,44 @@ class Database {
         });
     }
 
-    async buscarChecklists(termo) {
+    async buscarChecklists(termo, filtros = { nome: true, etiqueta: false }) {
+        if (!filtros.nome && !filtros.etiqueta) {
+            filtros.nome = true; // Garantir pelo menos um filtro ativo
+        }
+
         return new Promise((resolve, reject) => {
+            const conditions = [];
+            const params = [];
+
+            if (filtros.nome) {
+                conditions.push('c.nome LIKE ?');
+                params.push(`%${termo}%`);
+            }
+
+            if (filtros.etiqueta) {
+                conditions.push(`EXISTS (
+                    SELECT 1 FROM json_each(c.tag) 
+                    WHERE value LIKE ?
+                )`);
+                params.push(`%${termo}%`);
+            }
+
+            const whereClause = conditions.length > 0
+                ? 'WHERE ' + conditions.join(' OR ')
+                : '';
+
             this.db.all(`
-                WITH RECURSIVE
-                split_tags(id, nome, tag_value, checklist, modelo_id) AS (
-                    SELECT 
-                        id,
-                        nome,
-                        json_each.value,
-                        checklist,
-                        modelo_id
-                    FROM checklists, json_each(checklists.tag)
-                )
                 SELECT DISTINCT
                     c.id,
                     c.nome,
                     c.tag,
                     c.checklist,
-                    c.modelo_id,
-                    CASE 
-                        WHEN c.nome LIKE ? THEN 3
-                        WHEN st.tag_value LIKE ? THEN 2
-                        ELSE 1
-                    END as relevance
+                    c.modelo_id
                 FROM checklists c
-                LEFT JOIN split_tags st ON c.id = st.id
-                WHERE 
-                    c.nome LIKE ? OR
-                    st.tag_value LIKE ? OR
-                    EXISTS (
-                        SELECT 1
-                        FROM json_each(c.checklist) checklist_items
-                        WHERE 
-                            json_extract(checklist_items.value, '$.descrição') LIKE ? OR
-                            json_extract(checklist_items.value, '$.descricao') LIKE ?
-                    )
-                ORDER BY relevance DESC, c.nome COLLATE NOCASE
+                ${whereClause}
+                ORDER BY c.nome COLLATE NOCASE
                 LIMIT 100
-            `, [
-                `%${termo}%`, `%${termo}%`,
-                `%${termo}%`, `%${termo}%`,
-                `%${termo}%`, `%${termo}%`
-            ], (err, rows) => {
+            `, params, (err, rows) => {
                 if (err) reject(err);
                 else resolve(rows);
             });
@@ -180,37 +175,35 @@ class Database {
         return Array.isArray(data) ? data : [data];
     }
 
-    buscarChecklists(termo) {
+    async verificarModeloExistente(nome) {
         return new Promise((resolve, reject) => {
-            this.db.all(
-                `SELECT * FROM checklists 
-                WHERE nome LIKE ? 
-                OR EXISTS (
-                    SELECT 1 
-                    FROM json_each(tag) 
-                    WHERE value LIKE ?
-                )
-                ORDER BY nome COLLATE NOCASE`,
-                [`%${termo}%`, `%${termo}%`],
-                (err, rows) => {
+            this.db.get(
+                'SELECT * FROM modelos WHERE nome = ?',
+                [nome],
+                (err, row) => {
                     if (err) reject(err);
-                    else resolve(rows);
+                    else resolve(row);
                 }
             );
         });
     }
 
-    atualizarModelo(id, nome, tag, modelo) {
-        return new Promise((resolve, reject) => {
-            this.db.run(
-                'UPDATE modelos SET nome = ?, tag = ?, modelo = ? WHERE id = ?',
-                [nome, tag, modelo, id],
-                function(err) {
-                    if (err) reject(err);
-                    else resolve(this.changes);
-                }
-            );
-        });
+    async atualizarModelo(id, nome, tag, modelo) {
+        try {
+            const tagArray = this.#validarJSON(tag);
+            return new Promise((resolve, reject) => {
+                this.db.run(
+                    'UPDATE modelos SET nome = ?, tag = ?, modelo = ? WHERE id = ?',
+                    [nome, JSON.stringify(tagArray), modelo, id],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve(this.changes);
+                    }
+                );
+            });
+        } catch (err) {
+            throw new Error(`Erro ao validar JSON: ${err.message}`);
+        }
     }
 
     deletarModelo(id) {

@@ -6,11 +6,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Atualizar para passar os filtros
     buscarDocumentos: (termo, filtros) => ipcRenderer.invoke('buscar-documentos', termo, filtros),
     salvarDocumento: (dados) => ipcRenderer.invoke('salvar-documento', dados),
-    buscarChecklists: (termo) => ipcRenderer.invoke('buscar-checklists', termo),
+    buscarChecklists: (termo, filtros) => ipcRenderer.invoke('buscar-checklists', termo, filtros),
     buscarModeloPorId: (id) => ipcRenderer.invoke('buscar-modelo-por-id', id),
     minimizeWindow: () => ipcRenderer.send('minimize-window'),
     maximizeWindow: () => ipcRenderer.send('maximize-window'),
-    closeWindow: () => ipcRenderer.send('close-window')
+    closeWindow: () => ipcRenderer.send('close-window'),
+    apagarModelo: (id) => ipcRenderer.invoke('apagar-modelo', id),
+    verificarModelo: (nome) => ipcRenderer.invoke('verificar-modelo', nome),
+    atualizarModelo: (dados) => ipcRenderer.invoke('atualizar-modelo', dados)
 });
 
 // Expor Quill para o renderer process

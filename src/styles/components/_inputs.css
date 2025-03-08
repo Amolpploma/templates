@@ -65,3 +65,59 @@
 .search-checklist-input:not(:placeholder-shown) + .clear-input {
     display: block;
 }
+
+.editor-inputs {
+    display: flex;
+    gap: 10px;
+    padding: 0 20px 0 10px;
+    margin-bottom: 10px;
+    align-items: center; /* Alinhar verticalmente com os inputs */
+}
+
+.editor-inputs .input-container {
+    flex: 1;
+    position: relative;
+}
+
+.editor-input {
+    width: 100%;
+    height: 36px;
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.editor-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.editor-input:focus {
+    outline: none;
+    border-color: var(--result-selected-border);
+    box-shadow: 0 0 0 1px var(--result-selected-border);
+}
+
+.btn-salvar {
+    height: 36px;
+    padding: 0 16px;
+    background-color: var(--btn-bg); /* Usando a mesma variável do btn-inserir */
+    color: var(--text-primary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-salvar:hover {
+    background-color: var(--btn-hover); /* Usando a mesma variável do btn-inserir */
+}
+
+.btn-salvar:active {
+    transform: translateY(1px);
+}

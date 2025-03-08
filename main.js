@@ -80,9 +80,9 @@ const createWindow = () => {
 }
 
 function registerIpcHandlers() {
-  ipcMain.handle('buscar-checklists', async (event, termo) => {
+  ipcMain.handle('buscar-checklists', async (event, termo, filtros) => {
     try {
-      const resultados = await database.buscarChecklists(termo);
+      const resultados = await database.buscarChecklists(termo, filtros);
       return resultados;
     } catch (err) {
       console.error('Erro na busca de checklists:', err);
@@ -115,6 +115,33 @@ function registerIpcHandlers() {
       return modelo;
     } catch (err) {
       console.error('Erro ao buscar modelo por ID:', err);
+      return null;
+    }
+  });
+  
+  ipcMain.handle('apagar-modelo', async (event, id) => {
+    try {
+      return await database.deletarModelo(id);
+    } catch (err) {
+      console.error('Erro ao apagar modelo:', err);
+      return null;
+    }
+  });
+
+  ipcMain.handle('verificar-modelo', async (event, nome) => {
+    try {
+      return await database.verificarModeloExistente(nome);
+    } catch (err) {
+      console.error('Erro ao verificar modelo:', err);
+      return null;
+    }
+  });
+
+  ipcMain.handle('atualizar-modelo', async (event, { id, nome, tag, modelo }) => {
+    try {
+      return await database.atualizarModelo(id, nome, tag, modelo);
+    } catch (err) {
+      console.error('Erro ao atualizar modelo:', err);
       return null;
     }
   });

@@ -35,4 +35,9 @@
 .ql-toolbar {
     border-radius: 4px;
     padding: 5.2px 8px !important;
+    margin: 0 20px 0 10px !important;
+}
+
+.ql-editor {
+    padding: 15px 15px !important;    
 }
