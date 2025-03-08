@@ -9,35 +9,11 @@
 
 .textarea-editor {
     grid-row: 4;
-    height: calc(50% - 16px);
+    height: 100%;
     min-height: 50px;
     padding: 10px;
     overflow-y: auto;
     background-color: var(--panel-bg);
     color: var(--text-primary);
     border-color: var(--textarea-border);
-}
-
-/* Quill Editor Styles */
-.ql-container, .ql-toolbar {
-    background-color: var(--panel-bg);
-    border-color: var(--border-color) !important;
-}
-
-.ql-toolbar .ql-stroke {
-    stroke: var(--text-primary);
-}
-
-.ql-toolbar .ql-fill {
-    fill: var(--text-primary);
-}
-
-.ql-toolbar {
-    border-radius: 4px;
-    padding: 5.2px 8px !important;
-    margin: 0 20px 0 10px !important;
-}
-
-.ql-editor {
-    padding: 15px 15px !important;    
 }

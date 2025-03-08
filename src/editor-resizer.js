@@ -2,7 +2,7 @@ console.log('Arquivo editor-resizer.js carregado');
 
 document.addEventListener('DOMContentLoaded', () => {
     const panel = document.querySelector('.editor-panel');
-    const toolbar = document.querySelector('.ql-toolbar.ql-snow');
+    //const toolbar = document.querySelector('.ql-toolbar.ql-snow');
     const editorContainer = document.getElementById('editor-container');
     const resizer = document.getElementById('editor-resizer');
     const textareaEditor = document.querySelector('.textarea-editor');
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         console.log('Medidas reais:', {
             panel: panelHeight,
-            toolbar: toolbarHeight,
+            //toolbar: toolbarHeight,
             resizer: resizerHeight,
             available: availableHeight
         });
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         panel.style.overflow = 'hidden';
 
         // Remover margens que possam interferir
-        toolbar.style.margin = '0';
+        //toolbar.style.margin = '0';
         resizer.style.margin = '0';
         editorContainer.style.margin = '0';
         textareaEditor.style.margin = '0';

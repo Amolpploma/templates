@@ -7,6 +7,7 @@
     background-color: var(--bg-primary);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
+    height: 100%;
 }
 
 .modelo-box:nth-child(4n+1) { background-color: var(--modelo-box-light-1); }

@@ -15,29 +15,3 @@ contextBridge.exposeInMainWorld('electronAPI', {
     verificarModelo: (nome) => ipcRenderer.invoke('verificar-modelo', nome),
     atualizarModelo: (dados) => ipcRenderer.invoke('atualizar-modelo', dados)
 });
-
-// Expor Quill para o renderer process
-contextBridge.exposeInMainWorld('QuillEditor', {
-    createEditor: (selector, options) => {
-        return import('quill').then(module => new module.default(selector, options));
-    }
-});
-
-// Adicionar API para obter caminhos
-contextBridge.exposeInMainWorld('paths', {
-    getQuillPaths: () => {
-        const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
-        
-        if (isDev) {
-            return {
-                js: '../node_modules/quill/dist/quill.js',
-                css: '../node_modules/quill/dist/quill.snow.css'
-            };
-        } else {
-            return {
-                js: '../resources/quill.js',
-                css: '../resources/quill.snow.css'
-            };
-        }
-    }
-});
