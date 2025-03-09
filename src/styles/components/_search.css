@@ -186,4 +186,5 @@ body[data-page="checklist-editor"] .associate-model-btn {
     color: var(--modelo-associado-text);
     margin-top: 4px;
     font-style: italic;
+    text-align: justify;
 }

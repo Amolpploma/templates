@@ -237,6 +237,26 @@
 .editor-panel {
     display: flex;
     flex-direction: column;
+    height: 100%; /* Garante que o painel ocupe toda a altura disponível */
+    box-sizing: border-box; /* Inclui padding e borda no cálculo da largura/altura */
+}
+
+#editor-container {
+    flex: 1; /* Permite que o editor cresça para ocupar o espaço disponível */
+    min-height: 200px; /* Altura mínima para o editor */
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.textarea-editor {
+    flex: 1; /* Permite que a textarea cresça para ocupar o espaço disponível */
+    min-height: 200px; /* Altura mínima para a textarea */
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    background-color: var(--panel-bg);
+    color: var(--text-primary);
+    border-color: var(--textarea-border);
 }
 
 .checklist-header {
