@@ -124,26 +124,33 @@
     transform: translateY(1px);
 }
 
-/* Estilos para o input de item de checklist */
-.checklist-item-input {
+.checklist-item-row {
     display: flex;
     gap: 8px;
     align-items: center;
+    margin-bottom: 10px;
+    background-color: var(--bg-secondary);
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
 }
 
-.checklist-item-input .editor-input {
+.checklist-item-input {
     flex: 1;
+    height: 36px;
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: inherit;
 }
 
-.item-actions {
-    display: flex;
-    gap: 4px;
-}
-
-.item-action-btn {
-    width: 24px;
-    height: 24px;
-    padding: 4px;
+.checklist-item-btn {
+    width: 28px;
+    height: 28px;
+    padding: 6px;
     border: none;
     border-radius: 4px;
     background-color: var(--btn-bg);
@@ -152,25 +159,37 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 }
 
-.item-action-btn svg {
+.checklist-item-btn:hover {
+    background-color: var(--btn-hover);
+}
+
+.checklist-item-btn svg {
     width: 16px;
     height: 16px;
     fill: currentColor;
 }
 
-.item-action-btn:hover {
-    background-color: var(--btn-hover);
-    transform: scale(1.05);
-}
-
-.item-action-btn:active {
-    transform: scale(0.95);
-}
-
-.item-action-btn.close:hover {
+.checklist-item-btn.remove:hover {
     background-color: var(--btn-danger-bg);
     color: white;
+}
+
+.btn-adicionar-item {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: inherit;
+    transition: background-color 0.2s;
+}
+
+.btn-adicionar-item:hover {
+    background-color: var(--btn-hover);
 }
