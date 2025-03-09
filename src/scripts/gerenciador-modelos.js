@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSalvar = document.querySelector('.btn-salvar');
     const nomeInput = document.getElementById('nome-input');
     const tagInput = document.getElementById('tag-input');
+    const searchInput = document.querySelector('.search-input');
 
     // Remover o check pelo Quill e usar TinyMCE
     const waitForEditor = setInterval(() => {
@@ -15,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
         nomeInput.value = '';
         tagInput.value = '';
         tinymce.activeEditor.setContent('');
+        // Limpar campo de pesquisa e disparar o evento input para atualizar a lista
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
     }
 
     function showDialog(title, message, buttons) {

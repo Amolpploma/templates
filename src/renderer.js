@@ -115,13 +115,39 @@ if (searchInput && searchResults) {
                 if (isEditorPage) {
                     const btnApagar = resultsContent.querySelector('.btn-danger');
                     btnApagar.addEventListener('click', async () => {
-                        if (confirm('Tem certeza que deseja apagar este modelo?')) {
+                        const shouldDelete = await showDialog(
+                            'Confirmar exclusão',
+                            'Tem certeza que deseja apagar este modelo?',
+                            [{
+                                id: 'btn-cancelar',
+                                text: 'Cancelar',
+                                class: 'btn-secondary',
+                                value: false
+                            },
+                            {
+                                id: 'btn-apagar',
+                                text: 'Apagar',
+                                class: 'btn-danger',
+                                value: true
+                            }]
+                        );
+
+                        if (shouldDelete) {
                             try {
                                 await window.electronAPI.apagarModelo(item.dataset.id);
-                                // Atualizar a lista após apagar
                                 realizarBusca(searchInput.value);
                             } catch (err) {
                                 console.error('Erro ao apagar modelo:', err);
+                                await showDialog(
+                                    'Erro',
+                                    'Erro ao apagar o modelo',
+                                    [{
+                                        id: 'btn-ok',
+                                        text: 'OK',
+                                        class: 'btn-primary',
+                                        value: false
+                                    }]
+                                );
                             }
                         }
                     });
@@ -309,5 +335,39 @@ if (searchInput && searchResults) {
     document.addEventListener('DOMContentLoaded', () => {
         setupSearchRefinements('.left-panel', 'checklist-nome');
         setupSearchRefinements('.right-panel', 'modelo-nome');
+    });
+}
+
+function showDialog(title, message, buttons) {
+    return new Promise((resolve) => {
+        const existingDialog = document.querySelector('.custom-dialog');
+        if (existingDialog) {
+            document.body.classList.remove('dialog-open');
+            existingDialog.remove();
+        }
+        
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-dialog';
+        dialog.innerHTML = `
+            <div class="dialog-content">
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="dialog-buttons">${buttons.map(btn => `
+                    <button class="${btn.class}" id="${btn.id}">${btn.text}</button>
+                `).join('')}</div>
+            </div>
+        `;
+    
+        document.body.appendChild(dialog);
+        document.body.classList.add('dialog-open');
+
+        // Configurar eventos dos botões
+        buttons.forEach(btn => {
+            dialog.querySelector(`#${btn.id}`).onclick = () => {
+                document.body.classList.remove('dialog-open');
+                dialog.remove();
+                resolve(btn.value);
+            };
+        });
     });
 }
