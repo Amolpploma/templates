@@ -1,25 +1,25 @@
 [data-theme="dark"] {
-    /* Cores base */
-    --bg-primary: #1e1e1e;
-    --bg-secondary: #2d2d2d;
-    --text-primary: #cccccc;
-    --text-secondary: #cccccc;
-    --border-color: #666666;
+    /* Cores base - adaptadas do TinyMCE dark theme */
+    --bg-primary: #222f3e;      /* Cor de fundo principal do TinyMCE dark */
+    --bg-secondary: #2f3742;    /* Cor de fundo secundária do TinyMCE dark */
+    --text-primary: #e3e3e3;    /* Cor de texto do TinyMCE dark */
+    --text-secondary: #bdbdbd;
+    --border-color: #495057;    /* Cor de borda do TinyMCE dark */
 
     /* Barra de título */
-    --titlebar-bg: #1e1e1e;
-    --titlebar-text: #858585;
+    --titlebar-bg: #222f3e;
+    --titlebar-text: #bdbdbd;
     --titlebar-active: #ffffff;
-    --titlebar-hover: #404040;
-    --tab-active-bg: #2d2d2d;
-    --tab-active-border: #007acc;
+    --titlebar-hover: #2f3742;
+    --tab-active-bg: #2f3742;
+    --tab-active-border: #4099ff;
 
     /* Resultados */
-    --result-bg-odd: #2d2d2d;
-    --result-bg-even: #1e1e1e;
-    --result-hover-bg: #3d3d3d;
-    --result-selected-bg: #004a77;
-    --result-selected-border: #0078d4;
+    --result-bg-odd: #2f3742;
+    --result-bg-even: #222f3e;
+    --result-hover-bg: #364150;
+    --result-selected-bg: #264f78;
+    --result-selected-border: #4099ff;
 
     /* Checklist */
     --checklist-bg: #2d2d2d;
@@ -29,13 +29,23 @@
     --checklist-inactive-bg: #4a1515;
     --checklist-inactive-color: #ff5252;
 
+    /* Inputs e campos de texto */
+    --input-bg: #2f3742;
+    --input-text: #e3e3e3;
+    --input-border: #495057;
+    --input-placeholder: #6c757d;
+
+    /* Scrollbar */
+    --scroll-thumb: #495057;
+    --scroll-thumb-hover: #5a6268;
+
     /* Modelo Box */
-    --modelo-box-light-1: rgba(25, 118, 210, 0.15);
-    --modelo-box-light-2: rgba(56, 142, 60, 0.15);
-    --modelo-box-light-3: rgba(245, 124, 0, 0.15);
-    --modelo-box-light-4: rgba(123, 31, 162, 0.15);
-    --modelo-header-bg: rgba(255, 255, 255, 0.1);
-    --modelo-title-color: rgba(255, 255, 255, 0.8);
+    --modelo-box-light-1: rgba(64, 153, 255, 0.1);
+    --modelo-box-light-2: rgba(80, 250, 123, 0.1);
+    --modelo-box-light-3: rgba(255, 184, 108, 0.1);
+    --modelo-box-light-4: rgba(189, 147, 249, 0.1);
+    --modelo-header-bg: rgba(255, 255, 255, 0.05);
+    --modelo-title-color: rgba(227, 227, 227, 0.9);
     --modelo-btn-bg: rgba(0, 0, 0, 0.3);
     --modelo-btn-hover: rgba(0, 0, 0, 0.5);
 }

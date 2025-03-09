@@ -1,11 +1,12 @@
+/* Containers de resultados */
 .search-results-list {
     flex: 0 0 auto;
-    max-height: calc(35% - 10px); /* Ajustar para considerar padding */
+    max-height: calc(35% - 10px);
     overflow-y: auto;
-    padding: 10px;  /* Padding uniforme */
+    padding: 10px;
     background-color: var(--panel-bg);
-    margin-bottom: 5px; /* Aumentado o espaçamento sem a borda */
-    margin-right: 0; /* Garante que não há margem interferindo */
+    margin-bottom: 5px;
+    margin-right: 0;
 }
 
 .search-results-content {
@@ -13,10 +14,10 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    height: calc(65% - 5px); /* Ajustar para considerar margin do elemento anterior */
+    height: calc(65% - 5px);
     overflow: hidden;
     background-color: var(--panel-bg);
-    padding: 10px 0 10px 10px; /* Alinhar com o padding do resultado-modelo */
+    padding: 10px 0 10px 10px;
     padding-top: 10px;
 }
 
@@ -27,35 +28,24 @@
     height: calc(100% - 66px);
     margin-top: 0;
     flex-shrink: 0;
-    padding-bottom: 10px; /* Adicionar padding inferior */
+    padding-bottom: 10px;
     box-sizing: border-box;
-    padding-right: 0; /* Remove padding direito do container principal */
+    padding-right: 0;
 }
 
-/* Remover regras redundantes que já estão em _modelos.css e _checklists.css */
-
-/* Estilos para resultados e tags */
+/* Estilos base para todos os itens de resultado */
 .resultado-modelo,
 .resultado-checklist {
-    padding: 8px 10px; /* Alinhado com o padding do container */
+    padding: 8px 10px;
     cursor: pointer;
     border-bottom: 1px solid var(--border-color);
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
-    gap: 4px;
     color: var(--result-text);
     background-color: var(--result-bg-even);
 }
 
-.resultado-modelo-container {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 0; /* Remover margin que estava causando scroll extra */
-    margin-right: 0; /* Garante que não há margem interferindo */
-}
-
-/* Hover e estados selecionados */
 .resultado-modelo:hover,
 .resultado-checklist:hover {
     background-color: var(--result-hover-bg);
@@ -68,6 +58,23 @@
     border-left: 4px solid var(--result-selected-border);
 }
 
+/* Container do conteúdo do resultado */
+.resultado-modelo-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 0;
+    margin-right: 0;
+}
+
+.resultado-modelo-texto {
+    padding: 10px;
+    background-color: var(--bg-secondary);
+    margin-right: 10px;
+    line-height: 1;
+    text-align: justify;
+}
+
+/* Refinamentos de busca */
 .search-refinements {
     display: flex;
     align-items: center;
@@ -97,8 +104,7 @@
 }
 
 .search-refinement-item label {
-    font-size: 11px;
-    line-height: 14px;
+    font-size: 11pt;
     display: inline-block;
     vertical-align: middle;
     color: var(--text-primary);
@@ -106,14 +112,9 @@
     line-height: 1;
 }
 
-.resultado-modelo-texto {
-    padding: 15px;
-    background-color: var(--bg-secondary);
-    margin-right: 10px; /* Adiciona margem para compensar o padding removido */
-}
-
+/* Destaque de texto */
 mark {
-    background-color: var(--highlight-bg, #ffeb3b);
+    background-color: var(--highlight-bg, #fff48d);
     color: var(--highlight-text, #000000);
     padding: 0 2px;
     border-radius: 2px;
@@ -121,6 +122,6 @@ mark {
 }
 
 [data-theme="dark"] mark {
-    background-color: var(--highlight-bg-dark, #ffd700);
+    background-color: var(--highlight-bg-dark, #c9f0ff);
     color: var(--highlight-text-dark, #000000);
 }

@@ -115,19 +115,46 @@ if (searchInput && searchResults) {
                 if (isEditorPage) {
                     const btnApagar = resultsContent.querySelector('.btn-danger');
                     btnApagar.addEventListener('click', async () => {
-                        if (confirm('Tem certeza que deseja apagar este modelo?')) {
+                        const shouldDelete = await showDialog(
+                            'Confirmar exclusão',
+                            'Tem certeza que deseja apagar este modelo?',
+                            [{
+                                id: 'btn-cancelar',
+                                text: 'Cancelar',
+                                class: 'btn-secondary',
+                                value: false
+                            },
+                            {
+                                id: 'btn-apagar',
+                                text: 'Apagar',
+                                class: 'btn-danger',
+                                value: true
+                            }]
+                        );
+
+                        if (shouldDelete) {
                             try {
                                 await window.electronAPI.apagarModelo(item.dataset.id);
-                                // Atualizar a lista após apagar
                                 realizarBusca(searchInput.value);
                             } catch (err) {
                                 console.error('Erro ao apagar modelo:', err);
+                                await showDialog(
+                                    'Erro',
+                                    'Erro ao apagar o modelo',
+                                    [{
+                                        id: 'btn-ok',
+                                        text: 'OK',
+                                        class: 'btn-primary',
+                                        value: false
+                                    }]
+                                );
                             }
                         }
                     });
                 }
 
-                atualizarBotaoInserir();
+                // Atualizar para usar a função global
+                window.atualizarBotaoInserir(resultsContent);
             });
         });
 
@@ -165,6 +192,10 @@ if (searchInput && searchResults) {
         const backgroundColor = getRandomPastelColor();
         div.style.backgroundColor = backgroundColor;
         
+        // Adicionar classe para cor de fundo baseada no tema atual
+        const colorClass = `modelo-box-color-${Math.floor(Math.random() * 4) + 1}`;
+        div.classList.add(colorClass);
+        
         div.innerHTML = `
             <div class="modelo-header">
                 <div class="modelo-title">${nome}</div>
@@ -177,12 +208,12 @@ if (searchInput && searchResults) {
                     <button class="modelo-action-btn" title="Copiar" type="button">
                         <svg viewBox="0 0 24 24">
                             <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                        </svg>
+                    </svg>
                     </button>
                     <button class="modelo-action-btn" title="Fechar" type="button">
                         <svg viewBox="0 0 24 24">
                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
+                    </svg>
                     </button>
                 </div>
             </div>
@@ -211,58 +242,43 @@ if (searchInput && searchResults) {
             e.preventDefault();
             const content = modeloContent.innerHTML;
             
-            if (window.quill) {
+            // Usar TinyMCE em vez de Quill
+            if (window.tinymce && window.tinymce.activeEditor) {
                 try {
-                    const editor = window.quill;
-                    let textLength = 0;
+                    const editor = window.tinymce.activeEditor;
+                    const currentContent = editor.getContent();
                     
-                    // Tentar obter o texto usando diferentes métodos
-                    if (typeof editor.getText === 'function') {
-                        textLength = editor.getText().length;
-                    } else if (editor.root && typeof editor.root.innerText === 'string') {
-                        textLength = editor.root.innerText.length;
-                    } else {
-                        console.warn('Não foi possível obter o comprimento do texto do editor.');
-                    }
+                    // Adicionar quebras de linha se já houver conteúdo
+                    const newContent = currentContent 
+                        ? currentContent + '<p>&nbsp;</p>' + content 
+                        : content;
                     
-                    // Adicionar quebras de linha se necessário
-                    if (textLength > 1) {
-                        if (typeof editor.insertText === 'function') {
-                            editor.insertText(textLength - 1, '\n\n');
-                        } else {
-                            editor.root.innerHTML += '<br><br>';
-                        }
-                    }
+                    // Inserir o conteúdo
+                    editor.setContent(newContent);
                     
-                    // Inserir o conteúdo HTML
-                    if (typeof editor.clipboard !== 'undefined' && typeof editor.clipboard.dangerouslyPasteHTML === 'function') {
-                        editor.clipboard.dangerouslyPasteHTML(textLength, content);
-                    } else {
-                        editor.root.innerHTML += content;
-                    }
+                    // Mover o cursor para o final
+                    editor.selection.select(editor.getBody(), true);
+                    editor.selection.collapse(false);
                     
-                    // Rolar para o final do editor
-                    const editorElement = document.querySelector('.ql-editor');
-                    if (editorElement) {
-                        setTimeout(() => {
-                            editorElement.scrollTop = editorElement.scrollHeight;
-                        }, 100);
-                    }
+                    // Rolar para o final
+                    const body = editor.getBody();
+                    body.scrollTop = body.scrollHeight;
                     
+                    // Remover a caixa do modelo
                     div.remove();
                 } catch (error) {
                     console.error('Erro ao inserir conteúdo no editor:', error);
                 }
             } else {
-                console.error('Editor Quill não encontrado');
+                console.error('Editor TinyMCE não encontrado');
             }
         });
 
         copyBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
             navigator.clipboard.writeText(modeloContent.textContent);
-            copyBtn.style.color = '#4CAF50';
-            setTimeout(() => copyBtn.style.color = '', 500);
+            copyBtn.classList.add('copy-success');
+            setTimeout(() => copyBtn.classList.remove('copy-success'), 500);
         });
 
         closeBtn.addEventListener('mousedown', (e) => {
@@ -275,47 +291,6 @@ if (searchInput && searchResults) {
     }
 
     // Remover a função inserirModelo daqui pois ela agora está em shared-functions.js
-
-    function atualizarBotaoInserir() {
-        const btnInserir = resultsContent.querySelector('.btn-inserir');
-        const btnEditar = resultsContent.querySelector('.btn-editar');
-        const modeloSelecionado = document.querySelector('.resultado-modelo.selected');
-
-        if (btnInserir) {
-            btnInserir.addEventListener('click', () => {
-                if (modeloSelecionado) {
-                    const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
-                    const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
-                    const modeloId = modeloSelecionado.dataset.id;
-                    window.inserirModelo(modelo, nome, modeloId);
-                }
-            });
-        }
-
-        if (btnEditar) {
-            btnEditar.addEventListener('click', () => {
-                if (modeloSelecionado) {
-                    const nomeInput = document.getElementById('nome-input');
-                    const tagInput = document.getElementById('tag-input');
-                    
-                    // Obter nome
-                    const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
-                    
-                    // Obter tags dos atributos data-tag
-                    const tags = Array.from(modeloSelecionado.querySelectorAll('.tag'))
-                        .map(tag => decodeURIComponent(tag.dataset.tag));
-                    
-                    // Obter conteúdo do modelo
-                    const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
-                    
-                    // Preencher os campos
-                    nomeInput.value = nome;
-                    tagInput.value = tags.join(', ');
-                    window.quill.root.innerHTML = modelo;
-                }
-            });
-        }
-    }
 
     async function salvarDocumento() {
         const modelo = textArea.value;
@@ -360,5 +335,39 @@ if (searchInput && searchResults) {
     document.addEventListener('DOMContentLoaded', () => {
         setupSearchRefinements('.left-panel', 'checklist-nome');
         setupSearchRefinements('.right-panel', 'modelo-nome');
+    });
+}
+
+function showDialog(title, message, buttons) {
+    return new Promise((resolve) => {
+        const existingDialog = document.querySelector('.custom-dialog');
+        if (existingDialog) {
+            document.body.classList.remove('dialog-open');
+            existingDialog.remove();
+        }
+        
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-dialog';
+        dialog.innerHTML = `
+            <div class="dialog-content">
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <div class="dialog-buttons">${buttons.map(btn => `
+                    <button class="${btn.class}" id="${btn.id}">${btn.text}</button>
+                `).join('')}</div>
+            </div>
+        `;
+    
+        document.body.appendChild(dialog);
+        document.body.classList.add('dialog-open');
+
+        // Configurar eventos dos botões
+        buttons.forEach(btn => {
+            dialog.querySelector(`#${btn.id}`).onclick = () => {
+                document.body.classList.remove('dialog-open');
+                dialog.remove();
+                resolve(btn.value);
+            };
+        });
     });
 }

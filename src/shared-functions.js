@@ -96,3 +96,43 @@ window.inserirModelo = async function(texto, nome, modeloId = '') {
 window.verificarModeloInserido = function(modeloId) {
     return modeloId ? modelosManager.verificar(modeloId) : false;
 };
+
+// Adicionar após o bloco do modelosManager
+window.atualizarBotaoInserir = function(resultsContent) {
+    const btnInserir = resultsContent.querySelector('.btn-inserir');
+    const btnEditar = resultsContent.querySelector('.btn-editar');
+    const modeloSelecionado = document.querySelector('.resultado-modelo.selected');
+
+    if (btnInserir) {
+        btnInserir.addEventListener('click', () => {
+            if (modeloSelecionado) {
+                const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
+                const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
+                const modeloId = modeloSelecionado.dataset.id;
+                window.inserirModelo(modelo, nome, modeloId);
+            }
+        });
+    }
+
+    if (btnEditar) {
+        btnEditar.addEventListener('click', () => {
+            if (modeloSelecionado) {
+                const nomeInput = document.getElementById('nome-input');
+                const tagInput = document.getElementById('tag-input');
+                
+                // Obter nome e tags
+                const nome = decodeURIComponent(modeloSelecionado.dataset.nome);
+                const tags = Array.from(modeloSelecionado.querySelectorAll('.tag'))
+                    .map(tag => decodeURIComponent(tag.dataset.tag));
+                
+                // Obter conteúdo do modelo
+                const modelo = decodeURIComponent(modeloSelecionado.dataset.modelo);
+                
+                // Preencher os campos
+                nomeInput.value = nome;
+                tagInput.value = tags.join(', ');
+                tinymce.activeEditor.setContent(modelo);
+            }
+        });
+    }
+};

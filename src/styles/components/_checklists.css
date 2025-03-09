@@ -39,24 +39,3 @@
     text-align: justify;
     color: var(--text-primary);
 }
-
-.resultado-checklist {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--result-border);
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    color: var(--result-text);
-}
-
-.resultado-checklist:hover {
-    background-color: var(--result-hover-bg);
-    transform: translateX(5px);
-}
-
-.resultado-checklist.selected {
-    background-color: var(--result-selected-bg);
-    border-left: 4px solid var(--result-selected-border);
-}
