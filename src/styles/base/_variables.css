@@ -59,6 +59,11 @@
     /* Botões de ação */
     --btn-danger-bg: #dc3545;
     --btn-danger-hover: #c82333;
+
+    /* Modo foco */
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+    --focus-shadow: 0 0 0 9999px var(--overlay-bg);
+    --modelo-associado-text: #666666;
 }
 
 [data-theme="dark"] {
@@ -96,4 +101,6 @@
     /* Botões de ação */
     --btn-danger-bg: #bd2130;
     --btn-danger-hover: #a71d2a;
+
+    --modelo-associado-text: #999999;
 }
