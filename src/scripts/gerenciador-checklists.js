@@ -182,4 +182,16 @@ document.addEventListener('DOMContentLoaded', () => {
         itemsContainer.appendChild(itemRow);
         setupModelAssociation(itemRow);
     });
+
+    // Adicionar associação de modelo ao cabeçalho do checklist
+    const headerAssociateBtn = document.querySelector('.checklist-associate-btn');
+    if (headerAssociateBtn) {
+        setupModelAssociation({
+            querySelector: selector => {
+                if (selector === '.paste') return headerAssociateBtn;
+                if (selector === '.modelo-associado') return document.querySelector('.checklist-header-modelo');
+                return null;
+            }
+        });
+    }
 });
