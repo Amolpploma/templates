@@ -126,7 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.resultado-modelo').forEach(resultado => {
             if (!resultado.querySelector('.associate-model-btn')) {
                 const btn = createAssociateButton();
-                resultado.appendChild(btn);
+                //resultado.appendChild(btn);
+                //resultado.firstElementChild.appendChild(btn);
+                resultado.firstElementChild.insertBefore(btn, resultado.firstElementChild.firstChild);
+                console.log(resultado.firstElementChild);
             }
         });
     }

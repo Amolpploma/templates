@@ -66,6 +66,11 @@
     margin-right: 0;
 }
 
+.nome-modelo {
+    text-align: justify;
+}
+
+/*
 .resultado-modelo-texto {
     padding: 10px;
     background-color: var(--bg-secondary);
@@ -73,6 +78,7 @@
     line-height: 1;
     text-align: justify;
 }
+    */
 
 /* Refinamentos de busca */
 .search-refinements {
@@ -114,6 +120,7 @@
 
 /* Destaque de texto */
 mark {
+    display: inline-block;
     background-color: var(--highlight-bg, #fff48d);
     color: var(--highlight-text, #000000);
     padding: 0 2px;
@@ -143,10 +150,12 @@ mark {
     background-color: var(--btn-bg);
     color: var(--text-primary);
     cursor: pointer;
-    display: none;
+    display: inline-block;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    position: relative;
+    top: 3px;
 }
 
 .associate-model-btn svg {
@@ -159,15 +168,16 @@ mark {
     background-color: var(--btn-hover);
 }
 
+/*
 body[data-page="checklist-editor"] .associate-model-btn {
     display: flex;
 }
+    */
 
 .resultado-modelo {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 10px;
+    gap: 5px;
 }
 
 /* Modelo associado */
