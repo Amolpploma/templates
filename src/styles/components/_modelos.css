@@ -4,7 +4,6 @@
     margin: 0 0 10px 0;
     overflow: hidden;
     width: 100%;
-    background-color: var(--bg-primary);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     height: auto;
