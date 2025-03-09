@@ -2,17 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const theme = document.documentElement.getAttribute('data-theme');
     const isDarkTheme = theme === 'dark';
 
-    // Configurações de cores personalizadas para tema escuro
-    const darkThemeOverrides = `
-        body.mce-content-body {
-            background-color: #1e1e1e !important;
-            color: #cccccc !important;
-        }
-        .mce-content-body[data-mce-selected="inline-boundary"] {
-            background-color: #2d2d2d !important;
-        }
-    `;
-
     tinymce.init({
         selector: '#editor-container',
         skin: isDarkTheme ? 'oxide-dark' : 'oxide',
@@ -23,9 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusbar: true,
         elementpath: false,
         toolbar: "charmap | undo redo selectall copy| searchreplace | numlist bullist | fontfamily fontsize | bold italic underline | align outdent indent| lineheight | forecolor backcolor removeformat",
-        content_style: isDarkTheme 
-            ? `body { font-family:times new roman,times; font-size:14px } ${darkThemeOverrides}`
-            : 'body { font-family:times new roman,times; font-size:14px }',
+        content_style:'body { font-family:times new roman,times; font-size:12pt }',
         license_key: 'gpl'
     });
 
@@ -47,9 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         statusbar: true,
                         elementpath: false,
                         toolbar: "charmap | undo redo selectall copy| searchreplace | numlist bullist | fontfamily fontsize | bold italic underline | align outdent indent| lineheight | forecolor backcolor removeformat",
-                        content_style: newTheme === 'dark'
-                            ? `body { font-family:times new roman,times; font-size:14px } ${darkThemeOverrides}`
-                            : 'body { font-family:times new roman,times; font-size:14px }',
+                        content_style: 'body { font-family:times new roman,times; font-size:12pt }',
                         license_key: 'gpl'
                     });
                 }
