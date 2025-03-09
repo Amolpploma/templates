@@ -99,34 +99,11 @@
     padding: 10px 0 10px 0;
     margin-bottom: 60px;
 }
-
+/*
 .resultado-modelo-texto {
     white-space: pre-wrap;
     padding: 10px;
     line-height: 1;
     text-align: justify;
 }
-
-.resultado-modelo,
-.resultado-checklist {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border-color);
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    color: var(--result-text);
-}
-
-.resultado-modelo:hover,
-.resultado-checklist:hover {
-    background-color: var(--result-hover-bg);
-    transform: translateX(5px);
-}
-
-.resultado-modelo.selected,
-.resultado-checklist.selected {
-    background-color: var(--result-selected-bg);
-    border-left: 4px solid var(--result-selected-border);
-}
+*/

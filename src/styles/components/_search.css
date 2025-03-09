@@ -42,7 +42,6 @@
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
-    gap: 4px;
     color: var(--result-text);
     background-color: var(--result-bg-even);
 }
@@ -68,9 +67,11 @@
 }
 
 .resultado-modelo-texto {
-    padding: 15px;
+    padding: 10px;
     background-color: var(--bg-secondary);
     margin-right: 10px;
+    line-height: 1;
+    text-align: justify;
 }
 
 /* Refinamentos de busca */
@@ -103,8 +104,7 @@
 }
 
 .search-refinement-item label {
-    font-size: 11px;
-    line-height: 14px;
+    font-size: 11pt;
     display: inline-block;
     vertical-align: middle;
     color: var(--text-primary);
