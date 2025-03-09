@@ -51,9 +51,10 @@
     --btn-bg: #c1c1c1;
     --btn-hover: #a8a8a8;
 
-    /* Highlight */
+    /* Highlight 
     --highlight-bg: #ffeb3b;
     --highlight-text: #000000;
+    */
 
     /* Botões de ação */
     --btn-danger-bg: #dc3545;
@@ -87,9 +88,10 @@
     --btn-bg: #404040;
     --btn-hover: #666666;
 
-    /* Highlight */
+    /* Highlight 
     --highlight-bg-dark: #ffd700;
     --highlight-text-dark: #000000;
+    */
 
     /* Botões de ação */
     --btn-danger-bg: #bd2130;

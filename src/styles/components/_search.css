@@ -114,7 +114,7 @@
 
 /* Destaque de texto */
 mark {
-    background-color: var(--highlight-bg, #ffeb3b);
+    background-color: var(--highlight-bg, #fff48d);
     color: var(--highlight-text, #000000);
     padding: 0 2px;
     border-radius: 2px;
@@ -122,6 +122,6 @@ mark {
 }
 
 [data-theme="dark"] mark {
-    background-color: var(--highlight-bg-dark, #ffd700);
+    background-color: var(--highlight-bg-dark, #c9f0ff);
     color: var(--highlight-text-dark, #000000);
 }
