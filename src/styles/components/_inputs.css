@@ -123,3 +123,54 @@
 .btn-salvar:active {
     transform: translateY(1px);
 }
+
+/* Estilos para o input de item de checklist */
+.checklist-item-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.checklist-item-input .editor-input {
+    flex: 1;
+}
+
+.item-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.item-action-btn {
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.item-action-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.item-action-btn:hover {
+    background-color: var(--btn-hover);
+    transform: scale(1.05);
+}
+
+.item-action-btn:active {
+    transform: scale(0.95);
+}
+
+.item-action-btn.close:hover {
+    background-color: var(--btn-danger-bg);
+    color: white;
+}
