@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
             </div>
+            <div class="modelo-associado" data-id="" data-nome="">Modelo: sem modelo associado</div>
         `;
 
         // Adicionar handlers dos botões
@@ -161,19 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const itemRow = currentFocusedItem;
 
         if (itemRow) {
-            // Remover associação anterior se existir
-            itemRow.querySelector('.modelo-associado')?.remove();
-
-            // Criar elemento de modelo associado
-            const modeloAssociado = document.createElement('div');
-            modeloAssociado.className = 'modelo-associado';
-            modeloAssociado.textContent = `Modelo: ${modeloNome}`;
-            modeloAssociado.dataset.id = modeloId;
-            modeloAssociado.dataset.nome = modeloNome;
-
-            // Adicionar após a div checklist-content
-            const content = itemRow.querySelector('.checklist-content');
-            content.parentNode.insertBefore(modeloAssociado, content.nextSibling);
+            const modeloAssociado = itemRow.querySelector('.modelo-associado');
+            if (modeloAssociado) {
+                modeloAssociado.textContent = `Modelo: ${modeloNome}`;
+                modeloAssociado.dataset.id = modeloId;
+                modeloAssociado.dataset.nome = modeloNome;
+            }
 
             // Sair do modo foco
             rightPanel.classList.remove('focus-mode');
