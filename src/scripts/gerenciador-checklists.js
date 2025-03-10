@@ -278,7 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             nome,
                             tag: tags,
                             checklist: checklistItems,
-                            modelo_id: modeloId
+                            modelo_id: modeloId,
+                            id: checklistExistente.id // Passar o ID para a função salvarChecklist
                         });
 
                         // Limpar campos após salvar

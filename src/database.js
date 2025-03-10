@@ -170,23 +170,31 @@ class Database {
             const checklistArray = this.#validarJSON(checklist);
 
             return new Promise((resolve, reject) => {
-                this.db.run(
-                    'INSERT INTO checklists (nome, tag, checklist, modelo_id) VALUES (?, ?, ?, ?)',
-                    [
-                        nome,
-                        JSON.stringify(tagArray),
-                        JSON.stringify(checklistArray),
-                        modelo_id || null
-                    ],
-                    function(err) {
+                // Primeiro verificar se já existe um checklist com este nome
+                this.db.get('SELECT id FROM checklists WHERE nome = ?', [nome], (err, row) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    const sql = row 
+                        ? 'UPDATE checklists SET tag = ?, checklist = ?, modelo_id = ? WHERE nome = ?'
+                        : 'INSERT INTO checklists (nome, tag, checklist, modelo_id) VALUES (?, ?, ?, ?)';
+
+                    const params = row
+                        ? [JSON.stringify(tagArray), JSON.stringify(checklistArray), modelo_id || null, nome]
+                        : [nome, JSON.stringify(tagArray), JSON.stringify(checklistArray), modelo_id || null];
+
+                    this.db.run(sql, params, function(err) {
                         if (err) {
-                            console.error('Erro ao inserir checklist no banco:', err);
+                            console.error('Erro ao inserir/atualizar checklist no banco:', err);
                             reject(err);
                         } else {
-                            resolve(this.lastID);
+                            // Se for UPDATE, retornar o ID existente, se for INSERT, retornar o novo ID
+                            resolve(row ? row.id : this.lastID);
                         }
-                    }
-                );
+                    });
+                });
             });
         } catch (err) {
             console.error('Erro ao processar dados do checklist:', err);
