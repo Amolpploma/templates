@@ -315,7 +315,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function exibirResultadosChecklist(resultados) {
-    // ...existing code...
+    const filtros = {
+        nome: document.getElementById('checklist-nome').checked,
+        etiqueta: document.getElementById('checklist-etiqueta').checked
+    };
 
     checklistResultsList.innerHTML = resultados
         .map(checklist => {
@@ -389,44 +392,84 @@ function exibirResultadosChecklist(resultados) {
 }
 
 async function carregarChecklistParaEdicao(item) {
-    // Preencher os campos com os dados do checklist
-    const nome = decodeURIComponent(item.dataset.nome);
-    const tags = JSON.parse(item.dataset.tag);
-    const checklist = JSON.parse(item.dataset.checklist);
-    const modeloId = item.dataset.modelo_id;
+    try {
+        // Preencher os campos com os dados do checklist
+        const checklistData = JSON.parse(item.dataset.checklist);
+        const nome = decodeURIComponent(item.dataset.nome);
+        const tags = JSON.parse(item.dataset.tag || '[]');
+        const modeloId = item.dataset.modelo_id;
 
-    // Preencher nome e tags
-    document.getElementById('nome-checklist-input').value = nome;
-    document.getElementById('tag-checklist-input').value = tags.join(', ');
+        console.log(item);
+        console.log('Dados para edição:', { nome, tags, checklistData, modeloId });
 
-    // Limpar itens existentes
-    const container = document.getElementById('checklist-items-container');
-    container.innerHTML = '';
+        // Preencher nome e tags
+        document.getElementById('nome-checklist-input').value = nome;
+        document.getElementById('tag-checklist-input').value = (tags || []).join(', ');
 
-    // Adicionar itens
-    checklist.forEach(item => {
-        const itemRow = createItemRow();
-        container.appendChild(itemRow);
-        
-        // Preencher descrição
-        const input = itemRow.querySelector('.checklist-item-input');
-        input.value = item.descricao || item.descrição;
+        // Limpar itens existentes
+        const container = document.getElementById('checklist-items-container');
+        container.innerHTML = '';
 
-        // Configurar modelo associado se existir
-        if (item.modelo_id) {
-            const modeloAssociado = itemRow.querySelector('.modelo-associado');
-            modeloAssociado.dataset.id = item.modelo_id;
-            modeloAssociado.textContent = `Modelo: ID ${item.modelo_id}`;
+        // Adicionar itens e buscar nomes dos modelos
+        for (const item of checklistData) {
+            const itemRow = window.createItemRow();
+            container.appendChild(itemRow);
+            
+            // Preencher descrição
+            const input = itemRow.querySelector('.checklist-item-input');
+            input.value = item.descricao || item.descrição || '';
+
+            // Configurar modelo associado se existir
+            if (item.modelo_id) {
+                try {
+                    const modelo = await window.electronAPI.buscarModeloPorId(item.modelo_id);
+                    const modeloAssociado = itemRow.querySelector('.modelo-associado');
+                    if (modelo) {
+                        modeloAssociado.dataset.id = item.modelo_id;
+                        modeloAssociado.dataset.nome = modelo.nome;
+                        modeloAssociado.textContent = `Modelo: ${modelo.nome}`;
+                    }
+                } catch (err) {
+                    console.error('Erro ao buscar modelo:', err);
+                    modeloAssociado.textContent = `Modelo: ID ${item.modelo_id} (erro ao carregar nome)`;
+                }
+            }
+
+            setupModelAssociation(itemRow);
         }
 
-        setupModelAssociation(itemRow);
-    });
+        // Configurar modelo do cabeçalho se existir
+        if (modeloId) {
+            const headerModelo = document.querySelector('.checklist-header-modelo');
+            try {
+                const modelo = await window.electronAPI.buscarModeloPorId(modeloId);
+                if (modelo && headerModelo) {
+                    headerModelo.dataset.id = modeloId;
+                    headerModelo.dataset.nome = modelo.nome;
+                    headerModelo.textContent = `Modelo: ${modelo.nome}`;
+                }
+            } catch (err) {
+                console.error('Erro ao buscar modelo do cabeçalho:', err);
+                if (headerModelo) {
+                    headerModelo.textContent = `Modelo: ID ${modeloId} (erro ao carregar nome)`;
+                }
+            }
+        }
 
-    // Configurar modelo do cabeçalho se existir
-    const headerModelo = document.querySelector('.checklist-header-modelo');
-    if (modeloId) {
-        headerModelo.dataset.id = modeloId;
-        headerModelo.textContent = `Modelo: ID ${modeloId}`;
+        // Rolar para o topo da página
+        window.scrollTo(0, 0);
+    } catch (err) {
+        console.error('Erro ao carregar checklist para edição:', err);
+        await showDialog(
+            'Erro',
+            'Erro ao carregar checklist para edição',
+            [{
+                id: 'btn-ok',
+                text: 'OK',
+                class: 'btn-primary',
+                value: false
+            }]
+        );
     }
 }
 

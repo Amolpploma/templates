@@ -281,6 +281,7 @@ if (searchChecklistInput && searchChecklistResults) {
             const tags = JSON.parse(item.dataset.tag || '[]');
             const modeloId = item.dataset.modelo_id;
 
+            console.log(item);
             console.log('Dados carregados:', { nome, tags, checklistData, modeloId });
 
             // Preencher nome e tags
