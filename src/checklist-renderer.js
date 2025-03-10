@@ -190,7 +190,6 @@ if (searchChecklistInput && searchChecklistResults) {
                                 item.querySelector('.checklist-icon').innerHTML = `
                                     <svg viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                                    </svg>
                                 `;
                                 
                                 // Usar o modelo_id do item individual
@@ -273,4 +272,123 @@ if (searchChecklistInput && searchChecklistResults) {
         
         return !!modeloExistente;
     }
+
+    async function carregarChecklistParaEdicao(item) {
+        try {
+            // Preencher os campos com os dados do checklist
+            const checklistData = JSON.parse(item.dataset.checklist);
+            const nome = decodeURIComponent(item.dataset.nome);
+            const tags = JSON.parse(item.dataset.tag || '[]');
+            const modeloId = item.dataset.modelo_id;
+
+            console.log('Dados carregados:', { nome, tags, checklistData, modeloId });
+
+            // Preencher nome e tags
+            document.getElementById('nome-checklist-input').value = nome || '';
+            document.getElementById('tag-checklist-input').value = (tags || []).join(', ');
+
+            // Limpar itens existentes
+            const container = document.getElementById('checklist-items-container');
+            container.innerHTML = '';
+
+            // Adicionar itens
+            if (Array.isArray(checklistData)) {
+                checklistData.forEach(item => {
+                    const itemRow = createItemRow();
+                    container.appendChild(itemRow);
+                    
+                    // Preencher descrição
+                    const input = itemRow.querySelector('.checklist-item-input');
+                    input.value = item.descricao || item.descrição || '';
+
+                    // Configurar modelo associado se existir
+                    if (item.modelo_id) {
+                        const modeloAssociado = itemRow.querySelector('.modelo-associado');
+                        modeloAssociado.dataset.id = item.modelo_id;
+                        modeloAssociado.textContent = `Modelo: ${item.modelo_id}`;
+                    }
+
+                    setupModelAssociation(itemRow);
+                });
+            }
+
+            // Configurar modelo do cabeçalho se existir
+            const headerModelo = document.querySelector('.checklist-header-modelo');
+            if (headerModelo && modeloId) {
+                headerModelo.dataset.id = modeloId;
+                headerModelo.textContent = `Modelo: ${modeloId}`;
+            } else if (headerModelo) {
+                headerModelo.dataset.id = '';
+                headerModelo.textContent = 'Modelo: sem modelo associado';
+            }
+
+            // Rolar para o topo da página
+            window.scrollTo(0, 0);
+        } catch (err) {
+            console.error('Erro ao carregar checklist para edição:', err);
+            await showDialog(
+                'Erro',
+                'Erro ao carregar checklist para edição',
+                [{
+                    id: 'btn-ok',
+                    text: 'OK',
+                    class: 'btn-primary',
+                    value: false
+                }]
+            );
+        }
+    }
 }
+
+// Mover para fora do DOMContentLoaded para ficar no escopo global
+function setupModelAssociation(itemRow) {
+    const pasteBtn = itemRow.querySelector('.paste');
+    const rightPanel = document.querySelector('.right-panel');
+    const searchInput = rightPanel.querySelector('.search-input');
+
+    pasteBtn.onclick = (e) => {
+        e.stopPropagation();
+        
+        if (currentFocusedItem && currentFocusedItem !== itemRow) {
+            rightPanel.classList.remove('focus-mode');
+            removeAssociateButtons();
+        }
+
+        rightPanel.classList.add('focus-mode');
+        currentFocusedItem = itemRow;
+        searchInput.focus();
+        addAssociateButtons();
+    };
+
+    const observer = new MutationObserver(() => {
+        if (rightPanel.classList.contains('focus-mode') && currentFocusedItem === itemRow) {
+            addAssociateButtons();
+        }
+    });
+
+    observer.observe(rightPanel.querySelector('.search-results-list'), {
+        childList: true,
+        subtree: true
+    });
+}
+
+// Também mover as funções auxiliares para o escopo global
+function addAssociateButtons() {
+    document.querySelectorAll('.resultado-modelo').forEach(resultado => {
+        if (!resultado.querySelector('.associate-model-btn')) {
+            const btn = createAssociateButton();
+            resultado.firstElementChild.insertBefore(btn, resultado.firstElementChild.firstChild);
+        }
+    });
+}
+
+function removeAssociateButtons() {
+    document.querySelectorAll('.associate-model-btn').forEach(btn => btn.remove());
+}
+
+// Variável global para controle do item focado
+let currentFocusedItem = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ...existing code...
+});
