@@ -197,4 +197,84 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Adicionar handler para o botão salvar
+    const btnSalvar = document.querySelector('.btn-salvar');
+    const nomeInput = document.getElementById('nome-checklist-input');
+    const tagInput = document.getElementById('tag-checklist-input');
+
+    btnSalvar.addEventListener('click', async () => {
+        const nome = nomeInput.value.trim();
+        if (!nome) {
+            await showDialog(
+                'Campo obrigatório',
+                'Por favor, insira um nome para o checklist',
+                [{
+                    id: 'btn-ok',
+                    text: 'OK',
+                    class: 'btn-primary',
+                    value: false
+                }]
+            );
+            return;
+        }
+
+        // Processar tags
+        const tags = tagInput.value
+            .split(',')
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0);
+
+        // Coletar itens do checklist
+        const checklistItems = Array.from(document.querySelectorAll('.checklist-item-row'))
+            .map(item => ({
+                descricao: item.querySelector('.checklist-item-input').value,
+                modelo_id: item.querySelector('.modelo-associado')?.dataset?.id || null
+            }))
+            .filter(item => item.descricao.trim().length > 0);
+
+        // Obter modelo_id do header
+        const headerModelo = document.querySelector('.checklist-header-modelo');
+        const modeloId = headerModelo?.dataset?.id || null;
+
+        try {
+            const lastID = await window.electronAPI.salvarChecklist({
+                nome,
+                tag: tags,
+                checklist: checklistItems,
+                modelo_id: modeloId
+            });
+
+            // Limpar campos após salvar
+            nomeInput.value = '';
+            tagInput.value = '';
+            document.getElementById('checklist-items-container').innerHTML = '';
+            headerModelo.dataset.id = '';
+            headerModelo.dataset.nome = '';
+            headerModelo.textContent = 'Modelo: sem modelo associado';
+
+            await showDialog(
+                'Sucesso',
+                `Checklist salvo com sucesso! (ID: ${lastID})`,
+                [{
+                    id: 'btn-ok',
+                    text: 'OK',
+                    class: 'btn-primary',
+                    value: true
+                }]
+            );
+        } catch (err) {
+            console.error('Erro ao salvar checklist:', err);
+            await showDialog(
+                'Erro',
+                'Erro ao salvar o checklist: ${err.message}',
+                [{
+                    id: 'btn-ok',
+                    text: 'OK',
+                    class: 'btn-primary',
+                    value: false
+                }]
+            );
+        }
+    });
 });

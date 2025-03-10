@@ -13,5 +13,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     closeWindow: () => ipcRenderer.send('close-window'),
     apagarModelo: (id) => ipcRenderer.invoke('apagar-modelo', id),
     verificarModelo: (nome) => ipcRenderer.invoke('verificar-modelo', nome),
-    atualizarModelo: (dados) => ipcRenderer.invoke('atualizar-modelo', dados)
+    atualizarModelo: (dados) => ipcRenderer.invoke('atualizar-modelo', dados),
+    salvarChecklist: (dados) => ipcRenderer.invoke('salvar-checklist', dados)
 });

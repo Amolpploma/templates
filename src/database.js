@@ -164,6 +164,36 @@ class Database {
         }
     }
 
+    async inserirChecklist(nome, tag, checklist, modelo_id) {
+        try {
+            const tagArray = this.#validarJSON(tag);
+            const checklistArray = this.#validarJSON(checklist);
+
+            return new Promise((resolve, reject) => {
+                this.db.run(
+                    'INSERT INTO checklists (nome, tag, checklist, modelo_id) VALUES (?, ?, ?, ?)',
+                    [
+                        nome,
+                        JSON.stringify(tagArray),
+                        JSON.stringify(checklistArray),
+                        modelo_id || null
+                    ],
+                    function(err) {
+                        if (err) {
+                            console.error('Erro ao inserir checklist no banco:', err);
+                            reject(err);
+                        } else {
+                            resolve(this.lastID);
+                        }
+                    }
+                );
+            });
+        } catch (err) {
+            console.error('Erro ao processar dados do checklist:', err);
+            throw new Error(`Erro ao validar JSON: ${err.message}`);
+        }
+    }
+
     #validarJSON(data) {
         if (typeof data === 'string') {
             try {

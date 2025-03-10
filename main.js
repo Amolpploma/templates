@@ -145,6 +145,21 @@ function registerIpcHandlers() {
       return null;
     }
   });
+
+  ipcMain.handle('salvar-checklist', async (event, dados) => {
+    try {
+      const lastID = await database.inserirChecklist(
+        dados.nome,
+        dados.tag,
+        dados.checklist,
+        dados.modelo_id
+      );
+      return lastID; // Retornar o ID do novo checklist
+    } catch (err) {
+      console.error('Erro ao salvar checklist:', err);
+      throw err; // Propagar o erro para ser tratado no renderer
+    }
+  });
 }
 
 // This method will be called when Electron has finished
