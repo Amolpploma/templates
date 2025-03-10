@@ -160,6 +160,15 @@ function registerIpcHandlers() {
       throw err; // Propagar o erro para ser tratado no renderer
     }
   });
+
+  ipcMain.handle('verificar-checklist', async (event, nome) => {
+    try {
+      return await database.verificarChecklistExistente(nome);
+    } catch (err) {
+      console.error('Erro ao verificar checklist:', err);
+      return null;
+    }
+  });
 }
 
 // This method will be called when Electron has finished

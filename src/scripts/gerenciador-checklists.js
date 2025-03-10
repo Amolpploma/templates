@@ -219,12 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Processar tags
-        const tags = tagInput.value
-            .split(',')
-            .map(tag => tag.trim())
-            .filter(tag => tag.length > 0);
-
         // Coletar itens do checklist
         const checklistItems = Array.from(document.querySelectorAll('.checklist-item-row'))
             .map(item => ({
@@ -233,41 +227,128 @@ document.addEventListener('DOMContentLoaded', () => {
             }))
             .filter(item => item.descricao.trim().length > 0);
 
-        // Obter modelo_id do header
-        const headerModelo = document.querySelector('.checklist-header-modelo');
-        const modeloId = headerModelo?.dataset?.id || null;
-
-        try {
-            const lastID = await window.electronAPI.salvarChecklist({
-                nome,
-                tag: tags,
-                checklist: checklistItems,
-                modelo_id: modeloId
-            });
-
-            // Limpar campos após salvar
-            nomeInput.value = '';
-            tagInput.value = '';
-            document.getElementById('checklist-items-container').innerHTML = '';
-            headerModelo.dataset.id = '';
-            headerModelo.dataset.nome = '';
-            headerModelo.textContent = 'Modelo: sem modelo associado';
-
+        if (checklistItems.length === 0) {
             await showDialog(
-                'Sucesso',
-                `Checklist salvo com sucesso! (ID: ${lastID})`,
+                'Campo obrigatório',
+                'Por favor, adicione pelo menos um item ao checklist',
                 [{
                     id: 'btn-ok',
                     text: 'OK',
                     class: 'btn-primary',
-                    value: true
+                    value: false
                 }]
             );
+            return;
+        }
+
+        // Obter modelo_id do header
+        const headerModelo = document.querySelector('.checklist-header-modelo');
+        const modeloId = headerModelo?.dataset?.id || null;
+
+        // Processar tags
+        const tags = tagInput.value
+            .split(',')
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0);
+
+        try {
+            const checklistExistente = await verificarChecklistExistente(nome);
+
+            if (checklistExistente) {
+                const shouldUpdate = await showDialog(
+                    'Checklist Existente',
+                    'Já existe um checklist com este nome. Deseja atualizá-lo?',
+                    [{
+                        id: 'btn-cancelar',
+                        text: 'Cancelar',
+                        class: 'btn-secondary',
+                        value: false
+                    },
+                    {
+                        id: 'btn-atualizar',
+                        text: 'Atualizar',
+                        class: 'btn-primary',
+                        value: true
+                    }]
+                );
+
+                if (shouldUpdate) {
+                    try {
+                        const lastID = await window.electronAPI.salvarChecklist({
+                            nome,
+                            tag: tags,
+                            checklist: checklistItems,
+                            modelo_id: modeloId
+                        });
+
+                        // Limpar campos após salvar
+                        limparCampos();
+
+                        await showDialog(
+                            'Sucesso',
+                            `Checklist atualizado com sucesso! (ID: ${lastID})`,
+                            [{
+                                id: 'btn-ok',
+                                text: 'OK',
+                                class: 'btn-primary',
+                                value: true
+                            }]
+                        );
+                    } catch (err) {
+                        console.error('Erro ao atualizar checklist:', err);
+                        await showDialog(
+                            'Erro',
+                            `Erro ao atualizar o checklist: ${err.message}`,
+                            [{
+                                id: 'btn-ok',
+                                text: 'OK',
+                                class: 'btn-primary',
+                                value: false
+                            }]
+                        );
+                    }
+                }
+            } else {
+                try {
+                    const lastID = await window.electronAPI.salvarChecklist({
+                        nome,
+                        tag: tags,
+                        checklist: checklistItems,
+                        modelo_id: modeloId
+                    });
+
+                    // Limpar campos após salvar
+                    limparCampos();
+
+                    await showDialog(
+                        'Sucesso',
+                        `Checklist salvo com sucesso! (ID: ${lastID})`,
+                        [{
+                            id: 'btn-ok',
+                            text: 'OK',
+                            class: 'btn-primary',
+                            value: true
+                        }]
+                    );
+                } catch (err) {
+                    console.error('Erro ao salvar checklist:', err);
+                    await showDialog(
+                        'Erro',
+                        `Erro ao salvar o checklist: ${err.message}`,
+                        [{
+                            id: 'btn-ok',
+                            text: 'OK',
+                            class: 'btn-primary',
+                            value: false
+                        }]
+                    );
+                }
+            }
         } catch (err) {
-            console.error('Erro ao salvar checklist:', err);
+            console.error('Erro ao verificar checklist existente:', err);
             await showDialog(
                 'Erro',
-                'Erro ao salvar o checklist: ${err.message}',
+                `Erro ao verificar checklist existente: ${err.message}`,
                 [{
                     id: 'btn-ok',
                     text: 'OK',
@@ -277,4 +358,25 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
     });
+
+    async function verificarChecklistExistente(nome) {
+        try {
+            // Chamar a função no processo principal para verificar o modelo
+            const checklistExistente = await window.electronAPI.verificarChecklist(nome);
+            return checklistExistente;
+        } catch (error) {
+            console.error('Erro ao verificar checklist existente:', error);
+            return null;
+        }
+    }
+
+    function limparCampos() {
+        nomeInput.value = '';
+        tagInput.value = '';
+        document.getElementById('checklist-items-container').innerHTML = '';
+        const headerModelo = document.querySelector('.checklist-header-modelo');
+        headerModelo.dataset.id = '';
+        headerModelo.dataset.nome = '';
+        headerModelo.textContent = 'Modelo: sem modelo associado';
+    }
 });

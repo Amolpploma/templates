@@ -218,6 +218,19 @@ class Database {
         });
     }
 
+    async verificarChecklistExistente(nome) {
+        return new Promise((resolve, reject) => {
+            this.db.get(
+                'SELECT * FROM checklists WHERE nome = ?',
+                [nome],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                }
+            );
+        });
+    }
+
     async atualizarModelo(id, nome, tag, modelo) {
         try {
             const tagArray = this.#validarJSON(tag);
