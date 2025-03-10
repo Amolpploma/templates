@@ -270,6 +270,19 @@ class Database {
         });
     }
 
+    deletarChecklist(id) {
+        return new Promise((resolve, reject) => {
+            this.db.run(
+                'DELETE FROM checklists WHERE id = ?',
+                [id],
+                function(err) {
+                    if (err) reject(err);
+                    else resolve(this.changes);
+                }
+            );
+        });
+    }
+
     obterModeloPorId(id) {
         return new Promise((resolve, reject) => {
             this.db.get(

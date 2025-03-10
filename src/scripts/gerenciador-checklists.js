@@ -381,3 +381,175 @@ document.addEventListener('DOMContentLoaded', () => {
         headerModelo.textContent = 'Modelo: sem modelo associado';
     }
 });
+
+function exibirResultadosChecklist(resultados) {
+    // ...existing code...
+
+    checklistResultsList.innerHTML = resultados
+        .map(checklist => {
+            try {
+                const tags = Array.isArray(checklist.tag) ? checklist.tag : JSON.parse(checklist.tag || '[]');
+                const tagsHtml = tags
+                    .map(tag => `<span class="tag" data-tag="${encodeURIComponent(tag)}">${highlightText(tag, searchChecklistInput.value, filtros.etiqueta)}</span>`)
+                    .join('');
+
+                const checklistData = typeof checklist.checklist === 'string' ? 
+                    JSON.parse(checklist.checklist) : checklist.checklist;
+                
+                return `
+                    <div class="resultado-checklist" 
+                         data-id="${checklist.id}" 
+                         data-modelo_id="${checklist.modelo_id || ''}"
+                         data-checklist='${JSON.stringify(checklistData)}'
+                         data-nome="${encodeURIComponent(checklist.nome)}"
+                         data-tag='${JSON.stringify(tags)}'>
+                        <div class="nome-texto">
+                            ${highlightText(checklist.nome, searchChecklistInput.value, filtros.nome)}
+                        </div>
+                        <div class="tags-container">${tagsHtml}</div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error('Erro ao processar item do checklist:', err);
+                return '';
+            }
+        })
+        .join('');
+
+    const itensResultado = checklistResultsList.querySelectorAll('.resultado-checklist');
+    itensResultado.forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelector('.resultado-checklist.selected')?.classList.remove('selected');
+            item.classList.add('selected');
+
+            const checklistData = JSON.parse(item.dataset.checklist);
+            const modeloId = item.dataset.modelo_id;
+
+            const buttons = `
+                <div class="button-container">
+                    <button class="btn-editar">Editar</button>
+                    <button class="btn-danger">Apagar</button>
+                </div>
+            `;
+
+            checklistResultsContent.innerHTML = `
+                <div class="resultado-texto-container">
+                    ${renderizarChecklist(checklistData)}
+                </div>
+                ${buttons}
+            `;
+
+            // Adicionar handlers dos botões
+            const btnEditar = checklistResultsContent.querySelector('.btn-editar');
+            const btnApagar = checklistResultsContent.querySelector('.btn-danger');
+
+            if (btnEditar) {
+                btnEditar.addEventListener('click', () => carregarChecklistParaEdicao(item));
+            }
+
+            if (btnApagar) {
+                btnApagar.addEventListener('click', () => apagarChecklist(item));
+            }
+        });
+    });
+
+    // ...existing code...
+}
+
+async function carregarChecklistParaEdicao(item) {
+    // Preencher os campos com os dados do checklist
+    const nome = decodeURIComponent(item.dataset.nome);
+    const tags = JSON.parse(item.dataset.tag);
+    const checklist = JSON.parse(item.dataset.checklist);
+    const modeloId = item.dataset.modelo_id;
+
+    // Preencher nome e tags
+    document.getElementById('nome-checklist-input').value = nome;
+    document.getElementById('tag-checklist-input').value = tags.join(', ');
+
+    // Limpar itens existentes
+    const container = document.getElementById('checklist-items-container');
+    container.innerHTML = '';
+
+    // Adicionar itens
+    checklist.forEach(item => {
+        const itemRow = createItemRow();
+        container.appendChild(itemRow);
+        
+        // Preencher descrição
+        const input = itemRow.querySelector('.checklist-item-input');
+        input.value = item.descricao || item.descrição;
+
+        // Configurar modelo associado se existir
+        if (item.modelo_id) {
+            const modeloAssociado = itemRow.querySelector('.modelo-associado');
+            modeloAssociado.dataset.id = item.modelo_id;
+            modeloAssociado.textContent = `Modelo: ID ${item.modelo_id}`;
+        }
+
+        setupModelAssociation(itemRow);
+    });
+
+    // Configurar modelo do cabeçalho se existir
+    const headerModelo = document.querySelector('.checklist-header-modelo');
+    if (modeloId) {
+        headerModelo.dataset.id = modeloId;
+        headerModelo.textContent = `Modelo: ID ${modeloId}`;
+    }
+}
+
+async function apagarChecklist(item) {
+    const shouldDelete = await showDialog(
+        'Confirmar exclusão',
+        'Tem certeza que deseja apagar este checklist?',
+        [{
+            id: 'btn-cancelar',
+            text: 'Cancelar',
+            class: 'btn-secondary',
+            value: false
+        },
+        {
+            id: 'btn-apagar',
+            text: 'Apagar',
+            class: 'btn-danger',
+            value: true
+        }]
+    );
+
+    if (shouldDelete) {
+        try {
+            await window.electronAPI.apagarChecklist(item.dataset.id);
+            // Atualizar a lista de resultados
+            const searchInput = document.querySelector('.search-checklist-input');
+            searchInput.dispatchEvent(new Event('input'));
+        } catch (err) {
+            console.error('Erro ao apagar checklist:', err);
+            await showDialog(
+                'Erro',
+                'Erro ao apagar o checklist',
+                [{
+                    id: 'btn-ok',
+                    text: 'OK',
+                    class: 'btn-primary',
+                    value: false
+                }]
+            );
+        }
+    }
+}
+
+function renderizarChecklist(checklistData) {
+    return checklistData
+        .map(item => `
+            <div class="checklist-item">
+                <div class="checklist-descricao" 
+                     data-state="inactive"
+                     data-modelo_id="${item.modelo_id || ''}"
+                     data-checklist_id="${item.id || ''}">
+                    <span class="checklist-icon"></span>
+                    <span class="checklist-text">${item.descrição || item.descricao}</span>
+                </div>
+            </div>
+        `)
+        .join('');
+}

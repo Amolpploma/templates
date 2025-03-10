@@ -169,6 +169,15 @@ function registerIpcHandlers() {
       return null;
     }
   });
+
+  ipcMain.handle('apagar-checklist', async (event, id) => {
+    try {
+      return await database.deletarChecklist(id);
+    } catch (err) {
+      console.error('Erro ao apagar checklist:', err);
+      return null;
+    }
+  });
 }
 
 // This method will be called when Electron has finished

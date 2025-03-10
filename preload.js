@@ -15,5 +15,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     verificarModelo: (nome) => ipcRenderer.invoke('verificar-modelo', nome),
     atualizarModelo: (dados) => ipcRenderer.invoke('atualizar-modelo', dados),
     salvarChecklist: (dados) => ipcRenderer.invoke('salvar-checklist', dados),
-    verificarChecklist: (nome) => ipcRenderer.invoke('verificar-checklist', nome)
+    verificarChecklist: (nome) => ipcRenderer.invoke('verificar-checklist', nome),
+    apagarChecklist: (id) => ipcRenderer.invoke('apagar-checklist', id)
 });

@@ -112,11 +112,34 @@ if (searchChecklistInput && searchChecklistResults) {
                         `)
                         .join('');
 
+                    // Verificar se estamos na página de edição de checklists
+                    const isEditPage = document.body.getAttribute('data-page') === 'checklist-editor';
+
                     checklistResultsContent.innerHTML = `
                         <div class="resultado-texto-container">
                             <div class="resultado-texto" data-modelo_id="${modeloIdChecklist}">${checklistHtml}</div>
                         </div>
+                        ${isEditPage ? `
+                            <div class="button-container">
+                                <button class="btn-editar">Editar</button>
+                                <button class="btn-danger">Apagar</button>
+                            </div>
+                        ` : ''}
                     `;
+
+                    // Adicionar handlers dos botões apenas se estivermos na página de edição
+                    if (isEditPage) {
+                        const btnEditar = checklistResultsContent.querySelector('.btn-editar');
+                        const btnApagar = checklistResultsContent.querySelector('.btn-danger');
+
+                        if (btnEditar) {
+                            btnEditar.addEventListener('click', () => carregarChecklistParaEdicao(item));
+                        }
+
+                        if (btnApagar) {
+                            btnApagar.addEventListener('click', () => apagarChecklist(item));
+                        }
+                    }
 
                     // Adicionar eventos de clique aos itens do checklist
                     const checklistItems = checklistResultsContent.querySelectorAll('.checklist-descricao');
