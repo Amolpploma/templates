@@ -57,12 +57,11 @@ if (searchChecklistInput && searchChecklistResults) {
                     const checklistData = typeof checklist.checklist === 'string' ? 
                         JSON.parse(checklist.checklist) : checklist.checklist;
                     
-                    // Usar o modelo_id da coluna da tabela checklists
-                    console.log(`Checklist ${checklist.id} com modelo_id da tabela: ${checklist.modelo_id}`);
-                    
                     return `
                         <div class="resultado-checklist" 
-                             data-id="${checklist.id}" 
+                             data-id="${checklist.id}"
+                             data-nome="${encodeURIComponent(checklist.nome)}"
+                             data-tag='${JSON.stringify(tags)}'
                              data-modelo_id="${checklist.modelo_id || ''}"
                              data-checklist='${JSON.stringify(checklistData)}'>
                             <div class="nome-texto">
@@ -271,73 +270,6 @@ if (searchChecklistInput && searchChecklistResults) {
         console.log(`Modelo completo ${modeloId} ${modeloExistente ? 'encontrado' : 'não encontrado'} no DOM`);
         
         return !!modeloExistente;
-    }
-
-    async function carregarChecklistParaEdicao(item) {
-        try {
-            // Preencher os campos com os dados do checklist
-            const checklistData = JSON.parse(item.dataset.checklist);
-            const nome = decodeURIComponent(item.dataset.nome);
-            const tags = JSON.parse(item.dataset.tag || '[]');
-            const modeloId = item.dataset.modelo_id;
-
-            console.log(item);
-            console.log('Dados carregados:', { nome, tags, checklistData, modeloId });
-
-            // Preencher nome e tags
-            document.getElementById('nome-checklist-input').value = nome || '';
-            document.getElementById('tag-checklist-input').value = (tags || []).join(', ');
-
-            // Limpar itens existentes
-            const container = document.getElementById('checklist-items-container');
-            container.innerHTML = '';
-
-            // Adicionar itens
-            if (Array.isArray(checklistData)) {
-                checklistData.forEach(item => {
-                    const itemRow = createItemRow();
-                    container.appendChild(itemRow);
-                    
-                    // Preencher descrição
-                    const input = itemRow.querySelector('.checklist-item-input');
-                    input.value = item.descricao || item.descrição || '';
-
-                    // Configurar modelo associado se existir
-                    if (item.modelo_id) {
-                        const modeloAssociado = itemRow.querySelector('.modelo-associado');
-                        modeloAssociado.dataset.id = item.modelo_id;
-                        modeloAssociado.textContent = `Modelo: ${item.modelo_id}`;
-                    }
-
-                    setupModelAssociation(itemRow);
-                });
-            }
-
-            // Configurar modelo do cabeçalho se existir
-            const headerModelo = document.querySelector('.checklist-header-modelo');
-            if (headerModelo && modeloId) {
-                headerModelo.dataset.id = modeloId;
-                headerModelo.textContent = `Modelo: ${modeloId}`;
-            } else if (headerModelo) {
-                headerModelo.dataset.id = '';
-                headerModelo.textContent = 'Modelo: sem modelo associado';
-            }
-
-            // Rolar para o topo da página
-            window.scrollTo(0, 0);
-        } catch (err) {
-            console.error('Erro ao carregar checklist para edição:', err);
-            await showDialog(
-                'Erro',
-                'Erro ao carregar checklist para edição',
-                [{
-                    id: 'btn-ok',
-                    text: 'OK',
-                    class: 'btn-primary',
-                    value: false
-                }]
-            );
-        }
     }
 }
 

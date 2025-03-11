@@ -393,24 +393,23 @@ function exibirResultadosChecklist(resultados) {
 
 async function carregarChecklistParaEdicao(item) {
     try {
-        // Preencher os campos com os dados do checklist
-        const checklistData = JSON.parse(item.dataset.checklist);
+        // Preencher os campos com os dados do checklist já disponíveis
         const nome = decodeURIComponent(item.dataset.nome);
         const tags = JSON.parse(item.dataset.tag || '[]');
+        const checklistData = JSON.parse(item.dataset.checklist);
         const modeloId = item.dataset.modelo_id;
 
-        console.log(item);
         console.log('Dados para edição:', { nome, tags, checklistData, modeloId });
 
         // Preencher nome e tags
         document.getElementById('nome-checklist-input').value = nome;
-        document.getElementById('tag-checklist-input').value = (tags || []).join(', ');
+        document.getElementById('tag-checklist-input').value = tags.join(', ');
 
         // Limpar itens existentes
         const container = document.getElementById('checklist-items-container');
         container.innerHTML = '';
 
-        // Adicionar itens e buscar nomes dos modelos
+        // Adicionar itens
         for (const item of checklistData) {
             const itemRow = window.createItemRow();
             container.appendChild(itemRow);
@@ -421,9 +420,9 @@ async function carregarChecklistParaEdicao(item) {
 
             // Configurar modelo associado se existir
             if (item.modelo_id) {
+                const modeloAssociado = itemRow.querySelector('.modelo-associado');
                 try {
                     const modelo = await window.electronAPI.buscarModeloPorId(item.modelo_id);
-                    const modeloAssociado = itemRow.querySelector('.modelo-associado');
                     if (modelo) {
                         modeloAssociado.dataset.id = item.modelo_id;
                         modeloAssociado.dataset.nome = modelo.nome;
