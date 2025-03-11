@@ -304,13 +304,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function limparCampos() {
+        // Limpar campos do formulário principal
         nomeInput.value = '';
         tagInput.value = '';
         document.getElementById('checklist-items-container').innerHTML = '';
+        
+        // Limpar modelo do cabeçalho
         const headerModelo = document.querySelector('.checklist-header-modelo');
         headerModelo.dataset.id = '';
         headerModelo.dataset.nome = '';
         headerModelo.textContent = 'Modelo: sem modelo associado';
+    
+        // Limpar pesquisa do painel esquerdo
+        const searchChecklistInput = document.querySelector('.search-checklist-input');
+        if (searchChecklistInput) {
+            searchChecklistInput.value = '';
+            searchChecklistInput.dispatchEvent(new Event('input')); // Limpar resultados
+        }
+    
+        // Limpar pesquisa do painel direito
+        const searchModeloInput = document.querySelector('.right-panel .search-input');
+        if (searchModeloInput) {
+            searchModeloInput.value = '';
+            searchModeloInput.dispatchEvent(new Event('input')); // Limpar resultados
+        }
+    
+        // Limpar seleções
+        document.querySelector('.resultado-checklist.selected')?.classList.remove('selected');
+        document.querySelector('.resultado-modelo.selected')?.classList.remove('selected');
     }
 });
 
