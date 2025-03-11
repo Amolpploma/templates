@@ -532,19 +532,3 @@ async function apagarChecklist(item) {
         }
     }
 }
-
-function renderizarChecklist(checklistData) {
-    return checklistData
-        .map(item => `
-            <div class="checklist-item">
-                <div class="checklist-descricao" 
-                     data-state="inactive"
-                     data-modelo_id="${item.modelo_id || ''}"
-                     data-checklist_id="${item.id || ''}">
-                    <span class="checklist-icon"></span>
-                    <span class="checklist-text">${item.descrição || item.descricao}</span>
-                </div>
-            </div>
-        `)
-        .join('');
-}
