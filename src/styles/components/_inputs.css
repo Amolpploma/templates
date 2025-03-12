@@ -71,7 +71,6 @@
     display: flex;
     gap: 10px;
     padding: 0 20px 0 10px;
-    margin-bottom: 10px;
     align-items: center; /* Alinhar verticalmente com os inputs */
 }
 
@@ -122,4 +121,152 @@
 
 .btn-salvar:active {
     transform: translateY(1px);
+}
+
+.checklist-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checklist-item-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    /*background-color: var(--bg-secondary);*/
+    padding: 8px 0;
+    /*border-radius: 4px;
+    border: 1px solid var(--border-color);*/
+}
+
+.checklist-item-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.checklist-item-input {
+    flex: 1;
+    height: 36px;
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.checklist-item-btn {
+    width: 28px;
+    height: 28px;
+    padding: 6px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.checklist-item-btn:hover {
+    background-color: var(--btn-hover);
+}
+
+.checklist-item-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.checklist-item-btn.remove:hover {
+    background-color: var(--btn-danger-bg);
+    color: white;
+}
+
+.btn-adicionar-item {
+    width: auto;
+    padding: 8px 0;
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: inherit;
+    transition: background-color 0.2s;
+    margin: 10px 20px 10px 10px;
+}
+
+.btn-adicionar-item:hover {
+    background-color: var(--btn-hover);
+}
+
+.checklist-associate-btn {
+    height: 36px;
+    width: 36px;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.checklist-associate-btn:hover {
+    background-color: var(--btn-hover);
+}
+
+.checklist-associate-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.checklist-header-modelo {
+    padding: 0 20px 0 10px;
+    margin-bottom: 5px;
+}
+
+.editor-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Garante que o painel ocupe toda a altura disponível */
+    box-sizing: border-box; /* Inclui padding e borda no cálculo da largura/altura */
+}
+
+#editor-container {
+    flex: 1; /* Permite que o editor cresça para ocupar o espaço disponível */
+    min-height: 200px; /* Altura mínima para o editor */
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.textarea-editor {
+    flex: 1; /* Permite que a textarea cresça para ocupar o espaço disponível */
+    min-height: 200px; /* Altura mínima para a textarea */
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    background-color: var(--panel-bg);
+    color: var(--text-primary);
+    border-color: var(--textarea-border);
+}
+
+.checklist-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+#checklist-items-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 10px 0 10px;
 }

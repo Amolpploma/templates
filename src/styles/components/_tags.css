@@ -13,7 +13,8 @@
 .tags-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 4px;
+    /*gap: 4px;
+    margin-top: 4px;*/
     padding: 2px 0;
+    text-align: left;
 }

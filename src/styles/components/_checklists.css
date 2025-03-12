@@ -28,6 +28,17 @@
     color: var(--checklist-inactive-color);
 }
 
+/* Desabilitar interações na página de edição */
+.checklist-descricao.no-interaction {
+    pointer-events: none;
+    cursor: default;
+    background-color: var(--checklist-bg);
+}
+
+.checklist-descricao.no-interaction:hover {
+    background-color: var(--checklist-bg);
+}
+
 .checklist-icon {
     width: 16px;
     height: 16px;

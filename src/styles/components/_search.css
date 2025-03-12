@@ -17,7 +17,7 @@
     height: calc(65% - 5px);
     overflow: hidden;
     background-color: var(--panel-bg);
-    padding: 10px 0 10px 10px;
+    padding: 10px 0 0 10px;
     padding-top: 10px;
 }
 
@@ -66,6 +66,15 @@
     margin-right: 0;
 }
 
+body[data-page="checklist-editor"] .resultado-texto-container {
+    margin-bottom: 50px;
+}
+
+.nome-modelo {
+    text-align: justify;
+}
+
+/*
 .resultado-modelo-texto {
     padding: 10px;
     background-color: var(--bg-secondary);
@@ -73,6 +82,7 @@
     line-height: 1;
     text-align: justify;
 }
+    */
 
 /* Refinamentos de busca */
 .search-refinements {
@@ -114,6 +124,7 @@
 
 /* Destaque de texto */
 mark {
+    display: inline-block;
     background-color: var(--highlight-bg, #fff48d);
     color: var(--highlight-text, #000000);
     padding: 0 2px;
@@ -124,4 +135,60 @@ mark {
 [data-theme="dark"] mark {
     background-color: var(--highlight-bg-dark, #c9f0ff);
     color: var(--highlight-text-dark, #000000);
+}
+
+/* Modo foco */
+.right-panel.focus-mode {
+    position: relative;
+    z-index: 1000;
+    box-shadow: var(--focus-shadow);
+}
+
+/* Botão associar modelo */
+.associate-model-btn {
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--btn-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+    top: 3px;
+}
+
+.associate-model-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.associate-model-btn:hover {
+    background-color: var(--btn-hover);
+}
+
+/*
+body[data-page="checklist-editor"] .associate-model-btn {
+    display: flex;
+}
+    */
+
+.resultado-modelo {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+/* Modelo associado */
+.modelo-associado {
+    font-size: 0.9em;
+    color: var(--modelo-associado-text);
+    margin-top: 4px;
+    font-style: italic;
+    text-align: justify;
 }

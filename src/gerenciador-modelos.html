@@ -3,8 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
     <link rel="stylesheet" href="styles/main.css">
     <script src="../recursos/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
     <title>Modelos</title>
@@ -40,12 +42,12 @@
                     <input type="text" class="editor-input" id="nome-input" placeholder="Nome do modelo">
                 </div>
                 <div class="input-container">
-                    <input type="text" class="editor-input" id="tag-input" placeholder="Etiquetas (separadas por vírgula)">
+                    <input type="text" class="editor-input" id="tag-input"
+                        placeholder="Etiquetas (separadas por vírgula)">
                 </div>
                 <button class="btn-salvar">Salvar modelo</button>
             </div>
             <div id="editor-container"></div>
-            <div id="editor-resizer"></div>
             <div class="textarea-editor"></div>
         </div>
         <div id="resizer-right"></div>
@@ -90,11 +92,10 @@
     <script src="shared-functions.js"></script>
     <script src="renderer.js"></script>
     <script src="tinymce_init.js"></script>
-    <!--<script src="editor-resizer.js"></script> --> <!-- Garanta que esta linha esteja presente -->
     <script src="window-controls.js"></script>
     <script src="theme-toggle.js"></script>
     <script src="highlight-utils.js"></script>
-    <script src="scripts/gerenciador-modelos.js"></script> <!-- Adicionar esta linha -->
+    <script src="scripts/gerenciador-modelos.js"></script>
 </body>
 
 </html>

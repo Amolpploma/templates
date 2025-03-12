@@ -28,7 +28,8 @@
 .search-results-list,
 .resultado-modelo-container,
 .resultado-texto-container,
-.textarea-editor {
+.textarea-editor,
+#checklist-items-container {
     scrollbar-width: thin;
     scrollbar-color: var(--scroll-thumb) transparent;
     scrollbar-gutter: stable;

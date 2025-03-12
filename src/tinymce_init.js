@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         menubar: false,
         statusbar: true,
         elementpath: false,
-        toolbar: "charmap | undo redo selectall copy| searchreplace | numlist bullist | fontfamily fontsize | bold italic underline | align outdent indent| lineheight | forecolor backcolor removeformat",
+        toolbar: "fontfamily fontsize | bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap",
         content_style:'body { font-family:times new roman,times; font-size:12pt }',
         license_key: 'gpl'
     });
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         menubar: false,
                         statusbar: true,
                         elementpath: false,
-                        toolbar: "charmap | undo redo selectall copy| searchreplace | numlist bullist | fontfamily fontsize | bold italic underline | align outdent indent| lineheight | forecolor backcolor removeformat",
+                        toolbar: "fontfamily fontsize | bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap",
                         content_style: 'body { font-family:times new roman,times; font-size:12pt }',
                         license_key: 'gpl'
                     });

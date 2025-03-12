@@ -164,6 +164,44 @@ class Database {
         }
     }
 
+    async inserirChecklist(nome, tag, checklist, modelo_id) {
+        try {
+            const tagArray = this.#validarJSON(tag);
+            const checklistArray = this.#validarJSON(checklist);
+
+            return new Promise((resolve, reject) => {
+                // Primeiro verificar se já existe um checklist com este nome
+                this.db.get('SELECT id FROM checklists WHERE nome = ?', [nome], (err, row) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    const sql = row 
+                        ? 'UPDATE checklists SET tag = ?, checklist = ?, modelo_id = ? WHERE nome = ?'
+                        : 'INSERT INTO checklists (nome, tag, checklist, modelo_id) VALUES (?, ?, ?, ?)';
+
+                    const params = row
+                        ? [JSON.stringify(tagArray), JSON.stringify(checklistArray), modelo_id || null, nome]
+                        : [nome, JSON.stringify(tagArray), JSON.stringify(checklistArray), modelo_id || null];
+
+                    this.db.run(sql, params, function(err) {
+                        if (err) {
+                            console.error('Erro ao inserir/atualizar checklist no banco:', err);
+                            reject(err);
+                        } else {
+                            // Se for UPDATE, retornar o ID existente, se for INSERT, retornar o novo ID
+                            resolve(row ? row.id : this.lastID);
+                        }
+                    });
+                });
+            });
+        } catch (err) {
+            console.error('Erro ao processar dados do checklist:', err);
+            throw new Error(`Erro ao validar JSON: ${err.message}`);
+        }
+    }
+
     #validarJSON(data) {
         if (typeof data === 'string') {
             try {
@@ -179,6 +217,19 @@ class Database {
         return new Promise((resolve, reject) => {
             this.db.get(
                 'SELECT * FROM modelos WHERE nome = ?',
+                [nome],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                }
+            );
+        });
+    }
+
+    async verificarChecklistExistente(nome) {
+        return new Promise((resolve, reject) => {
+            this.db.get(
+                'SELECT * FROM checklists WHERE nome = ?',
                 [nome],
                 (err, row) => {
                     if (err) reject(err);
@@ -210,6 +261,19 @@ class Database {
         return new Promise((resolve, reject) => {
             this.db.run(
                 'DELETE FROM modelos WHERE id = ?',
+                [id],
+                function(err) {
+                    if (err) reject(err);
+                    else resolve(this.changes);
+                }
+            );
+        });
+    }
+
+    deletarChecklist(id) {
+        return new Promise((resolve, reject) => {
+            this.db.run(
+                'DELETE FROM checklists WHERE id = ?',
                 [id],
                 function(err) {
                     if (err) reject(err);
