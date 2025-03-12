@@ -17,7 +17,7 @@
     height: calc(65% - 5px);
     overflow: hidden;
     background-color: var(--panel-bg);
-    padding: 10px 0 10px 10px;
+    padding: 10px 0 0 10px;
     padding-top: 10px;
 }
 
@@ -64,6 +64,10 @@
     overflow-y: auto;
     margin-bottom: 0;
     margin-right: 0;
+}
+
+body[data-page="checklist-editor"] .resultado-texto-container {
+    margin-bottom: 50px;
 }
 
 .nome-modelo {
