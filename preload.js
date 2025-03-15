@@ -16,5 +16,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     atualizarModelo: (dados) => ipcRenderer.invoke('atualizar-modelo', dados),
     salvarChecklist: (dados) => ipcRenderer.invoke('salvar-checklist', dados),
     verificarChecklist: (nome) => ipcRenderer.invoke('verificar-checklist', nome),
-    apagarChecklist: (id) => ipcRenderer.invoke('apagar-checklist', id)
+    apagarChecklist: (id) => ipcRenderer.invoke('apagar-checklist', id),
+    selectDatabase: () => ipcRenderer.invoke('select-database'),
+    createDatabase: () => ipcRenderer.invoke('create-database'),
+    checkDatabaseConnection: () => ipcRenderer.invoke('check-database-connection')
 });

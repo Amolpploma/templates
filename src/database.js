@@ -3,28 +3,51 @@ const path = require('path');
 
 class Database {
     constructor(dbPath) {
-        if (!dbPath) {
-            throw new Error('Database path is required');
-        }
-        
-        console.log('Usando banco de dados em:', dbPath);
-        
-        this.db = new sqlite3.Database(dbPath, (err) => {
-            if (err) {
-                console.error('Erro ao conectar ao banco:', err);
-            } else {
-                console.log('Conectado ao banco SQLite');
-            }
-        });
+        if (!dbPath) throw new Error('Database path is required');
+        this.dbPath = dbPath;
+    }
 
-        // Criar índices para otimizar buscas
-        this.db.exec(`
-            CREATE INDEX IF NOT EXISTS idx_modelos_nome ON modelos(nome);
-            CREATE INDEX IF NOT EXISTS idx_modelos_tag ON modelos(tag);
-            CREATE INDEX IF NOT EXISTS idx_modelos_modelo ON modelos(modelo);
-            CREATE INDEX IF NOT EXISTS idx_checklists_nome ON checklists(nome);
-            CREATE INDEX IF NOT EXISTS idx_checklists_tag ON checklists(tag);
-        `);
+    async configurar() {
+        return new Promise((resolve, reject) => {
+            this.db = new sqlite3.Database(this.dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                // Configurar modo WAL e outros parâmetros para múltiplos acessos
+                this.db.exec(`
+                    PRAGMA journal_mode = WAL;
+                    PRAGMA synchronous = NORMAL;
+                    PRAGMA busy_timeout = 5000;
+                    
+                    CREATE TABLE IF NOT EXISTS modelos (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nome TEXT NOT NULL,
+                        tag TEXT,
+                        modelo TEXT
+                    );
+                    
+                    CREATE TABLE IF NOT EXISTS checklists (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nome TEXT NOT NULL,
+                        tag TEXT,
+                        checklist TEXT,
+                        modelo_id INTEGER,
+                        FOREIGN KEY(modelo_id) REFERENCES modelos(id)
+                    );
+                    
+                    CREATE INDEX IF NOT EXISTS idx_modelos_nome ON modelos(nome);
+                    CREATE INDEX IF NOT EXISTS idx_modelos_tag ON modelos(tag);
+                    CREATE INDEX IF NOT EXISTS idx_modelos_modelo ON modelos(modelo);
+                    CREATE INDEX IF NOT EXISTS idx_checklists_nome ON checklists(nome);
+                    CREATE INDEX IF NOT EXISTS idx_checklists_tag ON checklists(tag);
+                `, (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+        });
     }
 
     // Função auxiliar para construir a query de busca em modelos
