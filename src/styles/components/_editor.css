@@ -17,3 +17,7 @@
     color: var(--text-primary);
     border-color: var(--textarea-border);
 }
+
+.tox-tinymce {
+    border: none !important;
+}
