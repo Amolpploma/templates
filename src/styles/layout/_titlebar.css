@@ -6,7 +6,7 @@
     height: 32px;
     background-color: var(--titlebar-bg);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; /* Alterado para start */
     align-items: center;
     -webkit-app-region: drag;
     user-select: none;
@@ -42,6 +42,7 @@
     display: flex;
     height: 100%;
     -webkit-app-region: no-drag;
+    margin-left: auto;
 }
 
 .window-controls button {
@@ -50,7 +51,6 @@
     border: none;
     background: transparent;
     color: var(--titlebar-text);
-    font-size: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -69,6 +69,44 @@
 }
 
 /* Ajustes de fonte e alinhamento */
-.minimize-button { font-size: 20px; line-height: 1; padding-bottom: 4px; }
-.maximize-button { font-size: 14px; line-height: 1; }
-.close-button { font-size: 18px; line-height: 1; }
+.minimize-button { font-size: 16px; line-height: 1; }
+.maximize-button { font-size: 20px; line-height: 1; padding-bottom: 4px; }
+.close-button { font-size: 20px; line-height: 1; padding-bottom: 3px; }
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    color: var(--titlebar-text);
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    padding: 6px;
+    transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--titlebar-hover);
+}
+
+.theme-toggle svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.theme-icon-light,
+.theme-icon-dark {
+    display: none;
+}
+
+[data-theme="light"] .theme-icon-light {
+    display: block;
+}
+
+[data-theme="dark"] .theme-icon-dark {
+    display: block;
+}

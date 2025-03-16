@@ -4,6 +4,14 @@
 const { app, BrowserWindow, globalShortcut, ipcMain, dialog } = require('electron')
 const path = require('node:path')
 const fs = require('fs')
+let store;
+
+async function loadStore() {
+    const { default: Store } = await import('electron-store');
+    store = new Store();
+}
+
+let database = null;
 
 // Função para determinar o caminho correto do banco de dados
 function getDatabasePath() {
@@ -37,46 +45,105 @@ function getDatabasePath() {
     return dbPath;
 }
 
-// Inicializar o banco de dados com o caminho correto
-const database = require('./src/database')(getDatabasePath());
+async function initializeDatabase(dbPath) {
+    try {
+        if (database) {
+            database.fecharConexao();
+        }
 
-const createWindow = () => {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 960,
-    height: 600,
-    minWidth: 960,  // Tamanho mínimo
-    minHeight: 600, // Tamanho mínimo
-    frame: false, // Remove a barra padrão
-    titleBarStyle: 'hidden',   // Esconde a barra de título
-    autoHideMenuBar: true,     // Esconde a barra de menu
-    center: true,              // Centraliza a janela
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: false,
-      enableRemoteModule: false,
-      devTools: true,
-      preload: path.join(__dirname, 'preload.js')  // Caminho atualizado para a raiz
+        // Verificar se o banco de dados é válido
+        const isValid = await validateDatabase(dbPath);
+        if (!isValid) {
+            dialog.showMessageBox({
+                type: 'error',
+                title: 'Erro',
+                message: 'Banco de dados inválido ou corrompido. Selecione um banco de dados válido ou crie um novo a partir da tela inicial.'
+            });
+            return false;
+        }
+
+        // Configurar SQLite com modo WAL para permitir múltiplos acessos
+        const db = require('./src/database')(dbPath);
+        await db.configurar();
+        database = db;
+        
+        store.set('databasePath', dbPath);
+        return true;
+    } catch (error) {
+        console.error('Erro ao inicializar banco:', error);
+        return false;
     }
-  })
+}
 
-  // Adicionar handlers para controles da janela
-  ipcMain.on('minimize-window', () => mainWindow.minimize());
-  ipcMain.on('maximize-window', () => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize();
-    } else {
-      mainWindow.maximize();
+async function validateDatabase(dbPath) {
+    try {
+        const sqlite3 = require('sqlite3').verbose(); // Importar sqlite3 aqui
+        const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
+            if (err) {
+                console.error('Erro ao abrir banco para validação:', err);
+                return false;
+            }
+        });
+
+        const checkTablesQuery = `
+            SELECT name FROM sqlite_sequence WHERE name IN ('modelos', 'checklists');
+        `;
+
+        return new Promise((resolve, reject) => {
+            db.all(checkTablesQuery, [], (err, rows) => {
+                db.close();
+                if (err) {
+                    console.error('Erro ao validar tabelas:', err);
+                    resolve(false);
+                } else {
+                    const tableNames = rows.map(row => row.name);
+                    const hasModelos = tableNames.includes('modelos');
+                    const hasChecklists = tableNames.includes('checklists');
+                    resolve(hasModelos && hasChecklists);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Erro na validação do banco:', error);
+        return false;
     }
-  });
-  ipcMain.on('close-window', () => mainWindow.close());
+}
 
-  // Ajustando o caminho para o index.html no diretório src
-  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'))
+function createWindow(page = 'index.html') {
+    const mainWindow = new BrowserWindow({
+        width: 960,
+        height: 600,
+        minWidth: 960,  // Tamanho mínimo
+        minHeight: 600, // Tamanho mínimo
+        frame: false, // Remove a barra padrão
+        titleBarStyle: 'hidden',   // Esconde a barra de título
+        autoHideMenuBar: true,     // Esconde a barra de menu
+        center: true,              // Centraliza a janela
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            sandbox: false,
+            enableRemoteModule: false,
+            devTools: true,
+            preload: path.join(__dirname, 'preload.js')  // Caminho atualizado para a raiz
+        }
+    });
 
-  // Registrar todos os handlers IPC antes de qualquer outra operação
-  registerIpcHandlers();
+    mainWindow.loadFile(path.join(__dirname, 'src', page));
+
+    // Adicionar handlers para controles da janela
+    ipcMain.on('minimize-window', () => mainWindow.minimize());
+    ipcMain.on('maximize-window', () => {
+        if (mainWindow.isMaximized()) {
+            mainWindow.unmaximize();
+        } else {
+            mainWindow.maximize();
+        }
+    });
+    ipcMain.on('close-window', () => mainWindow.close());
+
+    // Registrar todos os handlers IPC antes de qualquer outra operação
+    registerIpcHandlers();
 }
 
 function registerIpcHandlers() {
@@ -178,20 +245,62 @@ function registerIpcHandlers() {
       return null;
     }
   });
+
+  ipcMain.handle('select-database', async () => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showOpenDialog(mainWindow, {
+        modal: true,
+        properties: ['openFile'],
+        filters: [{ name: 'SQLite Database', extensions: ['sqlite', 'db'] }]
+    });
+
+    if (!result.canceled && result.filePaths.length > 0) {
+        const success = await initializeDatabase(result.filePaths[0]);
+        if (success) {
+            BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'index.html'));
+        }
+        return success;
+    }
+    return false;
+  });
+
+  ipcMain.handle('create-database', async () => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showSaveDialog(mainWindow, {
+        modal: true,
+        filters: [{ name: 'SQLite Database', extensions: ['sqlite'] }]
+    });
+
+    if (!result.canceled) {
+        const success = await initializeDatabase(result.filePath);
+        if (success) {
+            BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'index.html'));
+        }
+        return success;
+    }
+    return false;
+  });
+
+  ipcMain.handle('get-database-path', async () => {
+    return store.get('databasePath') || 'Nenhum banco de dados selecionado';
+  });
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  createWindow()
-
-  app.on('activate', () => {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
+app.whenReady().then(async () => {
+    await loadStore();
+    // Verificar se já existe um caminho de banco salvo
+    const savedPath = store.get('databasePath');
+    
+    if (savedPath && fs.existsSync(savedPath)) {
+        const success = await initializeDatabase(savedPath);
+        createWindow(success ? 'index.html' : 'select-database.html');
+    } else {
+        createWindow('select-database.html');
+    }
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -208,7 +317,7 @@ app.on('will-quit', () => {
   ipcMain.removeHandler('buscar-modelo-por-id'); // Adicionar esta linha
   
   globalShortcut.unregisterAll();
-  database.fecharConexao();
+  //database.fecharConexao(); //Remover essa linha
 })
 
 ipcMain.on('save-content', (event, content) => {

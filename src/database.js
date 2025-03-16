@@ -3,39 +3,103 @@ const path = require('path');
 
 class Database {
     constructor(dbPath) {
-        if (!dbPath) {
-            throw new Error('Database path is required');
-        }
-        
-        console.log('Usando banco de dados em:', dbPath);
-        
-        this.db = new sqlite3.Database(dbPath, (err) => {
-            if (err) {
-                console.error('Erro ao conectar ao banco:', err);
-            } else {
-                console.log('Conectado ao banco SQLite');
-            }
-        });
+        if (!dbPath) throw new Error('Database path is required');
+        this.dbPath = dbPath;
+    }
 
-        // Criar índices para otimizar buscas
-        this.db.exec(`
+    async executarQuery(query, params = []) {
+        return new Promise((resolve, reject) => {
+            const db = new sqlite3.Database(this.dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                db.exec(`PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; PRAGMA busy_timeout = 5000;`, (err) => {
+                    if (err) {
+                        reject(err);
+                        db.close();
+                        return;
+                    }
+
+                    db.all(query, params, (err, rows) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(rows);
+                        }
+                        db.close();
+                    });
+                });
+            });
+        });
+    }
+
+    async executarRun(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            const db = new sqlite3.Database(this.dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                db.exec(`PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; PRAGMA busy_timeout = 5000;`, (err) => {
+                    if (err) {
+                        reject(err);
+                        db.close();
+                        return;
+                    }
+
+                    db.run(sql, params, function(err) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(this.lastID || this.changes);
+                        }
+                        db.close();
+                    });
+                });
+            });
+        });
+    }
+
+    async configurar() {
+        const sql = `
+            PRAGMA journal_mode = WAL;
+            PRAGMA synchronous = NORMAL;
+            PRAGMA busy_timeout = 5000;
+            
+            CREATE TABLE IF NOT EXISTS modelos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome TEXT NOT NULL,
+                tag TEXT,
+                modelo TEXT
+            );
+            
+            CREATE TABLE IF NOT EXISTS checklists (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome TEXT NOT NULL,
+                tag TEXT,
+                checklist TEXT,
+                modelo_id INTEGER,
+                FOREIGN KEY(modelo_id) REFERENCES modelos(id)
+            );
+            
             CREATE INDEX IF NOT EXISTS idx_modelos_nome ON modelos(nome);
             CREATE INDEX IF NOT EXISTS idx_modelos_tag ON modelos(tag);
             CREATE INDEX IF NOT EXISTS idx_modelos_modelo ON modelos(modelo);
             CREATE INDEX IF NOT EXISTS idx_checklists_nome ON checklists(nome);
             CREATE INDEX IF NOT EXISTS idx_checklists_tag ON checklists(tag);
-        `);
+        `;
+        return this.executarQuery(sql);
     }
 
-    // Função auxiliar para construir a query de busca em modelos
     #buildModelosSearchQuery(filters) {
         const conditions = [];
         const params = [];
 
-        // Dividir o termo de pesquisa em palavras
         const termos = filters.termo.split(/\s+/);
 
-        // Para cada palavra, adicionar uma condição LIKE para cada campo
         termos.forEach(termo => {
             const termoConditions = [];
 
@@ -57,13 +121,11 @@ class Database {
                 params.push(termo);
             }
 
-            // Combinar as condições de cada palavra com OR
             if (termoConditions.length > 0) {
                 conditions.push(`(${termoConditions.join(' OR ')})`);
             }
         });
 
-        // Combinar as condições de todas as palavras com AND
         const whereClause = conditions.length > 0
             ? 'WHERE ' + conditions.join(' AND ')
             : '';
@@ -85,7 +147,7 @@ class Database {
 
     async buscarModelos(termo, filtros = { nome: true, etiqueta: false, conteudo: false }) {
         if (!filtros.nome && !filtros.etiqueta && !filtros.conteudo) {
-            filtros.nome = true; // Garantir pelo menos um filtro ativo
+            filtros.nome = true;
         }
         
         const { query, params } = this.#buildModelosSearchQuery({
@@ -93,113 +155,47 @@ class Database {
             ...filtros
         });
 
-        return new Promise((resolve, reject) => {
-            this.db.all(query, params, (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
-            });
-        });
+        return this.executarQuery(query, params);
     }
 
     async buscarChecklists(termo, filtros = { nome: true, etiqueta: false }) {
         if (!filtros.nome && !filtros.etiqueta) {
-            filtros.nome = true; // Garantir pelo menos um filtro ativo
+            filtros.nome = true;
         }
 
-        return new Promise((resolve, reject) => {
-            const conditions = [];
-            const params = [];
+        const conditions = [];
+        const params = [];
 
-            if (filtros.nome) {
-                conditions.push('c.nome LIKE ?');
-                params.push(`%${termo}%`);
-            }
-
-            if (filtros.etiqueta) {
-                conditions.push(`EXISTS (
-                    SELECT 1 FROM json_each(c.tag) 
-                    WHERE value LIKE ?
-                )`);
-                params.push(`%${termo}%`);
-            }
-
-            const whereClause = conditions.length > 0
-                ? 'WHERE ' + conditions.join(' OR ')
-                : '';
-
-            this.db.all(`
-                SELECT DISTINCT
-                    c.id,
-                    c.nome,
-                    c.tag,
-                    c.checklist,
-                    c.modelo_id
-                FROM checklists c
-                ${whereClause}
-                ORDER BY c.nome COLLATE NOCASE
-                LIMIT 100
-            `, params, (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
-            });
-        });
-    }
-
-    // Métodos de manipulação com validação JSON
-    async inserirModelo(nome, tag, modelo) {
-        try {
-            const tagArray = this.#validarJSON(tag);
-            return new Promise((resolve, reject) => {
-                this.db.run(
-                    'INSERT INTO modelos (nome, tag, modelo) VALUES (?, ?, ?)',
-                    [nome, JSON.stringify(tagArray), modelo],
-                    function(err) {
-                        if (err) reject(err);
-                        else resolve(this.lastID);
-                    }
-                );
-            });
-        } catch (err) {
-            throw new Error(`Erro ao validar JSON: ${err.message}`);
+        if (filtros.nome) {
+            conditions.push('c.nome LIKE ?');
+            params.push(`%${termo}%`);
         }
-    }
 
-    async inserirChecklist(nome, tag, checklist, modelo_id) {
-        try {
-            const tagArray = this.#validarJSON(tag);
-            const checklistArray = this.#validarJSON(checklist);
-
-            return new Promise((resolve, reject) => {
-                // Primeiro verificar se já existe um checklist com este nome
-                this.db.get('SELECT id FROM checklists WHERE nome = ?', [nome], (err, row) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-
-                    const sql = row 
-                        ? 'UPDATE checklists SET tag = ?, checklist = ?, modelo_id = ? WHERE nome = ?'
-                        : 'INSERT INTO checklists (nome, tag, checklist, modelo_id) VALUES (?, ?, ?, ?)';
-
-                    const params = row
-                        ? [JSON.stringify(tagArray), JSON.stringify(checklistArray), modelo_id || null, nome]
-                        : [nome, JSON.stringify(tagArray), JSON.stringify(checklistArray), modelo_id || null];
-
-                    this.db.run(sql, params, function(err) {
-                        if (err) {
-                            console.error('Erro ao inserir/atualizar checklist no banco:', err);
-                            reject(err);
-                        } else {
-                            // Se for UPDATE, retornar o ID existente, se for INSERT, retornar o novo ID
-                            resolve(row ? row.id : this.lastID);
-                        }
-                    });
-                });
-            });
-        } catch (err) {
-            console.error('Erro ao processar dados do checklist:', err);
-            throw new Error(`Erro ao validar JSON: ${err.message}`);
+        if (filtros.etiqueta) {
+            conditions.push(`EXISTS (
+                SELECT 1 FROM json_each(c.tag) 
+                WHERE value LIKE ?
+            )`);
+            params.push(`%${termo}%`);
         }
+
+        const whereClause = conditions.length > 0
+            ? 'WHERE ' + conditions.join(' OR ')
+            : '';
+
+        const query = `
+            SELECT DISTINCT
+                c.id,
+                c.nome,
+                c.tag,
+                c.checklist,
+                c.modelo_id
+            FROM checklists c
+            ${whereClause}
+            ORDER BY c.nome COLLATE NOCASE
+            LIMIT 100
+        `;
+        return this.executarQuery(query, params);
     }
 
     #validarJSON(data) {
@@ -213,91 +209,79 @@ class Database {
         return Array.isArray(data) ? data : [data];
     }
 
+    async inserirModelo(nome, tag, modelo) {
+        try {
+            const tagArray = this.#validarJSON(tag);
+            const sql = 'INSERT INTO modelos (nome, tag, modelo) VALUES (?, ?, ?)';
+            return this.executarRun(sql, [nome, JSON.stringify(tagArray), modelo]);
+        } catch (err) {
+            throw new Error(`Erro ao validar JSON: ${err.message}`);
+        }
+    }
+
+    async inserirChecklist(nome, tag, checklist, modelo_id) {
+        try {
+            const tagArray = this.#validarJSON(tag);
+            const checklistArray = this.#validarJSON(checklist);
+
+            // Primeiro verificar se já existe um checklist com este nome
+            let row = await this.verificarChecklistExistente(nome);
+
+            const sql = row 
+                ? 'UPDATE checklists SET tag = ?, checklist = ?, modelo_id = ? WHERE nome = ?'
+                : 'INSERT INTO checklists (nome, tag, checklist, modelo_id) VALUES (?, ?, ?, ?)';
+
+            const params = row
+                ? [JSON.stringify(tagArray), JSON.stringify(checklistArray), modelo_id || null, nome]
+                : [nome, JSON.stringify(tagArray), JSON.stringify(checklistArray), modelo_id || null];
+
+            return this.executarRun(sql, params);
+        } catch (err) {
+            console.error('Erro ao processar dados do checklist:', err);
+            throw new Error(`Erro ao validar JSON: ${err.message}`);
+        }
+    }
+
     async verificarModeloExistente(nome) {
-        return new Promise((resolve, reject) => {
-            this.db.get(
-                'SELECT * FROM modelos WHERE nome = ?',
-                [nome],
-                (err, row) => {
-                    if (err) reject(err);
-                    else resolve(row);
-                }
-            );
-        });
+        const query = 'SELECT * FROM modelos WHERE nome = ?';
+        const rows = await this.executarQuery(query, [nome]);
+        return rows.length > 0 ? rows[0] : null;
     }
 
     async verificarChecklistExistente(nome) {
-        return new Promise((resolve, reject) => {
-            this.db.get(
-                'SELECT * FROM checklists WHERE nome = ?',
-                [nome],
-                (err, row) => {
-                    if (err) reject(err);
-                    else resolve(row);
-                }
-            );
-        });
+        const query = 'SELECT * FROM checklists WHERE nome = ?';
+        const rows = await this.executarQuery(query, [nome]);
+        return rows.length > 0 ? rows[0] : null;
     }
 
     async atualizarModelo(id, nome, tag, modelo) {
         try {
             const tagArray = this.#validarJSON(tag);
-            return new Promise((resolve, reject) => {
-                this.db.run(
-                    'UPDATE modelos SET nome = ?, tag = ?, modelo = ? WHERE id = ?',
-                    [nome, JSON.stringify(tagArray), modelo, id],
-                    function(err) {
-                        if (err) reject(err);
-                        else resolve(this.changes);
-                    }
-                );
-            });
+            const sql = 'UPDATE modelos SET nome = ?, tag = ?, modelo = ? WHERE id = ?';
+            return this.executarRun(sql, [nome, JSON.stringify(tagArray), modelo, id]);
         } catch (err) {
             throw new Error(`Erro ao validar JSON: ${err.message}`);
         }
     }
 
     deletarModelo(id) {
-        return new Promise((resolve, reject) => {
-            this.db.run(
-                'DELETE FROM modelos WHERE id = ?',
-                [id],
-                function(err) {
-                    if (err) reject(err);
-                    else resolve(this.changes);
-                }
-            );
-        });
+        const sql = 'DELETE FROM modelos WHERE id = ?';
+        return this.executarRun(sql, [id]);
     }
 
     deletarChecklist(id) {
-        return new Promise((resolve, reject) => {
-            this.db.run(
-                'DELETE FROM checklists WHERE id = ?',
-                [id],
-                function(err) {
-                    if (err) reject(err);
-                    else resolve(this.changes);
-                }
-            );
-        });
+        const sql = 'DELETE FROM checklists WHERE id = ?';
+        return this.executarRun(sql, [id]);
     }
 
-    obterModeloPorId(id) {
-        return new Promise((resolve, reject) => {
-            this.db.get(
-                'SELECT * FROM modelos WHERE id = ?',
-                [id],
-                (err, row) => {
-                    if (err) reject(err);
-                    else resolve(row);
-                }
-            );
-        });
+    async obterModeloPorId(id) {
+        const query = 'SELECT * FROM modelos WHERE id = ?';
+        const rows = await this.executarQuery(query, [id]);
+        return rows.length > 0 ? rows[0] : null;
     }
 
     fecharConexao() {
-        this.db.close();
+        // Não precisa fechar a conexão aqui, pois cada operação abre e fecha sua própria conexão
     }
 }
 

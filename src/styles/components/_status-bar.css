@@ -1,0 +1,47 @@
+.status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background-color: var(--titlebar-bg);
+    color: var(--titlebar-text);
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Alterado para space-between */
+    padding: 0 10px;
+    border-top: 1px solid var(--border-color);
+    z-index: 1000;
+    -webkit-app-region: no-drag;
+}
+
+.status-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 500px;
+    vertical-align: text-bottom;
+    display: flex;
+    align-items: center;
+}
+
+.status-close-btn {
+    background: none;
+    border: none;
+    color: var(--titlebar-text);
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 8px;
+    line-height: 1;
+    vertical-align: middle;
+    margin-bottom: 4px;
+}
+
+.status-close-btn:hover {
+    color: var(--text-primary);
+}
+
+#db-path {
+    vertical-align: middle;
+}
