@@ -6,12 +6,11 @@ module.exports = {
   packagerConfig: {
     asar: {
       unpack: [
-        "**/recursos/database.sqlite",
-        "**/node_modules/quill/**/*"  // Garantir que o Quill seja descompactado
+        //"**/recursos/database.sqlite",
       ]
     },
     extraResource: [
-      './recursos/database.sqlite'
+      //'./recursos/database.sqlite'
     ]
   },
   rebuildConfig: {},

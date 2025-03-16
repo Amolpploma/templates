@@ -264,7 +264,7 @@ app.on('will-quit', () => {
   ipcMain.removeHandler('buscar-modelo-por-id'); // Adicionar esta linha
   
   globalShortcut.unregisterAll();
-  database.fecharConexao();
+  //database.fecharConexao(); //Remover essa linha
 })
 
 ipcMain.on('save-content', (event, content) => {
