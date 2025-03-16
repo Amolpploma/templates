@@ -20,4 +20,25 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 500px;
+    vertical-align: text-bottom;
+}
+
+.status-close-btn {
+    background: none;
+    border: none;
+    color: var(--titlebar-text);
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 8px;
+    line-height: 1;
+    vertical-align: middle;
+    margin-bottom: 4px;
+}
+
+.status-close-btn:hover {
+    color: var(--text-primary);
+}
+
+#db-path {
+    vertical-align: middle;
 }
