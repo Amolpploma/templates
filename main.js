@@ -51,6 +51,17 @@ async function initializeDatabase(dbPath) {
             database.fecharConexao();
         }
 
+        // Verificar se o banco de dados é válido
+        const isValid = await validateDatabase(dbPath);
+        if (!isValid) {
+            dialog.showMessageBox({
+                type: 'error',
+                title: 'Erro',
+                message: 'Banco de dados inválido ou corrompido. Selecione um banco de dados válido ou crie um novo a partir da tela inicial.'
+            });
+            return false;
+        }
+
         // Configurar SQLite com modo WAL para permitir múltiplos acessos
         const db = require('./src/database')(dbPath);
         await db.configurar();
@@ -60,6 +71,40 @@ async function initializeDatabase(dbPath) {
         return true;
     } catch (error) {
         console.error('Erro ao inicializar banco:', error);
+        return false;
+    }
+}
+
+async function validateDatabase(dbPath) {
+    try {
+        const sqlite3 = require('sqlite3').verbose(); // Importar sqlite3 aqui
+        const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
+            if (err) {
+                console.error('Erro ao abrir banco para validação:', err);
+                return false;
+            }
+        });
+
+        const checkTablesQuery = `
+            SELECT name FROM sqlite_sequence WHERE name IN ('modelos', 'checklists');
+        `;
+
+        return new Promise((resolve, reject) => {
+            db.all(checkTablesQuery, [], (err, rows) => {
+                db.close();
+                if (err) {
+                    console.error('Erro ao validar tabelas:', err);
+                    resolve(false);
+                } else {
+                    const tableNames = rows.map(row => row.name);
+                    const hasModelos = tableNames.includes('modelos');
+                    const hasChecklists = tableNames.includes('checklists');
+                    resolve(hasModelos && hasChecklists);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Erro na validação do banco:', error);
         return false;
     }
 }
