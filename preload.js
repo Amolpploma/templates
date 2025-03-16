@@ -19,5 +19,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     apagarChecklist: (id) => ipcRenderer.invoke('apagar-checklist', id),
     selectDatabase: () => ipcRenderer.invoke('select-database'),
     createDatabase: () => ipcRenderer.invoke('create-database'),
-    checkDatabaseConnection: () => ipcRenderer.invoke('check-database-connection')
+    checkDatabaseConnection: () => ipcRenderer.invoke('check-database-connection'),
+    getDatabasePath: () => ipcRenderer.invoke('get-database-path')
 });

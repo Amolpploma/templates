@@ -202,7 +202,9 @@ function registerIpcHandlers() {
   });
 
   ipcMain.handle('select-database', async () => {
-    const result = await dialog.showOpenDialog({
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showOpenDialog(mainWindow, {
+        modal: true,
         properties: ['openFile'],
         filters: [{ name: 'SQLite Database', extensions: ['sqlite', 'db'] }]
     });
@@ -218,7 +220,9 @@ function registerIpcHandlers() {
   });
 
   ipcMain.handle('create-database', async () => {
-    const result = await dialog.showSaveDialog({
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showSaveDialog(mainWindow, {
+        modal: true,
         filters: [{ name: 'SQLite Database', extensions: ['sqlite'] }]
     });
 
@@ -230,6 +234,10 @@ function registerIpcHandlers() {
         return success;
     }
     return false;
+  });
+
+  ipcMain.handle('get-database-path', async () => {
+    return store.get('databasePath') || 'Nenhum banco de dados selecionado';
   });
 }
 
