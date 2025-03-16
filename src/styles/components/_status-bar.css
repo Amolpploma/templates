@@ -9,6 +9,7 @@
     font-size: 0.8em;
     display: flex;
     align-items: center;
+    justify-content: space-between; /* Alterado para space-between */
     padding: 0 10px;
     border-top: 1px solid var(--border-color);
     z-index: 1000;
@@ -21,6 +22,8 @@
     text-overflow: ellipsis;
     max-width: 500px;
     vertical-align: text-bottom;
+    display: flex;
+    align-items: center;
 }
 
 .status-close-btn {
