@@ -35,9 +35,21 @@
         .btn:hover {
             background: var(--button-hover);
         }
+        .close-button {
+            position: fixed; /* Alterado para fixed */
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.2em;
+            z-index: 1000; /* Garante que o botão fique acima de outros elementos */
+        }
     </style>
 </head>
 <body>
+    <button class="close-button" onclick="window.electronAPI.closeWindow()">×</button>
     <div class="container">
         <h2>Selecione o Banco de Dados</h2>
         <p>Escolha um arquivo de banco de dados existente ou crie um novo.</p>
