@@ -74,16 +74,6 @@ body[data-page="checklist-editor"] .resultado-texto-container {
     text-align: justify;
 }
 
-/*
-.resultado-modelo-texto {
-    padding: 10px;
-    background-color: var(--bg-secondary);
-    margin-right: 10px;
-    line-height: 1;
-    text-align: justify;
-}
-    */
-
 /* Refinamentos de busca */
 .search-refinements {
     display: flex;
@@ -171,12 +161,6 @@ mark {
 .associate-model-btn:hover {
     background-color: var(--btn-hover);
 }
-
-/*
-body[data-page="checklist-editor"] .associate-model-btn {
-    display: flex;
-}
-    */
 
 .resultado-modelo {
     display: flex;

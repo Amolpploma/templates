@@ -96,6 +96,7 @@ if (searchInput && searchResults) {
                 
                 // Verificar se estamos na página de edição
                 const isEditorPage = document.body.getAttribute('data-page') === 'editor';
+                const isChecklistEditorPage = document.body.getAttribute('data-page') === 'checklist-editor';
                 
                 resultsContent.innerHTML = `
                     <div class="resultado-modelo-container">
@@ -104,7 +105,7 @@ if (searchInput && searchResults) {
                         </div>
                     </div>
                     <div class="button-container">
-                        <button class="btn-inserir">Inserir modelo</button>
+                        ${!isChecklistEditorPage ? `<button class="btn-inserir">Inserir modelo</button>` : ''}
                         ${isEditorPage ? `
                             <button class="btn-editar">Editar</button>
                             <button class="btn-danger">Apagar</button>
