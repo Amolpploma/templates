@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     await showDialog(
                         'Sucesso',
-                        `Checklist salvo com sucesso! (ID: ${lastID})`,
+                        `Checklist <i><u>${nome}</u></i> salvo com sucesso!`,
                         [{
                             id: 'btn-ok',
                             text: 'OK',

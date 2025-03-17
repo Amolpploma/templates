@@ -190,7 +190,54 @@ if (searchChecklistInput && searchChecklistResults) {
                         }
 
                         if (btnApagar) {
-                            btnApagar.addEventListener('click', () => apagarChecklist(item));
+                            btnApagar.addEventListener('click', async () => {
+                                const shouldDelete = await showDialog(
+                                    'Confirmar exclusão',
+                                    'Tem certeza que deseja apagar este checklist?',
+                                    [{
+                                        id: 'btn-cancelar',
+                                        text: 'Cancelar',
+                                        class: 'btn-secondary',
+                                        value: false
+                                    },
+                                    {
+                                        id: 'btn-apagar',
+                                        text: 'Apagar',
+                                        class: 'btn-danger',
+                                        value: true
+                                    }]
+                                );
+                                if (shouldDelete) {
+                                    try {
+                                        await window.electronAPI.apagarChecklist(item.dataset.id);
+                                        // Atualizar a lista de resultados
+                                        const searchInput = document.querySelector('.search-checklist-input');
+                                        searchInput.dispatchEvent(new Event('input'));
+                                        await showDialog(
+                                            'Sucesso',
+                                            `Checklist <i><u>${decodeURIComponent(item.dataset.nome)}</u></i> apagado com sucesso!`,
+                                            [{
+                                                id: 'btn-ok',
+                                                text: 'OK',
+                                                class: 'btn-primary',
+                                                value: false
+                                            }]
+                                        );
+                                    } catch (err) {
+                                        console.error('Erro ao apagar checklist:', err);
+                                        await showDialog(
+                                            'Erro',
+                                            `Erro ao apagar o checklist: ${err.message}`,
+                                            [{
+                                                id: 'btn-ok',
+                                                text: 'OK',
+                                                class: 'btn-primary',
+                                                value: false
+                                            }]
+                                        );
+                                    }
+                                }
+                            });
                         }
                     }
 

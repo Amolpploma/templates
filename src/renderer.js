@@ -137,6 +137,16 @@ if (searchInput && searchResults) {
                             try {
                                 await window.electronAPI.apagarModelo(item.dataset.id);
                                 realizarBusca(searchInput.value);
+                                await showDialog(
+                                    'Sucesso',
+                                    `Modelo <i><u>${decodeURIComponent(item.dataset.nome)}</u></i> apagado com sucesso!`,
+                                    [{
+                                        id: 'btn-ok',
+                                        text: 'OK',
+                                        class: 'btn-primary',
+                                        value: false
+                                    }]
+                                );
                             } catch (err) {
                                 console.error('Erro ao apagar modelo:', err);
                                 await showDialog(
