@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (checklistExistente) {
                 const shouldUpdate = await showDialog(
                     'Checklist Existente',
-                    'Já existe um checklist com este nome. Deseja atualizá-lo?',
+                    'Já existe um checklist com este nome. Deseja editá-lo?',
                     [{
                         id: 'btn-cancelar',
                         text: 'Cancelar',

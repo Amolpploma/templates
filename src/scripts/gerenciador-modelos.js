@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSalvar.addEventListener('click', async () => {
             const nome = nomeInput.value.trim();
             if (!nome) {
-                await showDialog(
+                await window.showDialog(
                     'Campo obrigatório',
                     'Por favor, insira um nome para o modelo',
                     [{
@@ -82,9 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const modeloExistente = await window.electronAPI.verificarModelo(nome);
 
                 if (modeloExistente) {
-                    const shouldUpdate = await showDialog(
+                    const shouldUpdate = await window.showDialog(
                         'Modelo Existente',
-                        'Já existe um modelo com este nome. Deseja atualizá-lo?',
+                        'Já existe um modelo com este nome. Deseja editá-lo?',
                         [{
                             id: 'btn-cancelar',
                             text: 'Cancelar',
@@ -108,9 +108,19 @@ document.addEventListener('DOMContentLoaded', () => {
                                 modelo: modeloContent
                             });
                             limparCampos();
+                            await window.showDialog(
+                                'Sucesso',
+                                `Modelo <i><u>${nome}</u></i> editado com sucesso!`,
+                                [{
+                                    id: 'btn-ok',
+                                    text: 'OK',
+                                    class: 'btn-primary',
+                                    value: true
+                                }]
+                            );
                         } catch (err) {
                             console.error('Erro ao atualizar modelo:', err);
-                            await showDialog(
+                            await window.showDialog(
                                 'Erro',
                                 'Erro ao atualizar o modelo',
                                 [{
@@ -129,10 +139,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         modelo: modeloContent
                     });
                     limparCampos();
+                    await window.showDialog(
+                        'Sucesso',
+                        `Modelo <i><u>${nome}</u></i> salvo com sucesso!`,
+                        [{
+                            id: 'btn-ok',
+                            text: 'OK',
+                            class: 'btn-primary',
+                            value: true
+                        }]
+                    );
                 }
             } catch (err) {
                 console.error('Erro ao salvar modelo:', err);
-                await showDialog(
+                await window.showDialog(
                     'Erro',
                     'Erro ao salvar o modelo',
                     [{
