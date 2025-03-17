@@ -1,7 +1,7 @@
 {
-  "name": "modelos",
+  "name": "templates",
   "version": "1.0.0",
-  "description": "Aplicativo desktop para armazenamento, edição e utilização de modelos de decisões judiciais.",
+  "description": "Aplicativo desktop para armazenamento, edição e utilização de modelos de decisões e outros documentos utilizados em processos judiciais.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
