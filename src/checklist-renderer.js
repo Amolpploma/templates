@@ -308,55 +308,6 @@ if (searchChecklistInput && searchChecklistResults) {
     }
 }
 
-// Mover para fora do DOMContentLoaded para ficar no escopo global
-function setupModelAssociation(itemRow) {
-    const pasteBtn = itemRow.querySelector('.paste');
-    const rightPanel = document.querySelector('.right-panel');
-    const searchInput = rightPanel.querySelector('.search-input');
-
-    pasteBtn.onclick = (e) => {
-        e.stopPropagation();
-        
-        if (currentFocusedItem && currentFocusedItem !== itemRow) {
-            rightPanel.classList.remove('focus-mode');
-            removeAssociateButtons();
-        }
-
-        rightPanel.classList.add('focus-mode');
-        currentFocusedItem = itemRow;
-        searchInput.focus();
-        addAssociateButtons();
-    };
-
-    const observer = new MutationObserver(() => {
-        if (rightPanel.classList.contains('focus-mode') && currentFocusedItem === itemRow) {
-            addAssociateButtons();
-        }
-    });
-
-    observer.observe(rightPanel.querySelector('.search-results-list'), {
-        childList: true,
-        subtree: true
-    });
-}
-
-// Também mover as funções auxiliares para o escopo global
-function addAssociateButtons() {
-    document.querySelectorAll('.resultado-modelo').forEach(resultado => {
-        if (!resultado.querySelector('.associate-model-btn')) {
-            const btn = createAssociateButton();
-            resultado.firstElementChild.insertBefore(btn, resultado.firstElementChild.firstChild);
-        }
-    });
-}
-
-function removeAssociateButtons() {
-    document.querySelectorAll('.associate-model-btn').forEach(btn => btn.remove());
-}
-
-// Variável global para controle do item focado
-let currentFocusedItem = null;
-
 document.addEventListener('DOMContentLoaded', () => {
     // ...existing code...
 });

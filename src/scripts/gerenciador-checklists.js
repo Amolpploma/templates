@@ -1,7 +1,98 @@
+// Mover as funções para o escopo global
+let currentFocusedItem = null;
+
+function createAssociateButton() {
+    const btn = document.createElement('button');
+    btn.className = 'associate-model-btn';
+    btn.title = 'Associar este modelo';
+    btn.innerHTML = `
+        <svg viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+        </svg>
+    `;
+
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        const resultado = e.currentTarget.closest('.resultado-modelo');
+        const modeloId = resultado.dataset.id;
+        const modeloNome = decodeURIComponent(resultado.dataset.nome);
+        
+        associateModel(modeloId, modeloNome);
+    };
+
+    return btn;
+}
+
+function addAssociateButtons() {
+    document.querySelectorAll('.resultado-modelo').forEach(resultado => {
+        if (!resultado.querySelector('.associate-model-btn')) {
+            const btn = createAssociateButton();
+            resultado.firstElementChild.insertBefore(btn, resultado.firstElementChild.firstChild);
+        }
+    });
+}
+
+function removeAssociateButtons() {
+    document.querySelectorAll('.associate-model-btn').forEach(btn => btn.remove());
+}
+
+function associateModel(modeloId, modeloNome) {
+    const rightPanel = document.querySelector('.right-panel');
+    const itemRow = currentFocusedItem;
+
+    if (itemRow) {
+        const modeloAssociado = itemRow.querySelector('.modelo-associado');
+        if (modeloAssociado) {
+            modeloAssociado.textContent = `Modelo: ${modeloNome}`;
+            modeloAssociado.dataset.id = modeloId;
+            modeloAssociado.dataset.nome = modeloNome;
+        }
+
+        rightPanel.classList.remove('focus-mode');
+        currentFocusedItem = null;
+        removeAssociateButtons();
+    }
+}
+
+function setupModelAssociation(itemRow) {
+    const pasteBtn = itemRow.querySelector('.paste');
+    const rightPanel = document.querySelector('.right-panel');
+    const searchInput = rightPanel.querySelector('.search-input');
+
+    pasteBtn.onclick = (e) => {
+        e.stopPropagation();
+        
+        if (currentFocusedItem && currentFocusedItem !== itemRow) {
+            rightPanel.classList.remove('focus-mode');
+            removeAssociateButtons();
+        }
+
+        rightPanel.classList.add('focus-mode');
+        currentFocusedItem = itemRow;
+        searchInput.focus();
+        addAssociateButtons();
+    };
+
+    const observer = new MutationObserver(() => {
+        if (rightPanel.classList.contains('focus-mode') && currentFocusedItem === itemRow) {
+            addAssociateButtons();
+        }
+    });
+
+    observer.observe(rightPanel.querySelector('.search-results-list'), {
+        childList: true,
+        subtree: true
+    });
+}
+
+// Tornar as funções disponíveis globalmente
+window.setupModelAssociation = setupModelAssociation;
+window.addAssociateButtons = addAssociateButtons;
+window.removeAssociateButtons = removeAssociateButtons;
+
 document.addEventListener('DOMContentLoaded', () => {
     const btnAdicionar = document.querySelector('.btn-adicionar-item');
     const itemsContainer = document.getElementById('checklist-items-container');
-    let currentFocusedItem = null; // Mover para o escopo mais amplo
 
     // Remover a função createItemRow daqui pois ela foi movida para shared-functions.js
 
@@ -16,100 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
             removeAssociateButtons();
         }
     });
-
-    function setupModelAssociation(itemRow) {
-        const pasteBtn = itemRow.querySelector('.paste');
-        const rightPanel = document.querySelector('.right-panel');
-        const searchInput = rightPanel.querySelector('.search-input');
-
-        pasteBtn.onclick = (e) => {
-            e.stopPropagation(); // Prevenir que o click se propague para o document
-            
-            // Desativar modo foco anterior se existir
-            if (currentFocusedItem && currentFocusedItem !== itemRow) {
-                rightPanel.classList.remove('focus-mode');
-                removeAssociateButtons();
-            }
-
-            // Ativar modo foco para o item atual
-            rightPanel.classList.add('focus-mode');
-            currentFocusedItem = itemRow;
-            searchInput.focus();
-
-            // Adicionar botões de associação aos resultados existentes
-            addAssociateButtons();
-        };
-
-        // Remover listener individual de clique fora e usar o global
-        // Manter apenas o observer para mudanças na lista
-        const observer = new MutationObserver(() => {
-            if (rightPanel.classList.contains('focus-mode') && currentFocusedItem === itemRow) {
-                addAssociateButtons();
-            }
-        });
-
-        observer.observe(rightPanel.querySelector('.search-results-list'), {
-            childList: true,
-            subtree: true
-        });
-    }
-
-    function addAssociateButtons() {
-        document.querySelectorAll('.resultado-modelo').forEach(resultado => {
-            if (!resultado.querySelector('.associate-model-btn')) {
-                const btn = createAssociateButton();
-                //resultado.appendChild(btn);
-                //resultado.firstElementChild.appendChild(btn);
-                resultado.firstElementChild.insertBefore(btn, resultado.firstElementChild.firstChild);
-                console.log(resultado.firstElementChild);
-            }
-        });
-    }
-
-    function removeAssociateButtons() {
-        document.querySelectorAll('.associate-model-btn').forEach(btn => btn.remove());
-    }
-
-    function createAssociateButton() {
-        const btn = document.createElement('button');
-        btn.className = 'associate-model-btn';
-        btn.title = 'Associar este modelo';
-        btn.innerHTML = `
-            <svg viewBox="0 0 24 24">
-                <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-            </svg>
-        `;
-
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            const resultado = e.currentTarget.closest('.resultado-modelo');
-            const modeloId = resultado.dataset.id;
-            const modeloNome = decodeURIComponent(resultado.dataset.nome);
-            
-            associateModel(modeloId, modeloNome);
-        };
-
-        return btn;
-    }
-
-    function associateModel(modeloId, modeloNome) {
-        const rightPanel = document.querySelector('.right-panel');
-        const itemRow = currentFocusedItem;
-
-        if (itemRow) {
-            const modeloAssociado = itemRow.querySelector('.modelo-associado');
-            if (modeloAssociado) {
-                modeloAssociado.textContent = `Modelo: ${modeloNome}`;
-                modeloAssociado.dataset.id = modeloId;
-                modeloAssociado.dataset.nome = modeloNome;
-            }
-
-            // Sair do modo foco
-            rightPanel.classList.remove('focus-mode');
-            currentFocusedItem = null;
-            removeAssociateButtons();
-        }
-    }
 
     // Modificar a listener do botão adicionar
     btnAdicionar.addEventListener('click', () => {
