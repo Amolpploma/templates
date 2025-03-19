@@ -32,6 +32,19 @@ body {
     color: var(--text-primary);
 }
 
+/* Prevenir seleção de texto durante o redimensionamento */
+body.resizing {
+    cursor: col-resize;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body.resizing .left-panel,
+body.resizing .editor-panel,
+body.resizing .right-panel {
+    pointer-events: none;
+}
+
 .container {
     flex: 1;
     display: flex;

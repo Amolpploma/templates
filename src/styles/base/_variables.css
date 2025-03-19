@@ -64,6 +64,12 @@
     --overlay-bg: rgba(0, 0, 0, 0.5);
     --focus-shadow: 0 0 0 9999px var(--overlay-bg);
     --modelo-associado-text: #666666;
+
+    /* New variables */
+    --resizer-bg: transparent;
+    --resizer-hover-bg: rgba(0, 0, 0, 0.1);
+    --divider-color: var(--border-color);
+    --resizer-hover-color: var(--accent-color);
 }
 
 [data-theme="dark"] {
@@ -103,4 +109,7 @@
     --btn-danger-hover: #a71d2a;
 
     --modelo-associado-text: #999999;
+
+    /* New variables */
+    --resizer-hover-bg: rgba(255, 255, 255, 0.1);
 }

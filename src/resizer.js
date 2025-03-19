@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
         currentResizer = e.target;
         startX = e.clientX;
 
+        // Adicionar classes para prevenir seleção
+        document.body.classList.add('resizing');
+        currentResizer.classList.add('dragging');
+
         // Inicializar larguras apenas para os painéis que existem
         startWidths = {};
         
@@ -22,9 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editorPanel) startWidths.editor = editorPanel.offsetWidth;
         if (rightPanel) startWidths.right = rightPanel.offsetWidth;
 
-        currentResizer.classList.add('dragging');
         document.addEventListener('mousemove', resize);
         document.addEventListener('mouseup', stopResize);
+        
+        // Prevenir comportamento padrão
+        e.preventDefault();
     }
 
     function resize(e) {
@@ -54,6 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentResizer) {
             currentResizer.classList.remove('dragging');
         }
+        
+        // Remover classes de prevenção de seleção
+        document.body.classList.remove('resizing');
+        
         document.removeEventListener('mousemove', resize);
         document.removeEventListener('mouseup', stopResize);
     }
