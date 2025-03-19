@@ -37,7 +37,6 @@ function removeAssociateButtons() {
 }
 
 function associateModel(modeloId, modeloNome) {
-    const rightPanel = document.querySelector('.right-panel');
     const itemRow = currentFocusedItem;
 
     if (itemRow) {
@@ -48,9 +47,7 @@ function associateModel(modeloId, modeloNome) {
             modeloAssociado.dataset.nome = modeloNome;
         }
 
-        rightPanel.classList.remove('focus-mode');
-        currentFocusedItem = null;
-        removeAssociateButtons();
+        exitFocusMode(); // Chamar exitFocusMode ao invés de manipular classes diretamente
     }
 }
 
@@ -63,14 +60,10 @@ function setupModelAssociation(itemRow) {
         e.stopPropagation();
         
         if (currentFocusedItem && currentFocusedItem !== itemRow) {
-            rightPanel.classList.remove('focus-mode');
-            removeAssociateButtons();
+            exitFocusMode();
         }
 
-        rightPanel.classList.add('focus-mode');
-        currentFocusedItem = itemRow;
-        searchInput.focus();
-        addAssociateButtons();
+        enterFocusMode(itemRow);
     };
 
     const observer = new MutationObserver(() => {
@@ -85,6 +78,38 @@ function setupModelAssociation(itemRow) {
     });
 }
 
+function enterFocusMode(itemRow) {
+    const rightPanel = document.querySelector('.right-panel');
+    const overlay = document.createElement('div');
+    overlay.className = 'focus-mode-overlay';
+    document.body.appendChild(overlay);
+    document.body.classList.add('has-focus-mode');
+    
+    rightPanel.classList.add('focus-mode');
+    currentFocusedItem = itemRow;
+    
+    const searchInput = rightPanel.querySelector('.search-input');
+    searchInput.focus();
+    addAssociateButtons();
+
+    // Adicionar evento de clique no overlay
+    overlay.addEventListener('click', exitFocusMode);
+}
+
+function exitFocusMode() {
+    const rightPanel = document.querySelector('.right-panel');
+    const overlay = document.querySelector('.focus-mode-overlay');
+    
+    if (overlay) {
+        overlay.remove();
+    }
+    
+    document.body.classList.remove('has-focus-mode');
+    rightPanel.classList.remove('focus-mode');
+    currentFocusedItem = null;
+    removeAssociateButtons();
+}
+
 // Tornar as funções disponíveis globalmente
 window.setupModelAssociation = setupModelAssociation;
 window.addAssociateButtons = addAssociateButtons;
@@ -95,18 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsContainer = document.getElementById('checklist-items-container');
 
     // Remover a função createItemRow daqui pois ela foi movida para shared-functions.js
-
-    // Adicionar handler global para cliques fora
-    document.addEventListener('click', (e) => {
-        const rightPanel = document.querySelector('.right-panel');
-        if (rightPanel?.classList.contains('focus-mode') && 
-            !rightPanel.contains(e.target) && 
-            !e.target.closest('.checklist-item-row')) {
-            rightPanel.classList.remove('focus-mode');
-            currentFocusedItem = null;
-            removeAssociateButtons();
-        }
-    });
 
     // Modificar a listener do botão adicionar
     btnAdicionar.addEventListener('click', () => {
