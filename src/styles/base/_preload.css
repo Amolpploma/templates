@@ -1,0 +1,24 @@
+/* Estilos aplicados antes do carregamento da página */
+:root {
+    color-scheme: light;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* Prevenir flash durante carregamento */
+html {
+    visibility: hidden;
+    background-color: #ffffff;
+}
+
+html[data-theme="dark"] {
+    background-color: #1e1e1e;
+}
+
+/* Mostrar conteúdo apenas quando estiver pronto */
+html.ready {
+    visibility: visible;
+    transition: background-color 0.2s ease;
+}
