@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDarkTheme = theme === 'dark';
         const isSearchPage = !document.body.hasAttribute('data-page');
         const defaultPlugins = ['wordcount', 'lists', 'searchreplace', 'charmap'];
-        const defaultToolbar = 'fontfamily fontsize | bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap';
+        const defaultToolbar = 'fontfamily fontsize bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap';
         
         const config = {
             selector: '#editor-container',
@@ -17,15 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
             menubar: false,
             statusbar: true,
             elementpath: false,
-            toolbar: isSearchPage ? `${defaultToolbar} | editnewmodel` : defaultToolbar,
+            toolbar: isSearchPage ? `editnewmodel|${defaultToolbar}` : defaultToolbar,
             content_style: 'body { font-family:times new roman,times; font-size:12pt }',
             readonly: false, // Remover readonly global
             license_key: 'gpl',
             setup: function(editor) {
                 if (isSearchPage) {
                     editor.ui.registry.addButton('editnewmodel', {
-                        text: 'Editar novo modelo',
-                        tooltip: 'Transferir conteúdo para página de edição',
+                        icon: 'save',
+                        tooltip: 'Transferir para página de edição',
                         onAction: function() {
                             const content = editor.getContent();
                             window.electronAPI.navigateAndTransferContent('gerenciador-modelos.html', content);
