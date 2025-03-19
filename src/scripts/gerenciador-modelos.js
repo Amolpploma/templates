@@ -5,10 +5,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.querySelector('.search-input');
 
     // Remover o check pelo Quill e usar TinyMCE
-    const waitForEditor = setInterval(() => {
+    const waitForEditor = setInterval(async () => {
         if (window.tinymce?.activeEditor) {
             clearInterval(waitForEditor);
             setupSaveHandler();
+            
+            // Verificar se há conteúdo transferido
+            const transferContent = await window.electronAPI.getStore('transferContent');
+            if (transferContent) {
+                tinymce.get('editor-container').setContent(transferContent);
+                await window.electronAPI.setStore('transferContent', null); // Limpar após uso
+            }
         }
     }, 100);
 
