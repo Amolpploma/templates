@@ -20,5 +20,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     selectDatabase: () => ipcRenderer.invoke('select-database'),
     createDatabase: () => ipcRenderer.invoke('create-database'),
     checkDatabaseConnection: () => ipcRenderer.invoke('check-database-connection'),
-    getDatabasePath: () => ipcRenderer.invoke('get-database-path')
+    getDatabasePath: () => ipcRenderer.invoke('get-database-path'),
+    navigateAndTransferContent: (page, content) => {
+        ipcRenderer.send('navigate-transfer-content', { page, content });
+    },
+    getStore: (key) => ipcRenderer.invoke('get-store', key),
+    setStore: (key, value) => ipcRenderer.invoke('set-store', key, value)
 });

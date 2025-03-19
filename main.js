@@ -309,6 +309,20 @@ function registerIpcHandlers() {
   ipcMain.handle('get-database-path', async () => {
     return store.get('databasePath') || 'Nenhum banco de dados selecionado';
   });
+
+  ipcMain.handle('get-store', (event, key) => {
+    return store.get(key);
+  });
+
+  ipcMain.handle('set-store', (event, key, value) => {
+    store.set(key, value);
+    return true;
+  });
+
+  ipcMain.on('navigate-transfer-content', (event, { page, content }) => {
+    store.set('transferContent', content);
+    BrowserWindow.getFocusedWindow().loadFile(path.join(__dirname, 'src', page));
+  });
 }
 
 // This method will be called when Electron has finished
