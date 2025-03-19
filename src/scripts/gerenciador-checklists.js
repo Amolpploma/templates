@@ -37,7 +37,6 @@ function removeAssociateButtons() {
 }
 
 function associateModel(modeloId, modeloNome) {
-    const rightPanel = document.querySelector('.right-panel');
     const itemRow = currentFocusedItem;
 
     if (itemRow) {
@@ -48,9 +47,7 @@ function associateModel(modeloId, modeloNome) {
             modeloAssociado.dataset.nome = modeloNome;
         }
 
-        rightPanel.classList.remove('focus-mode');
-        currentFocusedItem = null;
-        removeAssociateButtons();
+        exitFocusMode(); // Chamar exitFocusMode ao invés de manipular classes diretamente
     }
 }
 
