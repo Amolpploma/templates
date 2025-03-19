@@ -1,17 +1,34 @@
 #resizer-left,
 #resizer-right {
-    width: 3px;
-    height: 100%;
-    background-color: var(--resizer-color);
+    width: 8px;
     cursor: col-resize;
+    background-color: var(--resizer-bg);
     flex-shrink: 0;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+#resizer-left::after,
+#resizer-right::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 3px;
+    width: 2px;
+    height: 100%;
+    background-color: var(--divider-color);
 }
 
 #resizer-left:hover,
 #resizer-right:hover,
 #resizer-left.dragging,
 #resizer-right.dragging {
-    width: 3px;
-    background-color: var(--resizer-hover);
+    background-color: var(--resizer-hover-bg);
+}
+
+#resizer-left:hover::after,
+#resizer-right:hover::after,
+#resizer-left.dragging::after,
+#resizer-right.dragging::after {
+    background-color: var(--resizer-hover-color);
 }
