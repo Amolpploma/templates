@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateDbPath() {
         const dbPath = await window.electronAPI.getDatabasePath();
-        dbPathSpan.textContent = dbPath;
+        dbPathSpan.textContent = `: ${dbPath}` ;
     }
 
     dbPathSpan.addEventListener('click', () => {
