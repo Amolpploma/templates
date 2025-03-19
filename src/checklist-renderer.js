@@ -190,7 +190,54 @@ if (searchChecklistInput && searchChecklistResults) {
                         }
 
                         if (btnApagar) {
-                            btnApagar.addEventListener('click', () => apagarChecklist(item));
+                            btnApagar.addEventListener('click', async () => {
+                                const shouldDelete = await showDialog(
+                                    'Confirmar exclusão',
+                                    'Tem certeza que deseja apagar este checklist?',
+                                    [{
+                                        id: 'btn-cancelar',
+                                        text: 'Cancelar',
+                                        class: 'btn-secondary',
+                                        value: false
+                                    },
+                                    {
+                                        id: 'btn-apagar',
+                                        text: 'Apagar',
+                                        class: 'btn-danger',
+                                        value: true
+                                    }]
+                                );
+                                if (shouldDelete) {
+                                    try {
+                                        await window.electronAPI.apagarChecklist(item.dataset.id);
+                                        // Atualizar a lista de resultados
+                                        const searchInput = document.querySelector('.search-checklist-input');
+                                        searchInput.dispatchEvent(new Event('input'));
+                                        await showDialog(
+                                            'Sucesso',
+                                            `Checklist <i><u>${decodeURIComponent(item.dataset.nome)}</u></i> apagado com sucesso!`,
+                                            [{
+                                                id: 'btn-ok',
+                                                text: 'OK',
+                                                class: 'btn-primary',
+                                                value: false
+                                            }]
+                                        );
+                                    } catch (err) {
+                                        console.error('Erro ao apagar checklist:', err);
+                                        await showDialog(
+                                            'Erro',
+                                            `Erro ao apagar o checklist: ${err.message}`,
+                                            [{
+                                                id: 'btn-ok',
+                                                text: 'OK',
+                                                class: 'btn-primary',
+                                                value: false
+                                            }]
+                                        );
+                                    }
+                                }
+                            });
                         }
                     }
 
@@ -260,55 +307,6 @@ if (searchChecklistInput && searchChecklistResults) {
         return !!modeloExistente;
     }
 }
-
-// Mover para fora do DOMContentLoaded para ficar no escopo global
-function setupModelAssociation(itemRow) {
-    const pasteBtn = itemRow.querySelector('.paste');
-    const rightPanel = document.querySelector('.right-panel');
-    const searchInput = rightPanel.querySelector('.search-input');
-
-    pasteBtn.onclick = (e) => {
-        e.stopPropagation();
-        
-        if (currentFocusedItem && currentFocusedItem !== itemRow) {
-            rightPanel.classList.remove('focus-mode');
-            removeAssociateButtons();
-        }
-
-        rightPanel.classList.add('focus-mode');
-        currentFocusedItem = itemRow;
-        searchInput.focus();
-        addAssociateButtons();
-    };
-
-    const observer = new MutationObserver(() => {
-        if (rightPanel.classList.contains('focus-mode') && currentFocusedItem === itemRow) {
-            addAssociateButtons();
-        }
-    });
-
-    observer.observe(rightPanel.querySelector('.search-results-list'), {
-        childList: true,
-        subtree: true
-    });
-}
-
-// Também mover as funções auxiliares para o escopo global
-function addAssociateButtons() {
-    document.querySelectorAll('.resultado-modelo').forEach(resultado => {
-        if (!resultado.querySelector('.associate-model-btn')) {
-            const btn = createAssociateButton();
-            resultado.firstElementChild.insertBefore(btn, resultado.firstElementChild.firstChild);
-        }
-    });
-}
-
-function removeAssociateButtons() {
-    document.querySelectorAll('.associate-model-btn').forEach(btn => btn.remove());
-}
-
-// Variável global para controle do item focado
-let currentFocusedItem = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     // ...existing code...

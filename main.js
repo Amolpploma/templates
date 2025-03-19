@@ -271,12 +271,37 @@ function registerIpcHandlers() {
         filters: [{ name: 'SQLite Database', extensions: ['sqlite'] }]
     });
 
-    if (!result.canceled) {
-        const success = await initializeDatabase(result.filePath);
-        if (success) {
-            BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'index.html'));
+    if (!result.canceled && result.filePath) {
+        try {
+            const sqlite3 = require('sqlite3').verbose();
+            const db = new sqlite3.Database(result.filePath);
+            
+            // Ler o arquivo SQL template
+            const templatePath = path.join(__dirname, 'recursos', 'database_template.sql');
+            const schema = fs.readFileSync(templatePath, 'utf8');
+
+            await new Promise((resolve, reject) => {
+                db.exec(schema, (err) => {
+                    db.close();
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+
+            const success = await initializeDatabase(result.filePath);
+            if (success) {
+                BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'index.html'));
+            }
+            return success;
+        } catch (err) {
+            console.error('Erro ao criar banco de dados:', err);
+            dialog.showMessageBoxSync(mainWindow, {
+                type: 'error',
+                title: 'Erro',
+                message: 'Erro ao criar banco de dados: ' + err.message
+            });
+            return false;
         }
-        return success;
     }
     return false;
   });

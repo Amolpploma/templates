@@ -96,6 +96,7 @@ if (searchInput && searchResults) {
                 
                 // Verificar se estamos na página de edição
                 const isEditorPage = document.body.getAttribute('data-page') === 'editor';
+                const isChecklistEditorPage = document.body.getAttribute('data-page') === 'checklist-editor';
                 
                 resultsContent.innerHTML = `
                     <div class="resultado-modelo-container">
@@ -104,7 +105,7 @@ if (searchInput && searchResults) {
                         </div>
                     </div>
                     <div class="button-container">
-                        <button class="btn-inserir">Inserir modelo</button>
+                        ${!isChecklistEditorPage ? `<button class="btn-inserir">Inserir modelo</button>` : ''}
                         ${isEditorPage ? `
                             <button class="btn-editar">Editar</button>
                             <button class="btn-danger">Apagar</button>
@@ -136,6 +137,16 @@ if (searchInput && searchResults) {
                             try {
                                 await window.electronAPI.apagarModelo(item.dataset.id);
                                 realizarBusca(searchInput.value);
+                                await showDialog(
+                                    'Sucesso',
+                                    `Modelo <i><u>${decodeURIComponent(item.dataset.nome)}</u></i> apagado com sucesso!`,
+                                    [{
+                                        id: 'btn-ok',
+                                        text: 'OK',
+                                        class: 'btn-primary',
+                                        value: false
+                                    }]
+                                );
                             } catch (err) {
                                 console.error('Erro ao apagar modelo:', err);
                                 await showDialog(

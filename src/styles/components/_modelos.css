@@ -99,11 +99,7 @@
     padding: 10px 10px 10px 0;
     margin-bottom: 50px;
 }
-/*
-.resultado-modelo-texto {
-    white-space: pre-wrap;
-    padding: 10px;
-    line-height: 1;
-    text-align: justify;
+
+body[data-page="checklist-editor"] .resultado-modelo-container {
+    margin-bottom: 0px;
 }
-*/

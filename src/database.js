@@ -68,28 +68,6 @@ class Database {
             PRAGMA journal_mode = WAL;
             PRAGMA synchronous = NORMAL;
             PRAGMA busy_timeout = 5000;
-            
-            CREATE TABLE IF NOT EXISTS modelos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
-                tag TEXT,
-                modelo TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS checklists (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
-                tag TEXT,
-                checklist TEXT,
-                modelo_id INTEGER,
-                FOREIGN KEY(modelo_id) REFERENCES modelos(id)
-            );
-            
-            CREATE INDEX IF NOT EXISTS idx_modelos_nome ON modelos(nome);
-            CREATE INDEX IF NOT EXISTS idx_modelos_tag ON modelos(tag);
-            CREATE INDEX IF NOT EXISTS idx_modelos_modelo ON modelos(modelo);
-            CREATE INDEX IF NOT EXISTS idx_checklists_nome ON checklists(nome);
-            CREATE INDEX IF NOT EXISTS idx_checklists_tag ON checklists(tag);
         `;
         return this.executarQuery(sql);
     }
