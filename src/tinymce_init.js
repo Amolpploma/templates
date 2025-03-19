@@ -18,7 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
             statusbar: true,
             elementpath: false,
             toolbar: isSearchPage ? `editnewmodel|${defaultToolbar}` : defaultToolbar,
-            content_style: 'body { font-family:times new roman,times; font-size:12pt }',
+            content_style: `
+                body { 
+                    font-family:times new roman,times; 
+                    font-size:12pt;
+                    background-color: ${isDarkTheme ? '#1e1e1e !important' : '#ffffff'};
+                    color: ${isDarkTheme ? '#ffffff !important' : '#000000'};
+                }
+                * { 
+                    transition: none !important;
+                }
+            `,
             readonly: false, // Remover readonly global
             license_key: 'gpl',
             setup: function(editor) {

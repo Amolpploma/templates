@@ -48,4 +48,40 @@
     --modelo-title-color: rgba(227, 227, 227, 0.9);
     --modelo-btn-bg: rgba(0, 0, 0, 0.3);
     --modelo-btn-hover: rgba(0, 0, 0, 0.5);
+
+    /* TinyMCE Specific Dark Theme */
+    --tinymce-bg: #1e1e1e;
+    --tinymce-text: #ffffff;
+    --tinymce-toolbar-bg: #2d2d2d;
+    --tinymce-toolbar-text: #ffffff;
+    --tinymce-toolbar-hover: #404040;
+    --tinymce-toolbar-btn: #404040;
+    --tinymce-toolbar-btn-hover: #505050;
+    --tinymce-statusbar-bg: #2d2d2d;
+    --tinymce-statusbar-text: #cccccc;
+}
+
+/* Estilização específica do TinyMCE para tema escuro */
+[data-theme="dark"] .tox .tox-edit-area__iframe {
+    background-color: var(--tinymce-bg) !important;
+}
+
+[data-theme="dark"] .tox .tox-toolbar,
+[data-theme="dark"] .tox .tox-toolbar__primary,
+[data-theme="dark"] .tox .tox-toolbar__overflow {
+    background-color: var(--tinymce-toolbar-bg) !important;
+}
+
+[data-theme="dark"] .tox .tox-tbtn {
+    color: var(--tinymce-toolbar-text) !important;
+    background-color: var(--tinymce-toolbar-btn) !important;
+}
+
+[data-theme="dark"] .tox .tox-tbtn:hover {
+    background-color: var(--tinymce-toolbar-btn-hover) !important;
+}
+
+[data-theme="dark"] .tox .tox-statusbar {
+    background-color: var(--tinymce-statusbar-bg) !important;
+    color: var(--tinymce-statusbar-text) !important;
 }
