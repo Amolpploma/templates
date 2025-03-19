@@ -50,3 +50,55 @@
     text-align: justify;
     color: var(--text-primary);
 }
+
+/* Estilo para o modo foco */
+.focus-mode-overlay {
+    position: fixed;
+    top: 32px; /* Ajustado para começar abaixo da titlebar */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--overlay-bg);
+    z-index: 100;
+}
+
+/* Estilos para quando o modo foco está ativo */
+body.has-focus-mode {
+    pointer-events: none; /* Desabilita interações em todo o body */
+}
+
+body.has-focus-mode .focus-mode-overlay {
+    pointer-events: auto; /* Habilita interações com o overlay */
+}
+
+body.has-focus-mode .right-panel.focus-mode {
+    position: relative;
+    z-index: 101;
+    pointer-events: auto; /* Re-habilita interações apenas no painel direito */
+}
+
+/* Estilização específica para o painel direito em modo foco */
+.right-panel.focus-mode {
+    border-left: 2px solid var(--accent-color);
+    box-shadow: -3px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Remove explicitamente interações dos painéis esquerdo e central */
+body.has-focus-mode .left-panel,
+body.has-focus-mode .editor-panel {
+    pointer-events: none !important;
+}
+
+/* Permitir interações apenas com elementos específicos do painel direito */
+.right-panel.focus-mode .search-container,
+.right-panel.focus-mode .search-refinements,
+.right-panel.focus-mode .search-results-list,
+.right-panel.focus-mode .associate-model-btn {
+    pointer-events: auto;
+}
+
+.right-panel.focus-mode .search-input,
+.right-panel.focus-mode .resultado-modelo,
+.right-panel.focus-mode .clear-input {
+    pointer-events: auto;
+}
