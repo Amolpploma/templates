@@ -271,12 +271,58 @@ function registerIpcHandlers() {
         filters: [{ name: 'SQLite Database', extensions: ['sqlite'] }]
     });
 
-    if (!result.canceled) {
-        const success = await initializeDatabase(result.filePath);
-        if (success) {
-            BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'index.html'));
+    if (!result.canceled && result.filePath) {
+        try {
+            const sqlite3 = require('sqlite3').verbose();
+            const db = new sqlite3.Database(result.filePath);
+
+            const schema = `
+                CREATE TABLE "checklists" (
+                    "id"	INTEGER NOT NULL UNIQUE,
+                    "nome"	TEXT NOT NULL,
+                    "tag"	TEXT,
+                    "checklist"	TEXT NOT NULL,
+                    "modelo_id"	INTEGER,
+                    PRIMARY KEY("id" AUTOINCREMENT)
+                );
+
+                CREATE TABLE "modelos" (
+                    "id"	INTEGER NOT NULL UNIQUE,
+                    "nome"	TEXT NOT NULL,
+                    "tag"	TEXT,
+                    "modelo"	TEXT NOT NULL,
+                    PRIMARY KEY("id" AUTOINCREMENT)
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_modelos_nome ON modelos(nome);
+                CREATE INDEX IF NOT EXISTS idx_modelos_tag ON modelos(tag);
+                CREATE INDEX IF NOT EXISTS idx_modelos_modelo ON modelos(modelo);
+                CREATE INDEX IF NOT EXISTS idx_checklists_nome ON checklists(nome);
+                CREATE INDEX IF NOT EXISTS idx_checklists_tag ON checklists(tag);
+            `;
+
+            await new Promise((resolve, reject) => {
+                db.exec(schema, (err) => {
+                    db.close();
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+
+            const success = await initializeDatabase(result.filePath);
+            if (success) {
+                BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'index.html'));
+            }
+            return success;
+        } catch (err) {
+            console.error('Erro ao criar banco de dados:', err);
+            dialog.showMessageBoxSync(mainWindow, {
+                type: 'error',
+                title: 'Erro',
+                message: 'Erro ao criar banco de dados: ' + err.message
+            });
+            return false;
         }
-        return success;
     }
     return false;
   });
