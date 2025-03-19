@@ -15,21 +15,3 @@
     width: 3px;
     background-color: var(--resizer-hover);
 }
-
-#editor-resizer {
-    height: 3px;
-    background: var(--resizer-color);
-    cursor: row-resize;
-    margin: 4px 0;
-    border-radius: 4px;
-    user-select: none;
-    transition: background-color 0.2s;
-    pointer-events: auto;
-    z-index: 1000;
-    position: relative;
-}
-
-#editor-resizer:hover,
-#editor-resizer.dragging {
-    background: var(--resizer-hover);
-}
