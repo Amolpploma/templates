@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const isDarkTheme = theme === 'dark';
 
     function initTinyMCE() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        const isDarkTheme = theme === 'dark';
         const isSearchPage = !document.body.hasAttribute('data-page');
         const defaultPlugins = ['wordcount', 'lists', 'searchreplace', 'charmap'];
         const defaultToolbar = 'fontfamily fontsize | bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap';
@@ -44,20 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
         tinymce.init(config);
     }
 
+    // Iniciar o editor
     initTinyMCE();
 
-    // Adicionar listener para mudança de tema
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.attributeName === 'data-theme') {
-                const newTheme = document.documentElement.getAttribute('data-theme');
-                const editor = tinymce.get('editor-container');
-                if (editor) {
-                    editor.destroy();
-                    initTinyMCE();
+    // Observar mudanças no tema
+    const observer = new MutationObserver(() => {
+        const editor = tinymce.get('editor-container');
+        if (editor) {
+            const content = editor.getContent();
+            editor.destroy();
+            initTinyMCE();
+            // Restaurar conteúdo após reinicialização
+            setTimeout(() => {
+                const newEditor = tinymce.get('editor-container');
+                if (newEditor) {
+                    newEditor.setContent(content);
                 }
-            }
-        });
+            }, 100);
+        }
     });
 
     observer.observe(document.documentElement, {
