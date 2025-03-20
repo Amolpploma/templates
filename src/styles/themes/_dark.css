@@ -1,25 +1,41 @@
 [data-theme="dark"] {
     /* Cores base - adaptadas do TinyMCE dark theme */
-    --bg-primary: #222f3e;      /* Cor de fundo principal do TinyMCE dark */
-    --bg-secondary: #2f3742;    /* Cor de fundo secundária do TinyMCE dark */
-    --text-primary: #e3e3e3;    /* Cor de texto do TinyMCE dark */
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #e3e3e3;
     --text-secondary: #bdbdbd;
-    --border-color: #495057;    /* Cor de borda do TinyMCE dark */
+    --border-color: #404040;
+
+    /* Interface */
+    --input-bg: #2d2d2d;
+    --input-text: #e3e3e3;
+    --input-border: #404040;
+    --input-placeholder: #666666;
+    --panel-bg: var(--bg-primary);
+    --resizer-color: #404040;
+    --resizer-hover: #666666;
+    --btn-bg: #404040;
+    --btn-hover: #666666;
 
     /* Barra de título */
-    --titlebar-bg: #222f3e;
+    --titlebar-bg: #2d2d2d;
     --titlebar-text: #bdbdbd;
     --titlebar-active: #ffffff;
-    --titlebar-hover: #2f3742;
-    --tab-active-bg: #2f3742;
+    --titlebar-hover: #3d3d3d;
+    --tab-active-bg: #3d3d3d;
     --tab-active-border: #4099ff;
 
     /* Resultados */
-    --result-bg-odd: #2f3742;
-    --result-bg-even: #222f3e;
-    --result-hover-bg: #364150;
-    --result-selected-bg: #264f78;
+    --result-bg-odd: #333333;
+    --result-bg-even: #2d2d2d;
+    --result-hover-bg: #444444;
+    --result-selected-bg: #335577;
     --result-selected-border: #4099ff;
+
+    /* Tags */
+    --tag-bg: #404040;
+    --tag-text: #cccccc;
+    --tag-border: #505050;
 
     /* Checklist */
     --checklist-bg: #2d2d2d;
@@ -28,16 +44,6 @@
     --checklist-active-color: #4caf50;
     --checklist-inactive-bg: #4a1515;
     --checklist-inactive-color: #ff5252;
-
-    /* Inputs e campos de texto */
-    --input-bg: #2f3742;
-    --input-text: #e3e3e3;
-    --input-border: #495057;
-    --input-placeholder: #6c757d;
-
-    /* Scrollbar */
-    --scroll-thumb: #495057;
-    --scroll-thumb-hover: #5a6268;
 
     /* Modelo Box */
     --modelo-box-light-1: rgba(64, 153, 255, 0.1);
@@ -49,6 +55,11 @@
     --modelo-btn-bg: rgba(0, 0, 0, 0.3);
     --modelo-btn-hover: rgba(0, 0, 0, 0.5);
 
+    /* Botões de ação */
+    --btn-danger-bg: #8b0000;
+    --btn-danger-hover: #a71d2a;
+    --modelo-associado-text: #999999;
+
     /* TinyMCE Specific Dark Theme */
     --tinymce-bg: #1e1e1e;
     --tinymce-text: #ffffff;
@@ -59,9 +70,12 @@
     --tinymce-toolbar-btn-hover: #505050;
     --tinymce-statusbar-bg: #2d2d2d;
     --tinymce-statusbar-text: #cccccc;
+
+    /* Overrides para tema escuro */
+    --resizer-hover-bg: rgba(255, 255, 255, 0.05);
 }
 
-/* Estilização específica do TinyMCE para tema escuro */
+/* Manter apenas a estilização específica do TinyMCE para tema escuro */
 [data-theme="dark"] .tox .tox-edit-area__iframe {
     background-color: var(--tinymce-bg) !important;
 }
