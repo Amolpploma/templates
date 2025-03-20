@@ -22,8 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 body { 
                     font-family:times new roman,times; 
                     font-size:12pt;
-                    background-color: ${isDarkTheme ? '#1e1e1e !important' : '#ffffff'};
-                    color: ${isDarkTheme ? '#ffffff !important' : '#000000'};
                 }
                 * { 
                     transition: none !important;
