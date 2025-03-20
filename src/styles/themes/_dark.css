@@ -63,7 +63,7 @@
     /* TinyMCE Specific Dark Theme */
     --tinymce-bg: #1e1e1e;
     --tinymce-text: #ffffff;
-    --tinymce-toolbar-bg: #2d2d2d;
+    --tinymce-toolbar-bg: #1e1e1e;
     --tinymce-toolbar-text: #ffffff;
     --tinymce-toolbar-hover: #404040;
     --tinymce-toolbar-btn: #404040;
@@ -82,7 +82,8 @@
 
 [data-theme="dark"] .tox .tox-toolbar,
 [data-theme="dark"] .tox .tox-toolbar__primary,
-[data-theme="dark"] .tox .tox-toolbar__overflow {
+[data-theme="dark"] .tox .tox-toolbar__overflow,
+[data-theme="dark"] .tox-toolbar-overlord {
     background-color: var(--tinymce-toolbar-bg) !important;
 }
 
@@ -99,3 +100,8 @@
     background-color: var(--tinymce-statusbar-bg) !important;
     color: var(--tinymce-statusbar-text) !important;
 }
+
+[data-theme="dark"] .tox .tox-editor-header {
+    background-color: var(--tinymce-bg) !important;
+}
+
