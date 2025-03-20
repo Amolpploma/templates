@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     font-family:times new roman,times; 
                     font-size:12pt;
                     background-color: ${isDarkTheme ? '#1e1e1e !important' : '#ffffff'};
-                    color: ${isDarkTheme ? '#e3e3e3 !important' : '#000000'};
+                    color: ${isDarkTheme ? '#bfbfbf !important' : '#000000'};
                 }
                 * { 
                     transition: none !important;

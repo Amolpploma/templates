@@ -2,7 +2,7 @@
     /* Cores base - adaptadas do TinyMCE dark theme */
     --bg-primary: #1e1e1e;
     --bg-secondary: #2d2d2d;
-    --text-primary: #e3e3e3;
+    --text-primary: #bfbfbf;
     --text-secondary: #bdbdbd;
     --border-color: #404040;
 
@@ -73,6 +73,8 @@
 
     /* Overrides para tema escuro */
     --resizer-hover-bg: rgba(255, 255, 255, 0.05);
+
+    --scroll-thumb: #404040;
 }
 
 /* Manter apenas a estilização específica do TinyMCE para tema escuro */
