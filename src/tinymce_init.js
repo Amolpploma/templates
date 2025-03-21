@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const theme = document.documentElement.getAttribute('data-theme');
         const isDarkTheme = theme === 'dark';
         const isSearchPage = !document.body.hasAttribute('data-page');
-        const defaultPlugins = ['wordcount', 'lists', 'searchreplace', 'charmap', 'hr'];
-        const defaultToolbar = 'hr fontfamily fontsize bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap';
+        const defaultPlugins = ['wordcount', 'lists', 'searchreplace', 'charmap']; // Remover 'hr'
+        const defaultToolbar = 'fontfamily fontsize bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap'; // Remover 'hr'
         
         const config = {
             selector: '#editor-container',
