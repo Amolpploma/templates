@@ -107,3 +107,7 @@
     background-color: var(--tinymce-bg) !important;
 }
 
+[data-theme="dark"] .tox .tox-edit-area::before {
+    border: 2px solid var(--result-selected-border);
+    border-radius: 6px;
+}
