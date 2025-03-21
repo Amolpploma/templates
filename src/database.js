@@ -117,6 +117,7 @@ class Database {
                     modelo
                 FROM modelos
                 ${whereClause}
+                ORDER BY nome COLLATE NOCASE
                 LIMIT 100
             `,
             params: params
