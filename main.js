@@ -1,7 +1,7 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, globalShortcut, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, globalShortcut, ipcMain, dialog, nativeTheme } = require('electron')
 const path = require('node:path')
 const fs = require('fs')
 let store;
@@ -119,6 +119,7 @@ function createWindow(page = 'index.html') {
         titleBarStyle: 'hidden',   // Esconde a barra de título
         autoHideMenuBar: true,     // Esconde a barra de menu
         center: true,              // Centraliza a janela
+        backgroundColor: nativeTheme.shouldUseDarkColors ? '#1e1e1e' : '#ffffff', // Adicionar backgroundColor
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -130,6 +131,12 @@ function createWindow(page = 'index.html') {
     });
 
     mainWindow.loadFile(path.join(__dirname, 'src', page));
+
+    // Adicionar handler para mudança de tema nativo
+    nativeTheme.on('updated', () => {
+        const isDark = nativeTheme.shouldUseDarkColors;
+        mainWindow.webContents.send('native-theme-update', isDark);
+    });
 
     // Adicionar handlers para controles da janela
     ipcMain.on('minimize-window', () => mainWindow.minimize());
@@ -317,6 +324,10 @@ function registerIpcHandlers() {
   ipcMain.handle('set-store', (event, key, value) => {
     store.set(key, value);
     return true;
+  });
+
+  ipcMain.handle('get-native-theme', () => {
+    return nativeTheme.shouldUseDarkColors;
   });
 
   ipcMain.on('navigate-transfer-content', (event, { page, content }) => {

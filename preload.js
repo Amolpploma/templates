@@ -25,5 +25,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.send('navigate-transfer-content', { page, content });
     },
     getStore: (key) => ipcRenderer.invoke('get-store', key),
-    setStore: (key, value) => ipcRenderer.invoke('set-store', key, value)
+    setStore: (key, value) => ipcRenderer.invoke('set-store', key, value),
+    getNativeTheme: () => ipcRenderer.invoke('get-native-theme'),
+    onNativeThemeUpdate: (callback) => ipcRenderer.on('native-theme-update', callback)
 });

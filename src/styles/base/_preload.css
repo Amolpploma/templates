@@ -1,0 +1,57 @@
+/* Estilos aplicados antes do carregamento da página */
+:root {
+    color-scheme: light;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* Prevenir flash durante carregamento */
+html {
+    visibility: hidden;
+    background-color: #ffffff;
+}
+
+html[data-theme="dark"] {
+    background-color: #1e1e1e;
+}
+
+/* Estilização do TinyMCE para prevenir flash */
+.tox-tinymce {
+    transition: background-color 0.2s ease !important;
+}
+
+.tox .tox-toolbar,
+.tox .tox-toolbar__primary,
+.tox .tox-toolbar__overflow,
+.tox .tox-edit-area__iframe,
+.tox .tox-statusbar {
+    transition: background-color 0.2s ease !important;
+}
+
+/* Transições suaves para elementos de formulário */
+input[type="text"],
+input[type="search"],
+textarea,
+button {
+    transition: background-color 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease !important;
+}
+
+/* Mostrar conteúdo apenas quando estiver pronto */
+html.ready {
+    visibility: visible;
+    transition: background-color 0.2s ease;
+}
+
+/* Garantir que o editor mantenha o tema correto durante a transição */
+[data-theme="dark"] .tox.tox-tinymce,
+[data-theme="dark"] .tox .tox-toolbar,
+[data-theme="dark"] .tox .tox-toolbar__primary,
+[data-theme="dark"] .tox .tox-toolbar__overflow,
+[data-theme="dark"] .tox .tox-statusbar {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+}
