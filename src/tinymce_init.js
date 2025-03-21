@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const theme = document.documentElement.getAttribute('data-theme');
         const isDarkTheme = theme === 'dark';
         const isSearchPage = !document.body.hasAttribute('data-page');
-        const defaultPlugins = ['wordcount', 'lists', 'searchreplace', 'charmap'];
-        const defaultToolbar = 'fontfamily fontsize bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap';
+        const defaultPlugins = ['wordcount', 'lists', 'searchreplace', 'charmap', 'hr'];
+        const defaultToolbar = 'hr fontfamily fontsize bold italic underline | alignjustify aligncenter align lineheight | outdent indent | selectall copy undo redo searchreplace | numlist bullist | forecolor backcolor | removeformat charmap';
         
         const config = {
             selector: '#editor-container',
@@ -25,6 +25,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     background-color: ${isDarkTheme ? '#1e1e1e !important' : '#ffffff'};
                     color: ${isDarkTheme ? '#bfbfbf !important' : '#000000'};
                 }
+
+                /* Estilização da barra de rolagem */
+                ::-webkit-scrollbar {
+                    width: 8px !important;
+                    height: 8px !important;
+                    background: transparent !important;
+                }
+                
+                ::-webkit-scrollbar-thumb {
+                    background-color: ${isDarkTheme ? '#404040' : '#c1c1c1'} !important;
+                }
+                
+                ::-webkit-scrollbar-thumb:hover {
+                    background-color: ${isDarkTheme ? '#666666' : '#a8a8a8'} !important;
+                }
+                
                 * { 
                     transition: none !important;
                 }
