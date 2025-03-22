@@ -76,7 +76,17 @@ class Database {
         const conditions = [];
         const params = [];
 
-        const termos = filters.termo.split(/\s+/);
+        const termos = filters.termo
+            .split(/\s+/)
+            .filter(termo => termo.length >= 3); // Filtrar termos com 3 ou mais caracteres
+
+        // Se não houver termos válidos, retornar uma query que não retorna resultados
+        if (termos.length === 0) {
+            return {
+                query: `SELECT id, nome, tag, modelo FROM modelos WHERE 0`,
+                params: []
+            };
+        }
 
         termos.forEach(termo => {
             const termoConditions = [];
@@ -117,6 +127,7 @@ class Database {
                     modelo
                 FROM modelos
                 ${whereClause}
+                ORDER BY nome COLLATE NOCASE
                 LIMIT 100
             `,
             params: params
@@ -128,8 +139,12 @@ class Database {
             filtros.nome = true;
         }
         
+        const termos = termo
+            .split(/\s+/)
+            .filter(termo => termo.length >= 3);
+
         const { query, params } = this.#buildModelosSearchQuery({
-            termo,
+            termo: termos.join(' '), // Usar termos filtrados
             ...filtros
         });
 
@@ -141,24 +156,37 @@ class Database {
             filtros.nome = true;
         }
 
+        const termos = termo
+            .split(/\s+/)
+            .filter(termo => termo.length >= 3); // Filtrar termos com 3 ou mais caracteres
+
+        if (termos.length === 0) {
+            return [];
+        }
+
         const conditions = [];
         const params = [];
 
-        if (filtros.nome) {
-            conditions.push('c.nome LIKE ?');
-            params.push(`%${termo}%`);
-        }
+        termos.forEach(termo => {
+            const termoConditions = [];
 
-        if (filtros.etiqueta) {
-            conditions.push(`EXISTS (
-                SELECT 1 FROM json_each(c.tag) 
-                WHERE value LIKE ?
-            )`);
-            params.push(`%${termo}%`);
-        }
+            if (filtros.nome) {
+                termoConditions.push('c.nome LIKE ?');
+                params.push(`%${termo}%`);
+            }
+
+            if (filtros.etiqueta) {
+                termoConditions.push(`EXISTS ( SELECT 1 FROM json_each(c.tag) WHERE value LIKE ? )`);
+                params.push(`%${termo}%`);
+            }
+
+            if (termoConditions.length > 0) {
+                conditions.push(`(${termoConditions.join(' OR ')})`);
+            }
+        });
 
         const whereClause = conditions.length > 0
-            ? 'WHERE ' + conditions.join(' OR ')
+            ? 'WHERE ' + conditions.join(' AND ')
             : '';
 
         const query = `
