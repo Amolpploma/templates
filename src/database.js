@@ -80,6 +80,14 @@ class Database {
             .split(/\s+/)
             .filter(termo => termo.length >= 3); // Filtrar termos com 3 ou mais caracteres
 
+        // Se não houver termos válidos, retornar uma query que não retorna resultados
+        if (termos.length === 0) {
+            return {
+                query: `SELECT id, nome, tag, modelo FROM modelos WHERE 0`,
+                params: []
+            };
+        }
+
         termos.forEach(termo => {
             const termoConditions = [];
 
