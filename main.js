@@ -411,8 +411,8 @@ function registerIpcHandlers() {
             console.warn('Checklist inválido encontrado', checklist);
             checklistsErro++;
           }
-        }
-      }
+        } // Fechar o loop for
+      } // Fechar o if
 
       let mensagem = `Importação concluída: ${modelosImportados} modelos e ${checklistsImportados} checklists importados.`;
       if (modelosErro > 0 || checklistsErro > 0) {

@@ -399,11 +399,12 @@
     background-color: var(--hover-color);
 }
 
+/*
 .modal-btn-primary {
     background-color: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
-}
+}*/
 
 .modal-btn-primary:hover {
     background-color: var(--primary-dark);

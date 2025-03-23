@@ -81,14 +81,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Função para resetar todos os checkboxes do modal
+    function resetCheckboxes() {
+        // Resetar checkbox "Selecionar todos"
+        selectAllModelos.checked = false;
+        selectAllModelos.indeterminate = false;
+        selectAllChecklists.checked = false;
+        selectAllChecklists.indeterminate = false;
+        
+        // Resetar checkboxes individuais
+        document.querySelectorAll('.modelo-checkbox, .checklist-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        // Limpar arrays de seleção
+        selectedModelos = [];
+        selectedChecklists = [];
+        
+        // Atualizar contadores
+        updateSelectionCounts();
+    }
+
     // Event listener para exportar documentos (agora com diagnóstico adicional)
     exportBtn.addEventListener('click', async () => {
         try {
             console.log('Clique no botão de exportar detectado');
             
-            // Limpar seleções anteriores
-            selectedModelos = [];
-            selectedChecklists = [];
+            // Limpar seleções anteriores e resetar checkboxes
+            resetCheckboxes();
             
             // Primeiro, mostrar o modal
             exportModal.classList.add('active');
@@ -320,10 +340,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event listeners para fechar o modal
     exportModalClose.addEventListener('click', () => {
         exportModal.classList.remove('active');
+        resetCheckboxes(); // Adicionar reset ao fechar
     });
     
     cancelExport.addEventListener('click', () => {
         exportModal.classList.remove('active');
+        resetCheckboxes(); // Adicionar reset ao fechar
     });
 
     // Event listener para confirmar exportação
@@ -350,6 +372,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Esconder modal
             exportModal.classList.remove('active');
+            resetCheckboxes(); // Adicionar reset após exportação
             
             // Mostrar mensagem de resultado
             if (result.success) {
@@ -374,6 +397,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     exportModal.addEventListener('click', (e) => {
         if (e.target === exportModal) {
             exportModal.classList.remove('active');
+            resetCheckboxes(); // Adicionar reset ao fechar
         }
     });
 
@@ -407,6 +431,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Esconder modal
             exportModal.classList.remove('active');
+            resetCheckboxes(); // Adicionar reset após exportação
             
             // Mostrar mensagem de resultado
             if (result.success) {
