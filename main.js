@@ -334,41 +334,339 @@ function registerIpcHandlers() {
     store.set('transferContent', content);
     BrowserWindow.getFocusedWindow().loadFile(path.join(__dirname, 'src', page));
   });
+
+  // Modificar o handler de importação para verificar melhor os dados
+  ipcMain.handle('import-documentos', async () => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Importar Documentos',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Arquivos JSON', extensions: ['json'] }
+      ]
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false, message: 'Importação cancelada' };
+    }
+
+    try {
+      const filePath = result.filePaths[0];
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      let data;
+      
+      try {
+        data = JSON.parse(fileContent);
+      } catch (e) {
+        return { success: false, message: 'O arquivo selecionado não contém JSON válido.' };
+      }
+      
+      // Verificar se os dados têm o formato esperado
+      if (!data.modelos && !data.checklists) {
+        return { success: false, message: 'O arquivo não contém documentos válidos para importação.' };
+      }
+
+      let modelosImportados = 0;
+      let checklistsImportados = 0;
+      let modelosErro = 0;
+      let checklistsErro = 0;
+
+      // Importar modelos
+      if (Array.isArray(data.modelos)) {
+        for (const modelo of data.modelos) {
+          // Validar estrutura
+          if (modelo.nome && (modelo.tag !== undefined) && modelo.modelo) {
+            try {
+              await database.inserirModelo(modelo.nome, modelo.tag, modelo.modelo);
+              modelosImportados++;
+            } catch (err) {
+              console.error('Erro ao importar modelo:', err);
+              modelosErro++;
+            }
+          } else {
+            console.warn('Modelo inválido encontrado', modelo);
+            modelosErro++;
+          }
+        }
+      }
+
+      // Importar checklists
+      if (Array.isArray(data.checklists)) {
+        for (const checklist of data.checklists) {
+          // Validar estrutura
+          if (checklist.nome && (checklist.tag !== undefined) && checklist.checklist) {
+            try {
+              await database.inserirChecklist(
+                checklist.nome,
+                checklist.tag,
+                checklist.checklist,
+                checklist.modelo_id || null
+              );
+              checklistsImportados++;
+            } catch (err) {
+              console.error('Erro ao importar checklist:', err);
+              checklistsErro++;
+            }
+          } else {
+            console.warn('Checklist inválido encontrado', checklist);
+            checklistsErro++;
+          }
+        }
+      }
+
+      let mensagem = `Importação concluída: ${modelosImportados} modelos e ${checklistsImportados} checklists importados.`;
+      if (modelosErro > 0 || checklistsErro > 0) {
+        mensagem += ` (${modelosErro} modelos e ${checklistsErro} checklists com erro)`;
+      }
+      return { success: true, message: mensagem };
+    } catch (err) {
+      console.error('Erro na importação:', err);
+      return { success: false, message: `Erro na importação: ${err.message}` };
+    }
+  });
+
+  ipcMain.handle('export-documentos', async () => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Exportar Documentos',
+      defaultPath: 'documentos_exportados.json',
+      filters: [
+        { name: 'Arquivos JSON', extensions: ['json'] }
+      ]
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { success: false, message: 'Exportação cancelada' };
+    }
+
+    try {
+      // Buscar todos os modelos e checklists
+      const modelos = await database.executarQuery('SELECT * FROM modelos');
+      const checklists = await database.executarQuery('SELECT * FROM checklists');
+
+      const dados = {
+        modelos,
+        checklists,
+        data_exportacao: new Date().toISOString(),
+        versao: app.getVersion()
+      };
+
+      fs.writeFileSync(result.filePath, JSON.stringify(dados, null, 2), 'utf8');
+
+      return { 
+        success: true, 
+        message: `Exportação concluída: ${modelos.length} modelos e ${checklists.length} checklists exportados.`
+      };
+    } catch (err) {
+      console.error('Erro na exportação:', err);
+      return { success: false, message: `Erro na exportação: ${err.message}` };
+    }
+  });
+
+  // Adicionar handler para exportação seletiva
+  ipcMain.handle('export-documentos-selecionados', async (event, dados) => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Exportar Documentos Selecionados',
+      defaultPath: 'documentos_exportados.json',
+      filters: [
+        { name: 'Arquivos JSON', extensions: ['json'] }
+      ]
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { success: false, message: 'Exportação cancelada' };
+    }
+
+    try {
+      // Usar os dados selecionados já fornecidos
+      const { modelos, checklists } = dados;
+
+      const dadosExportacao = {
+        modelos,
+        checklists,
+        data_exportacao: new Date().toISOString(),
+        versao: app.getVersion()
+      };
+
+      fs.writeFileSync(result.filePath, JSON.stringify(dadosExportacao, null, 2), 'utf8');
+
+      return { 
+        success: true, 
+        message: `Exportação concluída: ${modelos.length} modelos e ${checklists.length} checklists exportados.` 
+      };
+    } catch (err) {
+      console.error('Erro na exportação:', err);
+      return { success: false, message: `Erro na exportação: ${err.message}` };
+    }
+  });
+
+  ipcMain.handle('get-all-documents', async () => {
+    try {
+      // Executar consultas diretamente no banco de dados para depuração
+      const modelos = await database.executarQuery('SELECT id, nome FROM modelos ORDER BY nome LIMIT 10');
+      const checklists = await database.executarQuery('SELECT id, nome FROM checklists ORDER BY nome LIMIT 10');
+      
+      console.log('Diagnóstico - Modelos:', modelos.length);
+      console.log('Diagnóstico - Checklists:', checklists.length);
+      
+      return {
+        modelos,
+        checklists,
+        success: true
+      };
+    } catch (err) {
+      console.error('Erro no diagnóstico:', err);
+      return { 
+        success: false, 
+        error: err.message 
+      };
+    }
+  });
+
+  // Handler para exportar modelos como texto
+  ipcMain.handle('export-modelos-como-texto', async (event, modelos) => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    
+    // Verificar se há modelos para exportar
+    if (!modelos || modelos.length === 0) {
+      return { success: false, message: 'Nenhum modelo selecionado para exportação' };
+    }
+    
+    // Abrir diálogo para selecionar pasta de destino
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Selecione a pasta para salvar os arquivos de texto',
+      properties: ['openDirectory']
+    });
+    
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false, message: 'Seleção de pasta cancelada' };
+    }
+    
+    const destinationFolder = result.filePaths[0];
+    let successCount = 0;
+    let errorCount = 0;
+    let errorDetails = []; // Array para armazenar detalhes de erros
+    
+    try {
+      // Função para remover tags HTML e decodificar entidades preservando quebras de linha
+      function stripHtml(html) {
+        // Se não for string, retornar como está
+        if (typeof html !== 'string') {
+          return html;
+        }
+        
+        // Criar elemento temporário para converter entidades HTML
+        const { JSDOM } = require('jsdom');
+        const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+        const document = dom.window.document;
+        
+        // Converter quebras de linha em HTML para caracteres de quebra de linha real
+        // Substituir elementos de bloco comuns por quebras de linha
+        let processedHtml = html
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<\/(p|div|h\d|tr|li)>/gi, '\n')
+          .replace(/<\/(td|th)>/gi, '\t')
+          .replace(/<hr\s*\/?>/gi, '\n---\n');
+        
+        // Criar um elemento temporário
+        const tmp = document.createElement('div');
+        tmp.innerHTML = processedHtml;
+        
+        // Obter o texto puro (converte automaticamente todas entidades HTML)
+        let text = tmp.textContent || tmp.innerText || '';
+        
+        // Normalizar quebras de linha (remover quebras de linha duplicadas)
+        text = text.replace(/\n{3,}/g, '\n\n');
+        
+        return text;
+      }
+      
+      // Exportar cada modelo como um arquivo de texto separado
+      for (const modelo of modelos) {
+        try {
+          // Formatar o conteúdo conforme especificado
+          let content = 'tags:\n';
+          
+          // Processar tags (pode ser string JSON ou array)
+          let tags = modelo.tag;
+          if (typeof tags === 'string') {
+            try {
+              tags = JSON.parse(tags);
+            } catch (e) {
+              tags = [tags];
+            }
+          }
+          
+          if (Array.isArray(tags)) {
+            content += tags.join(',');
+          } else {
+            content += String(tags);
+          }
+          
+          // Adicionar conteúdo sem as tags HTML
+          content += '\n\nconteúdo:\n' + stripHtml(modelo.modelo);
+          
+          // Sanitizar o nome do arquivo
+          const sanitizedName = modelo.nome.replace(/[/\\?%*:|"<>]/g, '-');
+          const filePath = path.join(destinationFolder, `${sanitizedName}.txt`);
+          
+          // Salvar o arquivo
+          fs.writeFileSync(filePath, content, 'utf8');
+          successCount++;
+        } catch (err) {
+          console.error(`Erro ao exportar modelo "${modelo.nome}":`, err);
+          errorCount++;
+          // Armazenar detalhes do erro
+          errorDetails.push({
+            nome: modelo.nome,
+            erro: err.message || 'Erro desconhecido'
+          });
+        }
+      }
+      
+      // Retornar resultado com detalhes dos erros
+      let message = `Exportação como texto concluída: ${successCount} modelo(s) exportado(s) com sucesso`;
+      if (errorCount > 0) {
+        message += ` (${errorCount} com erro)`;
+      }
+      
+      return { 
+        success: true, 
+        message,
+        errorCount,
+        errorDetails // Incluir detalhes dos erros na resposta
+      };
+    } catch (err) {
+      console.error('Erro geral na exportação de modelos como texto:', err);
+      return { success: false, message: `Erro na exportação como texto: ${err.message}` };
+    }
+  });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-    await loadStore();
-    // Verificar se já existe um caminho de banco salvo
-    const savedPath = store.get('databasePath');
-    
-    if (savedPath && fs.existsSync(savedPath)) {
-        const success = await initializeDatabase(savedPath);
-        createWindow(success ? 'index.html' : 'select-database.html');
-    } else {
-        createWindow('select-database.html');
-    }
+  await loadStore();
+  const savedPath = store.get('databasePath');
+  
+  if (savedPath && fs.existsSync(savedPath)) {
+    const success = await initializeDatabase(savedPath);
+    createWindow(success ? 'index.html' : 'select-database.html');
+  } else {
+    createWindow('select-database.html');
+  }
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+  if (process.platform !== 'darwin') app.quit();
+});
 
 app.on('will-quit', () => {
-  // Remover todos os handlers ao fechar
   ipcMain.removeHandler('buscar-checklists');
   ipcMain.removeHandler('buscar-documentos');
   ipcMain.removeHandler('salvar-documento');
-  ipcMain.removeHandler('buscar-modelo-por-id'); // Adicionar esta linha
-  
+  ipcMain.removeHandler('buscar-modelo-por-id');
   globalShortcut.unregisterAll();
-  //database.fecharConexao(); //Remover essa linha
-})
+});
 
 ipcMain.on('save-content', (event, content) => {
   dialog.showSaveDialog({

@@ -139,6 +139,17 @@ class Database {
             filtros.nome = true;
         }
         
+        // Se o termo estiver vazio, retornar todos os modelos
+        if (!termo || termo.trim() === '') {
+            const query = `
+                SELECT id, nome, tag, modelo 
+                FROM modelos 
+                ORDER BY nome COLLATE NOCASE
+                LIMIT 500
+            `;
+            return this.executarQuery(query);
+        }
+        
         const termos = termo
             .split(/\s+/)
             .filter(termo => termo.length >= 3);
@@ -154,6 +165,17 @@ class Database {
     async buscarChecklists(termo, filtros = { nome: true, etiqueta: false }) {
         if (!filtros.nome && !filtros.etiqueta) {
             filtros.nome = true;
+        }
+
+        // Se o termo estiver vazio, retornar todos os checklists
+        if (!termo || termo.trim() === '') {
+            const query = `
+                SELECT id, nome, tag, checklist, modelo_id
+                FROM checklists
+                ORDER BY nome COLLATE NOCASE
+                LIMIT 500
+            `;
+            return this.executarQuery(query);
         }
 
         const termos = termo
