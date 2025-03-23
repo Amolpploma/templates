@@ -285,8 +285,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         modelosCount.textContent = `${selectedModelos.length} selecionados`;
         checklistsCount.textContent = `${selectedChecklists.length} selecionados`;
         
-        // Habilitar/desabilitar botão de exportação
+        // Habilitar/desabilitar botões de exportação
         confirmExport.disabled = selectedModelos.length === 0 && selectedChecklists.length === 0;
+        
+        // Habilitar "Exportar modelos como texto" apenas quando houver modelos selecionados
+        exportAsTextBtn.disabled = selectedModelos.length === 0;
     }
 
     // Função para atualizar estado do checkbox "selecionar todos"
@@ -404,10 +407,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Elemento do botão de exportação como texto
     const exportAsTextBtn = document.getElementById('export-as-text');
     
+    // Inicialmente desabilitar o botão até que haja seleção
+    exportAsTextBtn.disabled = true;
+    
     // Event listener para exportar modelos como texto
     exportAsTextBtn.addEventListener('click', async () => {
         try {
-            // Verificar se há modelos selecionados
+            // Verificação redundante (por segurança)
             if (selectedModelos.length === 0) {
                 statusMessage.textContent = 'Por favor, selecione pelo menos um modelo para exportar como texto.';
                 statusMessage.className = 'status-message error';
