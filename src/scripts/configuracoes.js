@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let checklists = [];
     let selectedModelos = [];
     let selectedChecklists = [];
+    // Mapa para rastrear modelos associados a checklists selecionados
+    let modelosAssociados = new Map(); // modeloId -> [checklistId1, checklistId2, ...]
 
     // Inicializar o tema atual
     const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -92,11 +94,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Resetar checkboxes individuais
         document.querySelectorAll('.modelo-checkbox, .checklist-checkbox').forEach(checkbox => {
             checkbox.checked = false;
+            checkbox.disabled = false; // Garantir que todos os checkboxes estejam habilitados
         });
         
         // Limpar arrays de seleção
         selectedModelos = [];
         selectedChecklists = [];
+        
+        // Limpar mapa de modelos associados
+        modelosAssociados.clear();
         
         // Atualizar contadores
         updateSelectionCounts();
@@ -175,6 +181,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.log('Exemplo de checklist:', checklists[0]);
             }
             
+            // Processo adicional para analisar associações de checklists e modelos
+            mapearModelosAssociados();
+            
             // Renderizar listas mesmo que estejam vazias
             renderModelosList();
             renderChecklistsList();
@@ -188,6 +197,48 @@ document.addEventListener('DOMContentLoaded', async () => {
             modelosList.innerHTML = '<div class="selection-list-empty">Erro ao carregar modelos: ' + error.message + '</div>';
             checklistsList.innerHTML = '<div class="selection-list-empty">Erro ao carregar checklists: ' + error.message + '</div>';
         }
+    }
+
+    // Função para mapear todos os modelos associados a checklists
+    function mapearModelosAssociados() {
+        // Limpar mapa existente
+        modelosAssociados.clear();
+        
+        // Construir mapa de todos os modelos associados a checklists
+        if (checklists && Array.isArray(checklists)) {
+            checklists.forEach(checklist => {
+                if (checklist.modelo_id) {
+                    if (!modelosAssociados.has(checklist.modelo_id)) {
+                        modelosAssociados.set(checklist.modelo_id, []);
+                    }
+                    modelosAssociados.get(checklist.modelo_id).push(checklist.id);
+                }
+                
+                // Verificar também associações dentro dos itens do checklist
+                try {
+                    const itens = typeof checklist.checklist === 'string' 
+                        ? JSON.parse(checklist.checklist) 
+                        : checklist.checklist;
+                    
+                    if (Array.isArray(itens)) {
+                        itens.forEach(item => {
+                            if (item.modelo_id && !isNaN(parseInt(item.modelo_id))) {
+                                const modeloId = parseInt(item.modelo_id);
+                                if (!modelosAssociados.has(modeloId)) {
+                                    modelosAssociados.set(modeloId, []);
+                                }
+                                if (!modelosAssociados.get(modeloId).includes(checklist.id)) {
+                                    modelosAssociados.get(modeloId).push(checklist.id);
+                                }
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Erro ao processar itens do checklist:', e);
+                }
+            });
+        }
+        console.log('Mapa de modelos associados:', Object.fromEntries(modelosAssociados));
     }
 
     // Função para renderizar lista de modelos com verificação adicional
@@ -210,7 +261,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <label class="checkmark-container">
                         <input type="checkbox" class="modelo-checkbox" data-id="${modeloId}">
                         <span class="checkmark"></span>
-                        <span class="selection-item-label" title="${modeloNome}">${modeloNome}</span>
+                        <div class="modelo-info">
+                            <span class="selection-item-label" title="${modeloNome}">${modeloNome}</span>
+                            <span class="modelo-associado-icon" title=""><svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg></span>
+                        </div>
                     </label>
                 </div>
             `;
@@ -221,6 +275,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Adicionar event listeners para checkboxes
         document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
+                // Evitar processamento se estiver desabilitado
+                if (this.disabled) return;
+                
                 const id = parseInt(this.getAttribute('data-id'));
                 if (this.checked) {
                     if (!selectedModelos.includes(id)) {
@@ -274,6 +331,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else {
                     selectedChecklists = selectedChecklists.filter(item => item !== id);
                 }
+                // Atualizar modelos associados após alteração na seleção de checklists
+                atualizarModelosAssociados();
                 updateSelectionCounts();
                 updateSelectAllCheckbox(selectAllChecklists, '.checklist-checkbox');
             });
@@ -308,10 +367,92 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Função para atualizar estado dos checkboxes de modelos associados
+    function atualizarModelosAssociados() {
+        console.log('Atualizando modelos associados...'); // Log para debug
+        
+        // Primeiro, ocultar todos os ícones de associação
+        document.querySelectorAll('.modelo-associado-icon').forEach(icon => {
+            icon.style.display = 'none';
+            icon.title = '';
+        });
+
+        // Habilitar todos os checkboxes de modelos
+        document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
+            checkbox.disabled = false;
+            // Remover estilo de destaque do item pai
+            const selectionItem = checkbox.closest('.selection-item');
+            selectionItem.style.backgroundColor = '';
+        });
+        
+        // Mapa para armazenar relações de modelos -> checklists (usado para tooltips)
+        const modeloToChecklists = new Map();
+        
+        // Identificar todos os modelos associados a checklists selecionados
+        selectedChecklists.forEach(checklistId => {
+            // Buscar nome do checklist para o tooltip
+            const checklist = checklists.find(c => c.id === checklistId);
+            const checklistNome = checklist ? checklist.nome : 'Checklist desconhecido';
+            
+            modelosAssociados.forEach((checklistsAssociados, modeloId) => {
+                if (checklistsAssociados.includes(checklistId)) {
+                    // Armazenar a relação para o tooltip
+                    if (!modeloToChecklists.has(modeloId)) {
+                        modeloToChecklists.set(modeloId, []);
+                    }
+                    modeloToChecklists.get(modeloId).push(checklistNome);
+                }
+            });
+        });
+        
+        console.log('Modelos que serão associados:', Object.fromEntries(modeloToChecklists));
+        
+        // Agora atualizar a UI com base nas relações
+        modeloToChecklists.forEach((checklistNomes, modeloId) => {
+            // Buscar o checkbox do modelo
+            const checkbox = document.querySelector(`.modelo-checkbox[data-id="${modeloId}"]`);
+            if (checkbox) {
+                console.log(`Aplicando associação ao modelo ID ${modeloId}`);
+                
+                // Selecionar e desabilitar o checkbox
+                checkbox.checked = true;
+                checkbox.disabled = true;
+                
+                // Mostrar o ícone de associação
+                const selectionItem = checkbox.closest('.selection-item');
+                // Aplicar estilo de destaque diretamente ao item, sem usar a classe modelo-associado
+                selectionItem.style.backgroundColor = 'rgba(var(--primary-color-rgb), 0.08)';
+                
+                const icon = selectionItem.querySelector('.modelo-associado-icon');
+                if (icon) {
+                    icon.style.display = 'inline-block';
+                    icon.title = `Associado a: ${checklistNomes.join(', ')}`;
+                    console.log('Ícone exibido com título:', icon.title);
+                } else {
+                    console.warn('Ícone não encontrado para o modelo ID', modeloId);
+                }
+                
+                // Garantir que está na lista de selecionados
+                if (!selectedModelos.includes(modeloId)) {
+                    selectedModelos.push(modeloId);
+                }
+            } else {
+                console.warn('Checkbox não encontrado para o modelo ID', modeloId);
+            }
+        });
+        
+        // Atualizar contador e estado do "selecionar todos"
+        updateSelectionCounts();
+        updateSelectAllCheckbox(selectAllModelos, '.modelo-checkbox');
+    }
+
     // Event listener para o botão "selecionar todos modelos"
     selectAllModelos.addEventListener('change', function() {
         const isChecked = this.checked;
         document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
+            // Não alterar checkboxes desabilitados
+            if (checkbox.disabled) return;
+            
             checkbox.checked = isChecked;
             const id = parseInt(checkbox.getAttribute('data-id'));
             
@@ -337,6 +478,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 selectedChecklists = selectedChecklists.filter(item => item !== id);
             }
         });
+        // Atualizar modelos associados após alteração na seleção de checklists
+        atualizarModelosAssociados();
         updateSelectionCounts();
     });
 

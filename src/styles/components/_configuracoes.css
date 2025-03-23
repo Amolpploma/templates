@@ -545,3 +545,61 @@
 .error-model-name {
   font-weight: 600;
 }
+
+/* Estilos para indicação de modelo associado a checklist */
+.modelo-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Manter a classe modelo-associado apenas para Checklists (Edição) */
+/* Remover regras de estilo que se aplicam apenas à classe */
+
+.modelo-associado-icon {
+    display: none;
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+    color: var(--primary-color, #1976d2); /* Valor fallback adicionado */
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.modelo-associado-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Estilo para modelo desabilitado */
+.selection-item label.checkmark-container input:disabled ~ .modelo-info {
+    opacity: 0.9;
+    color: var(--text-primary);
+}
+
+/* Quando o mouse passar sobre um item com checkbox desabilitado */
+.selection-item:has(input:disabled):hover {
+    background-color: rgba(var(--primary-color-rgb), 0.15) !important;
+}
+
+/* Estilo para modelo desabilitado */
+.selection-item label.checkmark-container input:disabled ~ .modelo-info {
+    opacity: 0.9;
+    color: var(--text-primary);
+}
+
+/* Estilo para tooltip personalizado */
+[title] {
+    position: relative;
+    cursor: help;
+}
+
+/* Variável RGB para cores primárias - necessária para cores com transparência */
+:root {
+    --primary-color-rgb: 25, 118, 210; /* Versão RGB do azul primário */
+}
+
+[data-theme="dark"] {
+    --primary-color-rgb: 33, 150, 243; /* Versão RGB do azul primário para tema escuro */
+}
