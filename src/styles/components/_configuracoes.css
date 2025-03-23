@@ -444,11 +444,6 @@
     background-color: var(--hover-color);
 }
 
-.checkmark-container input:checked ~ .checkmark {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
 .checkmark:after {
     content: "";
     position: absolute;
@@ -464,7 +459,7 @@
     top: 2px;
     width: 3px;
     height: 8px;
-    border: solid white;
+    border: solid var(--text-primary);
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
 }
