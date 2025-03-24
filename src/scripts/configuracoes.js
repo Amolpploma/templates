@@ -97,6 +97,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             checkbox.disabled = false; // Garantir que todos os checkboxes estejam habilitados
         });
         
+        // Ocultar todos os ícones de associação (mas manter espaço)
+        document.querySelectorAll('.modelo-associado-icon').forEach(icon => {
+            icon.classList.remove('visible');
+            icon.title = '';
+        });
+        
+        // Remover destaques
+        document.querySelectorAll('.selection-item').forEach(item => {
+            item.style.backgroundColor = '';
+        });
+        
         // Limpar arrays de seleção
         selectedModelos = [];
         selectedChecklists = [];
@@ -263,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span class="checkmark"></span>
                         <div class="modelo-info">
                             <span class="selection-item-label" title="${modeloNome}">${modeloNome}</span>
-                            <span class="modelo-associado-icon" title=""><svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg></span>
+                            <span class="modelo-associado-icon" title=""><svg viewBox="0 0 24 24"><text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="bold">A</text></svg></span>
                         </div>
                     </label>
                 </div>
@@ -371,9 +382,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function atualizarModelosAssociados() {
         console.log('Atualizando modelos associados...'); // Log para debug
         
-        // Primeiro, ocultar todos os ícones de associação
+        // Redefinir todos os ícones para invisível (mas mantendo espaço)
         document.querySelectorAll('.modelo-associado-icon').forEach(icon => {
-            icon.style.display = 'none';
+            icon.classList.remove('visible');
             icon.title = '';
         });
 
@@ -425,7 +436,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 const icon = selectionItem.querySelector('.modelo-associado-icon');
                 if (icon) {
-                    icon.style.display = 'inline-block';
+                    // Usar classe para mostrar o ícone em vez de mudar display
+                    icon.classList.add('visible');
                     icon.title = `Associado a: ${checklistNomes.join(', ')}`;
                     console.log('Ícone exibido com título:', icon.title);
                 } else {

@@ -339,7 +339,6 @@
 
 .selection-item {
     align-items: center;
-    margin-bottom: 8px;
     padding: 8px;
     border-radius: 4px;
     transition: background-color 0.2s;
@@ -546,30 +545,55 @@
   font-weight: 600;
 }
 
-/* Estilos para indicação de modelo associado a checklist */
+/* Estilos para indicação de modelo associado a checklist - corrigido para evitar reflow */
 .modelo-info {
     display: flex;
     align-items: center;
     flex: 1;
     min-width: 0;
+    position: relative; /* Para posicionamento do ícone */
 }
 
-/* Manter a classe modelo-associado apenas para Checklists (Edição) */
-/* Remover regras de estilo que se aplicam apenas à classe */
-
 .modelo-associado-icon {
-    display: none;
+    opacity: 0;
     width: 16px;
     height: 16px;
     margin-left: 5px;
-    color: var(--primary-color, #1976d2); /* Valor fallback adicionado */
+    color: var(--primary-color, #1976d2);
     fill: currentColor;
     flex-shrink: 0;
+    transition: opacity 0.2s ease;
+    /* Sempre manter o espaço reservado, nunca ocultar completamente */
+    visibility: visible !important; 
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modelo-associado-icon svg {
+    width: 18px; /* Aumentado de 16px para 18px */
+    height: 18px; /* Aumentado de 16px para 18px */
+    fill: none;
+    vertical-align: middle;
+    position: relative;
+    top: 0; /* Ajustado para centralizar melhor */
+}
+
+/* Quando o ícone está visível */
+.modelo-associado-icon.visible {
+    opacity: 1;
 }
 
 .modelo-associado-icon svg {
     width: 16px;
     height: 16px;
+    fill: none; /* Removido o fill para permitir que o texto seja visível */
+}
+
+.modelo-associado-icon svg text {
+    fill: currentColor;
+    font-family: Arial, sans-serif;
 }
 
 /* Estilo para modelo desabilitado */
