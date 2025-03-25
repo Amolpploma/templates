@@ -17,7 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
             menubar: false,
             statusbar: true,
             elementpath: false,
-            toolbar: isSearchPage ? `editnewmodel|${defaultToolbar}` : defaultToolbar,
+            // Remover 'insertmodelo' da toolbar
+            toolbar: isSearchPage 
+                ? `editnewmodel|${defaultToolbar}` 
+                : defaultToolbar,
             content_style: `
                 body { 
                     font-family:times new roman,times; 
@@ -66,6 +69,42 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 }
+
+                // Remover a definição do botão insertmodelo
+                // Manter apenas os atalhos de teclado
+
+                // Atalho Ctrl+Espaço
+                editor.addShortcut('ctrl+space', 'Inserir modelo (Ctrl+Espaço)', function() {
+                    console.log('Atalho Ctrl+Espaço acionado');
+                    if (typeof window.showModeloDialog === 'function') {
+                        window.showModeloDialog(editor);
+                        return true; // Indica que o evento foi processado
+                    }
+                });
+                
+                // Atalho alternativo Alt+M
+                editor.addShortcut('alt+m', 'Inserir modelo (Alt+M)', function() {
+                    console.log('Atalho Alt+M acionado');
+                    if (typeof window.showModeloDialog === 'function') {
+                        window.showModeloDialog(editor);
+                        return true; // Indica que o evento foi processado
+                    }
+                });
+
+                // Manipulador direto para Ctrl+Espaço
+                editor.on('keydown', function(e) {
+                    // Verificar se é Ctrl+Espaço 
+                    if (e.ctrlKey && e.keyCode === 32) { // 32 é o keyCode para a barra de espaço
+                        console.log('Evento keydown capturado: Ctrl+Espaço');
+                        e.preventDefault(); // Prevenir comportamento padrão
+                        e.stopPropagation(); // Parar propagação
+                        
+                        if (typeof window.showModeloDialog === 'function') {
+                            window.showModeloDialog(editor);
+                            return false; // Isso impede a propagação adicional
+                        }
+                    }
+                });
             }
         };
 
