@@ -349,7 +349,7 @@
         }
     }
 
-    // Nova função para inserir o modelo buscando seu conteúdo por ID
+    // Nova função para inserir o modelo buscando seu conteúdo por ID - CORRIGIDA
     async function insertModeloPorId(modeloId, modeloNome, editor) {
         if (!editor) return;
         
@@ -366,8 +366,35 @@
                 return;
             }
             
-            // Inserir o conteúdo do modelo
-            editor.execCommand('mceInsertContent', false, modelo.modelo);
+            // Verificar se o conteúdo é uma string válida
+            if (!modelo.modelo || typeof modelo.modelo !== 'string') {
+                console.error('O conteúdo do modelo não é válido:', modelo.modelo);
+                alert(`O conteúdo do modelo "${modeloNome}" está em formato inválido.`);
+                return;
+            }
+            
+            // Garantir que o editor está pronto - abordagem mais segura
+            if (editor.initialized) {
+                try {
+                    // Inserir o conteúdo do modelo usando insertContent em vez de execCommand
+                    // para melhor manipulação de erros
+                    editor.insertContent(modelo.modelo);
+                } catch (insertError) {
+                    console.error('Erro durante a inserção de conteúdo:', insertError);
+                    
+                    // Fallback: tentar limpeza básica de HTML e inserir novamente
+                    try {
+                        const cleanedContent = sanitizeHtml(modelo.modelo);
+                        editor.insertContent(cleanedContent);
+                    } catch (fallbackError) {
+                        console.error('Erro no fallback de inserção:', fallbackError);
+                        alert(`Não foi possível inserir o modelo. Por favor, tente novamente.`);
+                    }
+                }
+            } else {
+                console.error('O editor não está completamente inicializado');
+                alert(`Não foi possível inserir o modelo: o editor não está pronto.`);
+            }
             
             // Focar no editor novamente
             editor.focus();
@@ -378,6 +405,17 @@
             // Remover indicador de carregamento
             editor.setProgressState(false);
         }
+    }
+
+    // Nova função para sanitizar HTML - ajuda a remover estruturas inválidas
+    function sanitizeHtml(html) {
+        // Remover tags vazias ou malformadas que podem causar problemas
+        return html
+            .replace(/<([^>]+)><\/\1>/g, '') // Remover tags vazias
+            .replace(/<!--[\s\S]*?-->/g, '') // Remover comentários HTML
+            .replace(/<([^>]*)[^>]*>/g, (match, p1) => { // Corrigir atributos malformados
+                return match.replace(/\s+[a-zA-Z-]+=(?!")(?![a-zA-Z0-9])/g, '');
+            });
     }
 
     // Função para inserir o modelo no editor

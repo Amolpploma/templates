@@ -1,3 +1,17 @@
+:root {
+    --primary-color: #0078d7;
+    --primary-dark: #005a9e;
+    --primary-color-rgb: 0, 120, 215;
+    --result-selected-bg: rgba(0, 120, 215, 0.25);
+}
+
+[data-theme="dark"] {
+    --primary-color: #2196f3;
+    --primary-dark: #0d8bf2;
+    --primary-color-rgb: 33, 150, 243;
+    --result-selected-bg: rgba(33, 150, 243, 0.3);
+}
+
 .modelo-dialog-overlay {
     position: fixed;
     top: 0;
@@ -14,7 +28,7 @@
 .modelo-dialog {
     width: 768px;
     max-width: 95%;
-    max-height: 90vh;
+    height: 500px; /* Altura fixa para o diálogo */
     background-color: var(--bg-secondary);
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -100,9 +114,7 @@
     flex: 1;
     overflow-y: auto;
     padding: 0;
-    min-height: 200px;
-    max-height: 400px;
-    /* Melhorar desempenho da rolagem */
+    height: 0; /* Força o elemento a não crescer além do espaço disponível */
     scroll-behavior: auto;
     overscroll-behavior: contain;
 }
@@ -113,8 +125,10 @@
     cursor: pointer;
     transition: background-color 0.2s, border-left 0.2s;
     position: relative;
-    /* Altura mínima para melhor navegação */
     min-height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .modelo-result-item:last-child {
@@ -125,15 +139,19 @@
     background-color: var(--hover-color);
 }
 
-.modelo-result-item.selected {
-    background-color: rgba(var(--primary-color-rgb), 0.15);
-    border-left: 4px solid var(--primary-color);
-    padding-left: 12px; /* Ajustado para compensar a borda */
-    font-weight: 500;
-    position: relative;
+.modelo-result-item:hover:not(.selected) {
+    background-color: rgba(var(--primary-color-rgb), 0.05);
 }
 
-/* Adiciona um indicador de foco */
+.modelo-result-item.selected {
+    background-color: var(--result-selected-bg); /* Agora variável está definida */
+    border-left: 4px solid var(--primary-color);
+    padding-left: 12px;
+    font-weight: 500;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 .modelo-result-item.selected::before {
     content: "›";
     position: absolute;
