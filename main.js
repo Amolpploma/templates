@@ -654,7 +654,6 @@ function registerIpcHandlers() {
                 SELECT id, nome 
                 FROM modelos 
                 ORDER BY nome COLLATE NOCASE
-                LIMIT 500
             `;
             return await database.executarQuery(query);
         }

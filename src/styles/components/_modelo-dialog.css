@@ -12,7 +12,7 @@
 }
 
 .modelo-dialog {
-    width: 600px;
+    width: 768px;
     max-width: 95%;
     max-height: 90vh;
     background-color: var(--bg-secondary);
