@@ -37,7 +37,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     exportarDocumentosSelecionados: (dados) => ipcRenderer.invoke('export-documentos-selecionados', dados),
     
     // Método para exportar modelos como texto
-    exportarModelosComoTexto: (modelos) => ipcRenderer.invoke('export-modelos-como-texto', modelos)
+    exportarModelosComoTexto: (modelos) => ipcRenderer.invoke('export-modelos-como-texto', modelos),
+    
+    // Adicionar nova função para buscar apenas IDs e nomes de modelos
+    buscarModelosResumidos: (termo) => ipcRenderer.invoke('buscar-modelos-resumidos', termo)
     
     // Método de diagnóstico removido ou comentado da exposição pública
     // getAllDocuments: () => ipcRenderer.invoke('get-all-documents')

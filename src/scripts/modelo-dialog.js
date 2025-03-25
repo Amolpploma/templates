@@ -147,10 +147,14 @@
         dialog.addEventListener('keydown', handleKeyDown);
         searchInput.addEventListener('keydown', handleKeyDown);
         
-        // Inserir modelo selecionado
+        // Inserir modelo selecionado - atualizada para usar ID
         insertBtn.addEventListener('click', () => {
-            if (activeModeloDialog.selectedModelo) {
-                insertModelo(activeModeloDialog.selectedModelo, editor);
+            if (activeModeloDialog.selectedModeloId) {
+                insertModeloPorId(
+                    activeModeloDialog.selectedModeloId,
+                    activeModeloDialog.selectedModeloNome,
+                    editor
+                );
                 closeModeloDialog();
             }
         });
@@ -170,8 +174,12 @@
         }
         
         // Enter seleciona o modelo atual
-        if (event.key === 'Enter' && activeModeloDialog.selectedModelo) {
-            insertModelo(activeModeloDialog.selectedModelo, activeModeloDialog.editor);
+        if (event.key === 'Enter' && activeModeloDialog.selectedModeloId) {
+            insertModeloPorId(
+                activeModeloDialog.selectedModeloId,
+                activeModeloDialog.selectedModeloNome,
+                activeModeloDialog.editor
+            );
             closeModeloDialog();
             event.preventDefault();
             return;
@@ -229,26 +237,51 @@
             { duration: 150 }
         );
         
-        // Garantir que o item selecionado esteja visível
-        selectedItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        // SOLUÇÃO MELHORADA: Garantir visibilidade com cálculo manual da rolagem
+        ensureVisibility(selectedItem, activeModeloDialog.resultsContainer);
         
-        // Atualizar modelo selecionado
-        activeModeloDialog.selectedModelo = JSON.parse(selectedItem.dataset.modelo);
+        // Atualizar ID do modelo selecionado
+        activeModeloDialog.selectedModeloId = parseInt(selectedItem.dataset.modeloId);
+        activeModeloDialog.selectedModeloNome = selectedItem.textContent;
         activeModeloDialog.insertBtn.disabled = false;
     }
 
-    // Função para carregar modelos - adicionar seleção inicial melhorada
+    // Nova função para garantir que o item está visível na área de rolagem
+    function ensureVisibility(element, container) {
+        // Obter dimensões e posições
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        
+        // Verificar se o elemento está fora da área visível
+        const isAbove = elementRect.top < containerRect.top;
+        const isBelow = elementRect.bottom > containerRect.bottom;
+        
+        if (isAbove) {
+            // Se o elemento estiver acima, rolar para torná-lo visível com margens
+            const scrollTop = container.scrollTop - (containerRect.top - elementRect.top) - 10;
+            container.scrollTo({
+                top: scrollTop,
+                behavior: 'auto' // Comportamento imediato para resposta rápida
+            });
+        } else if (isBelow) {
+            // Se o elemento estiver abaixo, rolar para torná-lo visível com margens
+            const scrollBottom = container.scrollTop + (elementRect.bottom - containerRect.bottom) + 10;
+            container.scrollTo({
+                top: scrollBottom,
+                behavior: 'auto' // Comportamento imediato para resposta rápida
+            });
+        }
+    }
+
+    // Função para carregar modelos - otimizada para carregar apenas nome e ID
     async function loadModelos(termo, resultsContainer) {
         if (!activeModeloDialog) return;
         
         resultsContainer.innerHTML = '<div class="modelo-loading">Carregando modelos...</div>';
         
         try {
-            // Buscar modelos usando a API do Electron
-            const modelos = await window.electronAPI.buscarDocumentos(termo, { 
-                nome: true, 
-                etiqueta: true 
-            });
+            // Buscar apenas ID e nome dos modelos, não o conteúdo completo
+            const modelos = await window.electronAPI.buscarModelosResumidos(termo);
             
             if (!modelos || modelos.length === 0) {
                 resultsContainer.innerHTML = '<div class="modelo-no-results">Nenhum modelo encontrado</div>';
@@ -264,8 +297,8 @@
                 const modeloItem = document.createElement('div');
                 modeloItem.className = 'modelo-result-item';
                 modeloItem.textContent = modelo.nome;
-                // Guardar o modelo completo como atributo data
-                modeloItem.dataset.modelo = JSON.stringify(modelo);
+                // Armazenar apenas o ID do modelo
+                modeloItem.dataset.modeloId = modelo.id;
                 
                 // Eventos do item
                 modeloItem.addEventListener('click', () => {
@@ -276,12 +309,13 @@
                     
                     // Marcar como selecionado
                     modeloItem.classList.add('selected');
-                    activeModeloDialog.selectedModelo = modelo;
+                    activeModeloDialog.selectedModeloId = modelo.id;
+                    activeModeloDialog.selectedModeloNome = modelo.nome;
                     activeModeloDialog.insertBtn.disabled = false;
                     
                     // Inserir com duplo clique
                     if (modeloItem.dataset.lastClick && Date.now() - modeloItem.dataset.lastClick < 300) {
-                        insertModelo(modelo, activeModeloDialog.editor);
+                        insertModeloPorId(modelo.id, modelo.nome, activeModeloDialog.editor);
                         closeModeloDialog();
                     }
                     modeloItem.dataset.lastClick = Date.now();
@@ -292,7 +326,8 @@
                 // Selecionar automaticamente o primeiro item da lista quando carregar
                 if (index === 0) {
                     modeloItem.classList.add('selected');
-                    activeModeloDialog.selectedModelo = modelo;
+                    activeModeloDialog.selectedModeloId = modelo.id;
+                    activeModeloDialog.selectedModeloNome = modelo.nome;
                     activeModeloDialog.insertBtn.disabled = false;
                     
                     // Destacar o item selecionado inicialmente
@@ -304,15 +339,44 @@
                         { duration: 300 }
                     );
                     
-                    // Garantir que o item selecionado esteja visível
-                    setTimeout(() => {
-                        modeloItem.scrollIntoView({ block: 'nearest', behavior: 'auto' });
-                    }, 50);
+                    // Garantir que o item selecionado esteja visível com rolagem forçada
+                    resultsContainer.scrollTop = 0; // Forçar rolagem para o topo
                 }
             });
         } catch (error) {
             console.error('Erro ao buscar modelos:', error);
             resultsContainer.innerHTML = '<div class="modelo-no-results">Erro ao buscar modelos</div>';
+        }
+    }
+
+    // Nova função para inserir o modelo buscando seu conteúdo por ID
+    async function insertModeloPorId(modeloId, modeloNome, editor) {
+        if (!editor) return;
+        
+        try {
+            // Mostrar indicador de carregamento no editor
+            editor.setProgressState(true, 100);
+            
+            // Buscar o modelo completo usando o ID
+            const modelo = await window.electronAPI.buscarModeloPorId(modeloId);
+            
+            if (!modelo) {
+                console.error(`Modelo com ID ${modeloId} não encontrado`);
+                alert(`Erro ao carregar o modelo "${modeloNome}"`);
+                return;
+            }
+            
+            // Inserir o conteúdo do modelo
+            editor.execCommand('mceInsertContent', false, modelo.modelo);
+            
+            // Focar no editor novamente
+            editor.focus();
+        } catch (error) {
+            console.error('Erro ao inserir modelo:', error);
+            alert(`Erro ao carregar modelo: ${error.message}`);
+        } finally {
+            // Remover indicador de carregamento
+            editor.setProgressState(false);
         }
     }
 
