@@ -642,6 +642,51 @@ function registerIpcHandlers() {
       return { success: false, message: `Erro na exportação como texto: ${err.message}` };
     }
   });
+
+  // Adicionar handler para buscar modelos resumidos (apenas ID e nome)
+  ipcMain.handle('buscar-modelos-resumidos', async (event, termo) => {
+    try {
+        const filtros = { nome: true, etiqueta: true };
+        
+        // Se o termo estiver vazio, buscar todos
+        if (!termo || termo.trim() === '') {
+            const query = `
+                SELECT id, nome 
+                FROM modelos 
+                ORDER BY nome COLLATE NOCASE
+            `;
+            return await database.executarQuery(query);
+        }
+        
+        // Implementação simplificada de pesquisa
+        const termos = termo.split(/\s+/).filter(t => t.length >= 3);
+        if (!termos.length) return [];
+        
+        let conditions = [];
+        let params = [];
+        
+        termos.forEach(termo => {
+            conditions.push(`(nome LIKE ? OR EXISTS (
+                SELECT 1 FROM json_each(tag) 
+                WHERE value LIKE ?
+            ))`);
+            params.push(`%${termo}%`, `%${termo}%`);
+        });
+        
+        const query = `
+            SELECT id, nome
+            FROM modelos
+            WHERE ${conditions.join(' AND ')}
+            ORDER BY nome COLLATE NOCASE
+            LIMIT 100
+        `;
+        
+        return await database.executarQuery(query, params);
+    } catch (err) {
+        console.error('Erro na busca resumida:', err);
+        return [];
+    }
+  });
 }
 
 app.whenReady().then(async () => {
