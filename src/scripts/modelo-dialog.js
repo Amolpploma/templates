@@ -319,6 +319,13 @@
                         closeModeloDialog();
                     }
                     modeloItem.dataset.lastClick = Date.now();
+                    
+                    // NOVO: Retornar o foco para o campo de pesquisa após seleção com o mouse
+                    setTimeout(() => {
+                        if (activeModeloDialog && activeModeloDialog.searchInput) {
+                            activeModeloDialog.searchInput.focus();
+                        }
+                    }, 10);
                 });
                 
                 resultsContainer.appendChild(modeloItem);
