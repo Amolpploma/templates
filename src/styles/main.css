@@ -141,3 +141,22 @@ body.resizing .right-panel {
     pointer-events: none;
     opacity: 0.3;
 }
+
+/* Prevenir flash na transição entre abas - aplicado antes do DOMContentLoaded */
+html.left-panel-collapsed .left-panel {
+    width: 30px !important;
+    min-width: 30px !important;
+    position: relative;
+}
+
+html.right-panel-collapsed .right-panel {
+    width: 30px !important;
+    min-width: 30px !important;
+    position: relative;
+}
+
+/* Esconder conteúdo interno durante pré-inicialização */
+html.left-panel-collapsed .left-panel > *:not(.panel-header),
+html.right-panel-collapsed .right-panel > *:not(.panel-header) {
+    display: none;
+}

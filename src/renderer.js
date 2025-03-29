@@ -277,6 +277,9 @@ if (searchInput && searchResults) {
                     
                     // Remover a caixa do modelo
                     div.remove();
+                    
+                    // Atualizar visibilidade da textarea-editor
+                    window.updateTextareaEditorVisibility();
                 } catch (error) {
                     console.error('Erro ao inserir conteúdo no editor:', error);
                 }

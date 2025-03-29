@@ -1,6 +1,31 @@
 /**
  * Script para gerenciar a funcionalidade de colapsar/expandir painéis laterais
  */
+
+// Aplicar os estados colapsados imediatamente, antes do DOMContentLoaded
+(function() {
+    // Identificar a página atual
+    const body = document.body;
+    const isSearchPage = !body.hasAttribute('data-page');
+    const isEditorPage = body.getAttribute('data-page') === 'editor';
+    const pagePrefix = isSearchPage ? 'search_' : (isEditorPage ? 'editor_' : '');
+    
+    // Chaves localStorage específicas por página
+    const LEFT_PANEL_KEY = `${pagePrefix}leftPanelCollapsed`;
+    const RIGHT_PANEL_KEY = `${pagePrefix}rightPanelCollapsed`;
+    
+    // Aplicar classes de colapsado diretamente aos painéis no carregamento inicial
+    if (localStorage.getItem(LEFT_PANEL_KEY) === 'true') {
+        // Adicionar classe ao elemento <html> que será herdada pelos painéis
+        document.documentElement.classList.add('left-panel-collapsed');
+    }
+    
+    if (localStorage.getItem(RIGHT_PANEL_KEY) === 'true') {
+        // Adicionar classe ao elemento <html> que será herdada pelos painéis
+        document.documentElement.classList.add('right-panel-collapsed');
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     const leftPanel = document.querySelector('.left-panel');
     const rightPanel = document.querySelector('.right-panel');
@@ -142,12 +167,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (leftPanel && localStorage.getItem(LEFT_PANEL_KEY) === 'true') {
             leftPanel.classList.add('collapsed');
             if (resizerLeft) resizerLeft.classList.add('disabled');
+            // Remover classe de pré-carregamento
+            document.documentElement.classList.remove('left-panel-collapsed');
         }
         
         // Painel direito
         if (rightPanel && localStorage.getItem(RIGHT_PANEL_KEY) === 'true') {
             rightPanel.classList.add('collapsed');
             if (resizerRight) resizerRight.classList.add('disabled');
+            // Remover classe de pré-carregamento
+            document.documentElement.classList.remove('right-panel-collapsed');
         }
         
         // Recalcular layout inicial após um pequeno delay para garantir que o TinyMCE esteja pronto
