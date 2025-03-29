@@ -250,7 +250,7 @@
 
 .textarea-editor {
     flex: 1; /* Permite que a textarea cresça para ocupar o espaço disponível */
-    min-height: 200px; /* Altura mínima para a textarea */
+    /*min-height: 200px; /* Altura mínima para a textarea */
     padding: 10px;
     box-sizing: border-box;
     overflow-y: auto;
