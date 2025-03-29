@@ -50,3 +50,91 @@ body.resizing .right-panel {
     display: flex;
     overflow: hidden;
 }
+
+/* Estilos para botão de colapso */
+.collapse-panel-btn {
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: auto; /* Alinha à direita */
+    color: var(--text-secondary);
+}
+
+.collapse-panel-btn:hover {
+    background-color: var(--hover-color);
+}
+
+.collapse-panel-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Estados colapsados */
+.left-panel.collapsed {
+    width: 30px !important;
+    min-width: 30px !important;
+}
+
+.right-panel.collapsed {
+    width: 30px !important;
+    min-width: 30px !important;
+}
+
+/* Conteúdo oculto quando colapsado */
+.left-panel.collapsed .search-container,
+.left-panel.collapsed .search-refinements,
+.left-panel.collapsed #search-checklist-results,
+.right-panel.collapsed .search-container,
+.right-panel.collapsed .search-refinements,
+.right-panel.collapsed #search-results {
+    display: none;
+}
+
+/* Botão de expansão quando colapsado */
+.panel-expand-btn {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 5;
+    align-items: center;
+    justify-content: center;
+}
+
+.left-panel.collapsed .panel-expand-btn,
+.right-panel.collapsed .panel-expand-btn {
+    display: flex;
+}
+
+.panel-expand-btn:hover {
+    background-color: var(--hover-color);
+}
+
+.panel-expand-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--text-secondary);
+}
+
+/* Desativar resizers quando o painel está colapsado */
+#resizer-left.disabled,
+#resizer-right.disabled {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.3;
+}
