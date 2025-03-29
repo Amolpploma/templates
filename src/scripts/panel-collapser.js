@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recalculateLayout();
     }
     
-    // Função para recalcular layout do editor
+    // Função para recalcular layout do editor - modificada para evitar erros de inicialização
     function recalculateLayout() {
         if (!editorPanel) return;
         
@@ -96,9 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
         
         editorPanel.style.width = `${containerWidth - leftWidth - rightWidth}px`;
         
-        // Se o TinyMCE estiver inicializado, forçar redimensionamento
-        if (window.tinymce && tinymce.activeEditor) {
-            tinymce.activeEditor.execCommand('mceAutoResize');
+        // Verificar se o TinyMCE está inicializado e pronto para receber comandos
+        if (window.tinymce && tinymce.activeEditor && tinymce.activeEditor.initialized) {
+            try {
+                // Usar um método mais seguro para redimensionar - dispara o evento mas não tenta manipular a seleção
+                tinymce.activeEditor.fire('ResizeEditor');
+                
+                // Apenas se o editor tiver um estado de seleção válido, executar mceAutoResize
+                if (tinymce.activeEditor.selection && tinymce.activeEditor.selection.getContent() !== null) {
+                    setTimeout(() => {
+                        try {
+                            tinymce.activeEditor.execCommand('mceAutoResize');
+                        } catch(e) {
+                            console.log('Aviso: Não foi possível redimensionar o editor, mas isso não é um erro crítico.');
+                        }
+                    }, 100);
+                }
+            } catch(e) {
+                console.log('Aviso: TinyMCE não está completamente inicializado para redimensionamento.');
+            }
         }
     }
     
@@ -134,8 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (resizerRight) resizerRight.classList.add('disabled');
         }
         
-        // Recalcular layout inicial
-        recalculateLayout();
+        // Recalcular layout inicial após um pequeno delay para garantir que o TinyMCE esteja pronto
+        setTimeout(() => {
+            recalculateLayout();
+        }, 300);
         
         // Verificar se os botões de expansão estão corretamente visíveis
         setTimeout(() => {
