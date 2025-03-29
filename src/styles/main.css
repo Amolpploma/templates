@@ -100,13 +100,13 @@ body.resizing .right-panel {
     display: none;
 }
 
-/* Botão de expansão quando colapsado - revisado para ficar sempre visível no painel colapsado */
+/* Botão de expansão quando colapsado - centralizado verticalmente */
 .panel-expand-btn {
     display: none;
     position: absolute;
-    top: 10px; /* Posicionado no topo do painel */
+    top: 50%; /* Centralizado verticalmente */
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%); /* Centraliza tanto horizontal quanto verticalmente */
     width: 24px;
     height: 24px;
     background-color: var(--bg-element);
