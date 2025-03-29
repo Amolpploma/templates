@@ -19,7 +19,7 @@ window.createItemRow = function() {
                 </button>
                 <button class="checklist-item-btn paste" title="Associar modelo">
                     <svg viewBox="0 0 24 24">
-                        <path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/>
+                        <path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1-1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/>
                     </svg>
                 </button>
                 <button class="checklist-item-btn remove" title="Remover item">
@@ -144,8 +144,34 @@ const modelosManager = {
     }
 };
 
+// Função global para gerenciar altura da textarea-editor - corrigida
+window.updateTextareaEditorVisibility = function() {
+    const textareaEditor = document.querySelector('.textarea-editor');
+    if (!textareaEditor) return;
+    
+    // Verificar se há modelos na textarea
+    const hasModelos = textareaEditor.querySelectorAll('.modelo-box').length > 0;
+    
+    if (hasModelos) {
+        // Primeiro adicionar classe para tornar visível
+        textareaEditor.classList.add('has-content');
+        
+        // Calcular e definir altura de forma direta - sem transições
+        const totalHeight = Array.from(textareaEditor.children)
+            .reduce((sum, child) => sum + child.offsetHeight, 0) + 40; // +40 para padding
+            
+        // Limitar a 50% da altura da viewport
+        const maxHeight = Math.floor(window.innerHeight * 0.5);
+        textareaEditor.style.maxHeight = `${Math.min(totalHeight, maxHeight)}px`;
+    } else {
+        // Se não houver modelos, esconder completamente
+        textareaEditor.classList.remove('has-content');
+        textareaEditor.style.maxHeight = '0px';
+    }
+};
+
 // Função global para inserir modelo
-window.inserirModelo = async function(texto, nome, modeloId = '') {
+window.inserirModelo = function(texto, nome, modeloId) {
     if (!modeloId) return;
 
     modelosManager.log(`Iniciando processo de inserção do modelo ${modeloId}`);
@@ -161,6 +187,9 @@ window.inserirModelo = async function(texto, nome, modeloId = '') {
     const modeloBox = createModeloBox(texto, nome, modeloId);
     editor.appendChild(modeloBox);
     modelosManager.adicionar(modeloId, modeloBox, editor);
+    
+    // Atualizar visibilidade e altura
+    window.updateTextareaEditorVisibility();
 };
 
 // Função global para verificar modelo

@@ -16,11 +16,17 @@
     height: 100%;
     padding: 10px;
     background-color: var(--panel-bg);
-    display: grid;
-    grid-template-rows: min-content auto 8px 1fr;
-    gap: 5px;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
+    gap: 5px;
     box-sizing: border-box;
+}
+
+/* Ajuste para editor inputs (área superior) */
+.editor-inputs {
+    margin-bottom: 10px;
+    flex-shrink: 0; /* Impede que os inputs encolham */
 }
 
 /* Estilo específico para página de edição */

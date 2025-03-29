@@ -294,8 +294,11 @@ if (searchInput && searchResults) {
 
         closeBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
-            // Simplesmente remove a caixa sem afetar nenhuma linha
+            // Remove a caixa
             div.remove();
+            
+            // Atualizar visibilidade da textarea-editor
+            window.updateTextareaEditorVisibility();
         });
 
         return div;

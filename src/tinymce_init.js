@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
             menubar: false,
             statusbar: true,
             elementpath: false,
+            height: '100%',
+            min_height: 200,
+            resize: true, // Mantém a opção de resize
+            autoresize_bottom_margin: 20,
+            autoresize_overflow_padding: 10,
             // Remover 'insertmodelo' da toolbar
             toolbar: isSearchPage 
                 ? `editnewmodel|${defaultToolbar}` 
