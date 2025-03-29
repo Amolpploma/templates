@@ -55,3 +55,31 @@ html.ready {
     background-color: #1e1e1e !important;
     color: #ffffff !important;
 }
+
+/* Estilos básicos de pré-carregamento para antes que o CSS principal carregue */
+html {
+    visibility: visible;
+}
+
+/* Estilos de painel colapsado aplicados ANTES do carregamento completo da página */
+html.left-panel-collapsed .left-panel {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important; /* Adicionado para garantir largura fixa */
+    position: relative;
+    overflow: hidden !important;
+}
+
+html.right-panel-collapsed .right-panel {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important; /* Adicionado para garantir largura fixa */
+    position: relative;
+    overflow: hidden !important;
+}
+
+/* Ocultar completamente o conteúdo interno durante o carregamento */
+html.left-panel-collapsed .left-panel > *,
+html.right-panel-collapsed .right-panel > * {
+    opacity: 0;
+}

@@ -2,30 +2,6 @@
  * Script para gerenciar a funcionalidade de colapsar/expandir painéis laterais
  */
 
-// Aplicar os estados colapsados imediatamente, antes do DOMContentLoaded
-(function() {
-    // Identificar a página atual
-    const body = document.body;
-    const isSearchPage = !body.hasAttribute('data-page');
-    const isEditorPage = body.getAttribute('data-page') === 'editor';
-    const pagePrefix = isSearchPage ? 'search_' : (isEditorPage ? 'editor_' : '');
-    
-    // Chaves localStorage específicas por página
-    const LEFT_PANEL_KEY = `${pagePrefix}leftPanelCollapsed`;
-    const RIGHT_PANEL_KEY = `${pagePrefix}rightPanelCollapsed`;
-    
-    // Aplicar classes de colapsado diretamente aos painéis no carregamento inicial
-    if (localStorage.getItem(LEFT_PANEL_KEY) === 'true') {
-        // Adicionar classe ao elemento <html> que será herdada pelos painéis
-        document.documentElement.classList.add('left-panel-collapsed');
-    }
-    
-    if (localStorage.getItem(RIGHT_PANEL_KEY) === 'true') {
-        // Adicionar classe ao elemento <html> que será herdada pelos painéis
-        document.documentElement.classList.add('right-panel-collapsed');
-    }
-})();
-
 document.addEventListener('DOMContentLoaded', () => {
     const leftPanel = document.querySelector('.left-panel');
     const rightPanel = document.querySelector('.right-panel');
@@ -163,45 +139,53 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Restaurar estado dos painéis do localStorage e garantir visibilidade dos botões
     function restorePanelStates() {
-        // Painel esquerdo
-        if (leftPanel && localStorage.getItem(LEFT_PANEL_KEY) === 'true') {
-            leftPanel.classList.add('collapsed');
-            if (resizerLeft) resizerLeft.classList.add('disabled');
-            // Remover classe de pré-carregamento
+        const leftCollapsed = localStorage.getItem(LEFT_PANEL_KEY) === 'true';
+        const rightCollapsed = localStorage.getItem(RIGHT_PANEL_KEY) === 'true';
+        
+        // Ajustar estados dos painéis conforme localStorage (sem transições)
+        if (leftPanel) {
+            // Apenas adicionar classe se ainda não foi adicionada pelo preload
+            if (leftCollapsed && !leftPanel.classList.contains('collapsed')) {
+                leftPanel.classList.add('collapsed');
+            }
+            
+            if (resizerLeft) {
+                resizerLeft.classList.toggle('disabled', leftCollapsed);
+            }
+            
+            // Remover classe do HTML - o painel específico já tem a classe agora
             document.documentElement.classList.remove('left-panel-collapsed');
         }
         
-        // Painel direito
-        if (rightPanel && localStorage.getItem(RIGHT_PANEL_KEY) === 'true') {
-            rightPanel.classList.add('collapsed');
-            if (resizerRight) resizerRight.classList.add('disabled');
-            // Remover classe de pré-carregamento
+        if (rightPanel) {
+            // Apenas adicionar classe se ainda não foi adicionada pelo preload
+            if (rightCollapsed && !rightPanel.classList.contains('collapsed')) {
+                rightPanel.classList.add('collapsed');
+            }
+            
+            if (resizerRight) {
+                resizerRight.classList.toggle('disabled', rightCollapsed);
+            }
+            
+            // Remover classe do HTML - o painel específico já tem a classe agora
             document.documentElement.classList.remove('right-panel-collapsed');
         }
         
-        // Recalcular layout inicial após um pequeno delay para garantir que o TinyMCE esteja pronto
-        setTimeout(() => {
-            recalculateLayout();
-        }, 300);
+        // Mostrar o conteúdo do painel novamente (que estava oculto no preload)
+        if (leftPanel) {
+            Array.from(leftPanel.children).forEach(child => {
+                child.style.opacity = '';
+            });
+        }
         
-        // Verificar se os botões de expansão estão corretamente visíveis
-        setTimeout(() => {
-            if (leftPanel && leftPanel.classList.contains('collapsed')) {
-                const leftBtn = document.getElementById('left-expand-btn');
-                if (leftBtn) {
-                    console.log('Botão de expansão esquerdo após colapso:', 
-                                getComputedStyle(leftBtn).display);
-                }
-            }
-            
-            if (rightPanel && rightPanel.classList.contains('collapsed')) {
-                const rightBtn = document.getElementById('right-expand-btn');
-                if (rightBtn) {
-                    console.log('Botão de expansão direito após colapso:', 
-                                getComputedStyle(rightBtn).display);
-                }
-            }
-        }, 100);
+        if (rightPanel) {
+            Array.from(rightPanel.children).forEach(child => {
+                child.style.opacity = '';
+            });
+        }
+        
+        // Recalcular layout com delay para garantir que as dimensões foram aplicadas
+        setTimeout(recalculateLayout, 0);
     }
     
     // Restaurar estados no carregamento
