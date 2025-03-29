@@ -81,11 +81,13 @@ body.resizing .right-panel {
 .left-panel.collapsed {
     width: 30px !important;
     min-width: 30px !important;
+    position: relative; /* Garantir que é um contêiner para posicionamento absoluto */
 }
 
 .right-panel.collapsed {
     width: 30px !important;
     min-width: 30px !important;
+    position: relative; /* Garantir que é um contêiner para posicionamento absoluto */
 }
 
 /* Conteúdo oculto quando colapsado */
@@ -98,27 +100,28 @@ body.resizing .right-panel {
     display: none;
 }
 
-/* Botão de expansão quando colapsado */
+/* Botão de expansão quando colapsado - revisado para ficar sempre visível no painel colapsado */
 .panel-expand-btn {
     display: none;
     position: absolute;
-    top: 50%;
+    top: 10px; /* Posicionado no topo do painel */
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     width: 24px;
     height: 24px;
     background-color: var(--bg-element);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: pointer;
-    z-index: 5;
+    z-index: 99; /* Aumentado para garantir que fique acima de outros elementos */
     align-items: center;
     justify-content: center;
 }
 
-.left-panel.collapsed .panel-expand-btn,
-.right-panel.collapsed .panel-expand-btn {
-    display: flex;
+/* Sempre exibir o botão de expansão quando o painel estiver colapsado */
+.left-panel.collapsed > .panel-expand-btn,
+.right-panel.collapsed > .panel-expand-btn {
+    display: flex !important;
 }
 
 .panel-expand-btn:hover {
