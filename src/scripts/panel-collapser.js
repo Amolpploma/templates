@@ -120,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (isCollapsed) {
                 leftPanel.classList.add('collapsed');
+                leftPanel.style.width = '30px';
+                leftPanel.style.minWidth = '30px';
+                
                 if (resizerLeft) resizerLeft.classList.add('disabled');
                 
                 // Garantir que o botão de expansão esteja visível
@@ -130,6 +133,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     expandBtn.style.justifyContent = 'center';
                     console.log('Botão de expansão esquerdo configurado como visível');
                 }
+            } else {
+                // Se não estiver colapsado, garantir as larguras mínimas corretas
+                leftPanel.style.minWidth = '225px';
+                leftPanel.style.width = ''; // Deixar o CSS determinar a largura padrão
             }
             
             // Remover classe do HTML
@@ -142,6 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (isCollapsed) {
                 rightPanel.classList.add('collapsed');
+                rightPanel.style.width = '30px';
+                rightPanel.style.minWidth = '30px';
+                
                 if (resizerRight) resizerRight.classList.add('disabled');
                 
                 // Garantir que o botão de expansão esteja visível
@@ -152,6 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     expandBtn.style.justifyContent = 'center';
                     console.log('Botão de expansão direito configurado como visível');
                 }
+            } else {
+                // Se não estiver colapsado, garantir as larguras mínimas corretas
+                rightPanel.style.minWidth = '315px';
+                rightPanel.style.width = ''; // Deixar o CSS determinar a largura padrão
             }
             
             // Remover classe do HTML
@@ -183,8 +197,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 expandBtn.style.alignItems = 'center';
                 expandBtn.style.justifyContent = 'center';
             }
-            
-            console.log(`Botão de expansão esquerdo definido como ${isCollapsed ? 'visível' : 'oculto'}`);
+        }
+        
+        // Aplicar estilos diferentes dependendo do estado
+        if (isCollapsed) {
+            leftPanel.style.width = '30px';
+            leftPanel.style.minWidth = '30px';
+        } else {
+            // Ao expandir, remover todos os estilos inline de largura e deixar o CSS tomar conta
+            leftPanel.style.width = '';
+            leftPanel.style.minWidth = '225px'; // Forçar esta largura mínima
         }
         
         // Ajustar layout
@@ -212,8 +234,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 expandBtn.style.alignItems = 'center';
                 expandBtn.style.justifyContent = 'center';
             }
-            
-            console.log(`Botão de expansão direito definido como ${isCollapsed ? 'visível' : 'oculto'}`);
+        }
+        
+        // Aplicar estilos diferentes dependendo do estado
+        if (isCollapsed) {
+            rightPanel.style.width = '30px';
+            rightPanel.style.minWidth = '30px';
+        } else {
+            // Ao expandir, remover todos os estilos inline de largura e deixar o CSS tomar conta
+            rightPanel.style.width = '';
+            rightPanel.style.minWidth = '315px'; // Forçar esta largura mínima
         }
         
         // Ajustar layout

@@ -1,7 +1,6 @@
 .left-panel,
 .right-panel {
     width: 30%;
-    min-width: 200px;
     height: 100%;
     padding: 10px;
     background-color: var(--panel-bg);
@@ -10,9 +9,17 @@
     overflow: hidden; /* Alterado de auto para hidden */
 }
 
+.left-panel {
+    min-width: 225px;
+}
+
+.right-panel {
+    min-width: 315px;
+}
+
 .editor-panel {
     width: 40%;
-    min-width: 400px;
+    min-width: 428px;
     height: 100%;
     padding: 10px;
     background-color: var(--panel-bg);
