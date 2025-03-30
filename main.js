@@ -1,7 +1,7 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, globalShortcut, ipcMain, dialog, nativeTheme } = require('electron')
+const { app, BrowserWindow, globalShortcut, ipcMain, dialog, nativeTheme, Menu, MenuItem } = require('electron')
 const path = require('node:path')
 const fs = require('fs')
 let store;
@@ -126,7 +126,35 @@ function createWindow(page = 'index.html') {
             sandbox: false,
             enableRemoteModule: false,
             devTools: true,
-            preload: path.join(__dirname, 'preload.js')  // Caminho atualizado para a raiz
+            preload: path.join(__dirname, 'preload.js'),  // Caminho atualizado para a raiz
+            spellcheck: true, // Habilitar corretor ortográfico
+            spellcheckLanguages: ['pt-BR'],
+        }
+    });
+
+    mainWindow.webContents.session.setSpellCheckerLanguages(['pt-BR']); // Configurar o idioma do corretor ortográfico
+
+    mainWindow.webContents.on('context-menu', (event, params) => {
+        if (params.misspelledWord) {
+            const menu = new Menu();
+            
+            for (const suggestion of params.dictionarySuggestions) {
+                menu.append(new MenuItem({
+                    label: suggestion,
+                    click: () => mainWindow.webContents.replaceMisspelling(suggestion)
+                }));
+            }
+            
+            if (params.dictionarySuggestions.length > 0) {
+                menu.append(new MenuItem({ type: 'separator' }));
+            }
+            
+            menu.append(new MenuItem({
+                label: 'Adicionar ao dicionário',
+                click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
+            }));
+            
+            menu.popup();
         }
     });
 
