@@ -1,6 +1,7 @@
 .left-panel,
 .right-panel {
-    width: 30%;
+    /*width: 30%;*/
+    width: 400px;
     height: 100%;
     padding: 10px;
     background-color: var(--panel-bg);
@@ -11,7 +12,7 @@
 
 .left-panel {
     min-width: 225px;
-    max-width: 400px; /* Adicionar largura máxima */
+    max-width: 500px; /* Adicionar largura máxima */
 }
 
 .right-panel {
@@ -53,6 +54,6 @@ body[data-page="editor"] .editor-panel {
 
 body[data-page="editor"] .right-panel {
     min-width: 336px;
-    width: 35%; /* Ajustado para complementar o editor-panel */
+    /*width: 35%; /* Ajustado para complementar o editor-panel */
     max-width: none; /* Removido limite máximo */
 }

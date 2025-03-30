@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const maxSizes = {
-        left: 400,
+        left: 500,
         right: 500
     };
 
