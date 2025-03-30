@@ -1,7 +1,7 @@
 .left-panel,
 .right-panel {
-    width: 30%;
-    min-width: 200px;
+    /*width: 30%;*/
+    width: 400px;
     height: 100%;
     padding: 10px;
     background-color: var(--panel-bg);
@@ -10,17 +10,33 @@
     overflow: hidden; /* Alterado de auto para hidden */
 }
 
+.left-panel {
+    min-width: 225px;
+    max-width: 500px; /* Adicionar largura máxima */
+}
+
+.right-panel {
+    min-width: 315px;
+    max-width: 500px; /* Adicionar largura máxima */
+}
+
 .editor-panel {
     width: 40%;
-    min-width: 400px;
+    min-width: 428px;
     height: 100%;
     padding: 10px;
     background-color: var(--panel-bg);
-    display: grid;
-    grid-template-rows: min-content auto 8px 1fr;
-    gap: 5px;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
+    gap: 5px;
     box-sizing: border-box;
+}
+
+/* Ajuste para editor inputs (área superior) */
+.editor-inputs {
+    margin-bottom: 10px;
+    flex-shrink: 0; /* Impede que os inputs encolham */
 }
 
 /* Estilo específico para página de edição */
@@ -38,6 +54,6 @@ body[data-page="editor"] .editor-panel {
 
 body[data-page="editor"] .right-panel {
     min-width: 336px;
-    width: 35%; /* Ajustado para complementar o editor-panel */
+    /*width: 35%; /* Ajustado para complementar o editor-panel */
     max-width: none; /* Removido limite máximo */
 }

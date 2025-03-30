@@ -50,3 +50,89 @@ body.resizing .right-panel {
     display: flex;
     overflow: hidden;
 }
+
+/* Estilos para botão de colapso */
+.collapse-panel-btn {
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: auto; /* Alinha à direita */
+    color: var(--text-secondary);
+}
+
+.collapse-panel-btn:hover {
+    background-color: var(--hover-color);
+}
+
+.collapse-panel-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Estados colapsados */
+.left-panel.collapsed {
+    width: 30px !important;
+    min-width: 30px !important;
+    position: relative; /* Garantir que é um contêiner para posicionamento absoluto */
+}
+
+.right-panel.collapsed {
+    width: 30px !important;
+    min-width: 30px !important;
+    position: relative; /* Garantir que é um contêiner para posicionamento absoluto */
+}
+
+/* Conteúdo oculto quando colapsado */
+.left-panel.collapsed .search-container,
+.left-panel.collapsed .search-refinements,
+.left-panel.collapsed #search-checklist-results,
+.right-panel.collapsed .search-container,
+.right-panel.collapsed .search-refinements,
+.right-panel.collapsed #search-results {
+    display: none;
+}
+
+/* Botão de expansão quando colapsado - centralizado verticalmente */
+.panel-expand-btn {
+    position: absolute;
+    top: 50%; /* Centralizado verticalmente */
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centraliza tanto horizontal quanto verticalmente */
+    width: 24px;
+    height: 24px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 2000; /* Aumentado para garantir que fique acima de outros elementos */
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto !important; /* Garantir interação mesmo se o pai estiver com pointer-events: none */
+    
+    /* Remover display: none - o display será gerenciado via JavaScript */
+}
+
+/* Este seletor não é mais necessário pois o display será controlado via JavaScript 
+.left-panel.collapsed .panel-expand-btn,
+.right-panel.collapsed .panel-expand-btn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+*/
+
+/* Desativar resizers quando o painel está colapsado */
+#resizer-left.disabled,
+#resizer-right.disabled {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.3;
+}

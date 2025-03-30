@@ -50,6 +50,9 @@
           <input type="checkbox" id="checklist-etiqueta">
           <label for="checklist-etiqueta">etiqueta</label>
         </div>
+        <button class="collapse-panel-btn" data-target="left" title="Colapsar painel">
+          <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+        </button>
       </div>
       <div id="search-checklist-results"></div>
     </div>
@@ -82,6 +85,9 @@
           <input type="checkbox" id="modelo-conteudo">
           <label for="modelo-conteudo">conteúdo</label>
         </div>
+        <button class="collapse-panel-btn" data-target="right" title="Colapsar painel">
+          <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+        </button>
       </div>
       <div id="search-results"></div>
     </div>
@@ -103,6 +109,7 @@
     <button id="close-db" class="status-close-btn" title="Fechar banco de dados">×</button>
   </div>
   <script src="scripts/status-bar.js"></script>
+  <script src="scripts/panel-collapser.js"></script>
 </body>
 
 </html>
