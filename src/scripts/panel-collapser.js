@@ -180,6 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function toggleLeftPanel() {
         if (!leftPanel) return;
         
+        // Salvar larguras iniciais dos painéis
+        const initialLeftWidth = leftPanel.offsetWidth;
+        const initialEditorWidth = editorPanel.offsetWidth;
+        const initialRightWidth = rightPanel ? rightPanel.offsetWidth : 0;
+        
         const isCollapsed = leftPanel.classList.toggle('collapsed');
         localStorage.setItem(LEFT_PANEL_KEY, isCollapsed ? 'true' : 'false');
         
@@ -201,21 +206,43 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Aplicar estilos diferentes dependendo do estado
         if (isCollapsed) {
+            // Colapsar: salvar a largura antiga para restaurá-la depois
+            const oldWidth = leftPanel.style.width;
+            leftPanel.setAttribute('data-old-width', oldWidth);
+            
             leftPanel.style.width = '30px';
             leftPanel.style.minWidth = '30px';
+            
+            // Aumentar apenas a largura do editor, mantendo o painel direito inalterado
+            editorPanel.style.width = `${initialEditorWidth + (initialLeftWidth - 30)}px`;
         } else {
-            // Ao expandir, remover todos os estilos inline de largura e deixar o CSS tomar conta
-            leftPanel.style.width = '';
-            leftPanel.style.minWidth = '225px'; // Forçar esta largura mínima
+            // Expandir: restaurar largura anterior ou usar padrão
+            const oldWidth = leftPanel.getAttribute('data-old-width');
+            
+            if (oldWidth && oldWidth !== '30px') {
+                leftPanel.style.width = oldWidth;
+            } else {
+                leftPanel.style.width = '';
+                leftPanel.style.minWidth = '225px';
+            }
+            
+            // Reduzir apenas a largura do editor, mantendo o painel direito inalterado
+            const currentLeftWidth = leftPanel.offsetWidth;
+            editorPanel.style.width = `${initialEditorWidth - (currentLeftWidth - 30)}px`;
         }
         
-        // Ajustar layout
-        recalculateLayout();
+        // Ajustar layout após pequeno delay para garantir que as alterações CSS foram aplicadas
+        setTimeout(recalculateLayout, 10);
     }
     
     // Função para colapsar/expandir painel direito
     function toggleRightPanel() {
         if (!rightPanel) return;
+        
+        // Salvar larguras iniciais dos painéis
+        const initialLeftWidth = leftPanel ? leftPanel.offsetWidth : 0;
+        const initialEditorWidth = editorPanel.offsetWidth;
+        const initialRightWidth = rightPanel.offsetWidth;
         
         const isCollapsed = rightPanel.classList.toggle('collapsed');
         localStorage.setItem(RIGHT_PANEL_KEY, isCollapsed ? 'true' : 'false');
@@ -238,16 +265,33 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Aplicar estilos diferentes dependendo do estado
         if (isCollapsed) {
+            // Colapsar: salvar a largura antiga para restaurá-la depois
+            const oldWidth = rightPanel.style.width;
+            rightPanel.setAttribute('data-old-width', oldWidth);
+            
             rightPanel.style.width = '30px';
             rightPanel.style.minWidth = '30px';
+            
+            // Aumentar apenas a largura do editor, mantendo o painel esquerdo inalterado
+            editorPanel.style.width = `${initialEditorWidth + (initialRightWidth - 30)}px`;
         } else {
-            // Ao expandir, remover todos os estilos inline de largura e deixar o CSS tomar conta
-            rightPanel.style.width = '';
-            rightPanel.style.minWidth = '315px'; // Forçar esta largura mínima
+            // Expandir: restaurar largura anterior ou usar padrão
+            const oldWidth = rightPanel.getAttribute('data-old-width');
+            
+            if (oldWidth && oldWidth !== '30px') {
+                rightPanel.style.width = oldWidth;
+            } else {
+                rightPanel.style.width = '';
+                rightPanel.style.minWidth = '315px';
+            }
+            
+            // Reduzir apenas a largura do editor, mantendo o painel esquerdo inalterado
+            const currentRightWidth = rightPanel.offsetWidth;
+            editorPanel.style.width = `${initialEditorWidth - (currentRightWidth - 30)}px`;
         }
         
-        // Ajustar layout
-        recalculateLayout();
+        // Ajustar layout após pequeno delay para garantir que as alterações CSS foram aplicadas
+        setTimeout(recalculateLayout, 10);
     }
     
     // Função para recalcular layout do editor - modificada para evitar erros de inicialização
@@ -255,10 +299,45 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!editorPanel) return;
         
         const containerWidth = document.querySelector('.container').offsetWidth;
-        const leftWidth = leftPanel ? (leftPanel.classList.contains('collapsed') ? 30 : leftPanel.offsetWidth) : 0;
-        const rightWidth = rightPanel ? (rightPanel.classList.contains('collapsed') ? 30 : rightPanel.offsetWidth) : 0;
         
-        editorPanel.style.width = `${containerWidth - leftWidth - rightWidth}px`;
+        // Determinar larguras atuais e estados
+        const leftWidth = leftPanel ? leftPanel.offsetWidth : 0;
+        const rightWidth = rightPanel ? rightPanel.offsetWidth : 0;
+        const leftCollapsed = leftPanel && leftPanel.classList.contains('collapsed');
+        const rightCollapsed = rightPanel && rightPanel.classList.contains('collapsed');
+        
+        // Calcular a largura que o editor deve ter
+        let editorWidth = containerWidth - leftWidth - rightWidth;
+        
+        // Garantir que o editor tenha pelo menos a largura mínima
+        const minEditorWidth = 428; // Mesmo valor do CSS
+        if (editorWidth < minEditorWidth && containerWidth >= minEditorWidth) {
+            // Se o editor ficar menor que o mínimo, ajustar os painéis laterais proporcionalmente
+            const totalSideWidth = leftWidth + rightWidth;
+            const excessWidth = minEditorWidth - editorWidth;
+            
+            // Distribuir o excesso proporcionalmente entre os painéis laterais não colapsados
+            if (!leftCollapsed && !rightCollapsed) {
+                // Ambos painéis não colapsados, dividir proporcionalmente
+                const leftRatio = leftWidth / totalSideWidth;
+                const rightRatio = rightWidth / totalSideWidth;
+                
+                if (leftPanel) leftPanel.style.width = `${leftWidth - (excessWidth * leftRatio)}px`;
+                if (rightPanel) rightPanel.style.width = `${rightWidth - (excessWidth * rightRatio)}px`;
+            } else if (!leftCollapsed) {
+                // Apenas o painel esquerdo não está colapsado
+                if (leftPanel) leftPanel.style.width = `${leftWidth - excessWidth}px`;
+            } else if (!rightCollapsed) {
+                // Apenas o painel direito não está colapsado
+                if (rightPanel) rightPanel.style.width = `${rightWidth - excessWidth}px`;
+            }
+            
+            // Recalcular a largura do editor
+            editorWidth = minEditorWidth;
+        }
+        
+        // Aplicar a largura calculada do editor
+        editorPanel.style.width = `${editorWidth}px`;
         
         // Verificar se o TinyMCE está inicializado e pronto para receber comandos
         if (window.tinymce && tinymce.activeEditor && tinymce.activeEditor.initialized) {

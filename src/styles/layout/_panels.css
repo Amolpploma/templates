@@ -11,10 +11,12 @@
 
 .left-panel {
     min-width: 225px;
+    max-width: 400px; /* Adicionar largura máxima */
 }
 
 .right-panel {
     min-width: 315px;
+    max-width: 500px; /* Adicionar largura máxima */
 }
 
 .editor-panel {
