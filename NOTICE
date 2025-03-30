@@ -1,0 +1,90 @@
+# NOTICE - Aviso de Licenças de Terceiros
+
+Este arquivo contém informações sobre as bibliotecas e recursos de terceiros usados neste projeto,
+suas respectivas licenças e avisos de copyright.
+
+## Dependências de Produção
+
+### electron-squirrel-startup
+- Licença: MIT
+- Repositório: https://github.com/mongodb-js/electron-squirrel-startup
+- Copyright (c) 2016 MongoDB Inc.
+
+### electron-store
+- Licença: MIT
+- Repositório: https://github.com/sindresorhus/electron-store
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+
+### jsdom
+- Licença: MIT
+- Repositório: https://github.com/jsdom/jsdom
+Copyright (c) 2010 Elijah Insua
+
+### sqlite3
+- Licença: MIT
+- Repositório: https://github.com/TryGhost/node-sqlite3
+Copyright (c) MapBox
+
+## Dependências de Desenvolvimento
+
+### electron
+- Licença: MIT
+- Repositório: https://github.com/electron/electron
+Copyright (c) Electron contributors
+Copyright (c) GitHub Inc.
+
+### @electron-forge/cli
+- Licença: MIT
+- Repositório: https://github.com/electron-forge/electron-forge
+Copyright (c) 2016 Samuel Attard
+
+### @electron-forge/maker-deb
+- Licença: MIT
+- Repositório: https://github.com/electron-forge/electron-forge
+Copyright (c) 2016 Samuel Attard
+
+### @electron-forge/maker-rpm
+- Licença: MIT
+- Repositório: https://github.com/electron-forge/electron-forge
+Copyright (c) 2016 Samuel Attard
+
+### @electron-forge/maker-squirrel
+- Licença: MIT
+- Repositório: https://github.com/electron-forge/electron-forge
+Copyright (c) 2016 Samuel Attard
+
+### @electron-forge/maker-zip
+- Licença: MIT
+- Repositório: https://github.com/electron-forge/electron-forge
+Copyright (c) 2016 Samuel Attard
+
+### @electron-forge/plugin-auto-unpack-natives
+- Licença: MIT
+- Repositório: https://github.com/electron-forge/electron-forge
+Copyright (c) 2016 Samuel Attard
+
+### @electron-forge/plugin-fuses
+- Licença: MIT
+- Repositório: https://github.com/electron-forge/electron-forge
+Copyright (c) 2016 Samuel Attard
+
+### @electron/fuses
+- Licença: MIT
+- Repositório: https://github.com/electron/fuses
+Copyright (c) 2022 Electron Contributors
+
+## Outros Recursos
+
+### TinyMCE
+- Licença: LGPL-2.1
+- Website: https://www.tiny.cloud
+Copyright (c) Tiny Technologies, Inc.
+
+## Aviso de Licença
+
+Este projeto é licenciado sob os termos da licença GPL-3.0.
+Todas as dependências listadas acima são compatíveis com esta licença.
+
+Para o texto completo das licenças MIT e GPL-3.0, consulte:
+- MIT: https://opensource.org/licenses/MIT
+- GPL-3.0: https://www.gnu.org/licenses/gpl-3.0.html
