@@ -1,8 +1,9 @@
 /**
  * Script para gerenciar a funcionalidade de colapsar/expandir painéis laterais
  */
-
 document.addEventListener('DOMContentLoaded', () => {
+    // Remover estilos críticos - isso deve ser feito depois de criar os botões
+    // para evitar problemas de visibilidade
     const leftPanel = document.querySelector('.left-panel');
     const rightPanel = document.querySelector('.right-panel');
     const editorPanel = document.querySelector('.editor-panel');
@@ -18,41 +19,147 @@ document.addEventListener('DOMContentLoaded', () => {
     const LEFT_PANEL_KEY = `${pagePrefix}leftPanelCollapsed`;
     const RIGHT_PANEL_KEY = `${pagePrefix}rightPanelCollapsed`;
     
-    // Adicionar botões de expansão aos painéis colapsáveis - modificado para garantir visibilidade
-    if (leftPanel) {
-        // Remover qualquer botão de expansão existente para evitar duplicação
-        const existingBtn = leftPanel.querySelector('.panel-expand-btn');
-        if (existingBtn) {
-            existingBtn.remove();
+    // IMPORTANTE: Criar os botões imediatamente, antes de qualquer outra operação
+    createExpandButtons();
+    
+    // Agora podemos remover os estilos críticos
+    const criticalLeftStyle = document.getElementById('critical-panel-styles-left');
+    const criticalRightStyle = document.getElementById('critical-panel-styles-right');
+    
+    if (criticalLeftStyle) criticalLeftStyle.remove();
+    if (criticalRightStyle) criticalRightStyle.remove();
+    
+    // Função para criar botões de expansão com estilos inline para garantir visibilidade
+    function createExpandButtons() {
+        console.log('Criando botões de expansão');
+        
+        // Criar botão para o painel esquerdo
+        if (leftPanel) {
+            // Remover qualquer botão existente para evitar duplicação
+            const existingBtn = leftPanel.querySelector('.panel-expand-btn');
+            if (existingBtn) existingBtn.remove();
+            
+            const expandBtn = document.createElement('button');
+            expandBtn.className = 'panel-expand-btn';
+            expandBtn.id = 'left-expand-btn';
+            expandBtn.title = 'Expandir painel';
+            expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg>';
+            expandBtn.setAttribute('data-target', 'left');
+            
+            // Aplicar estilos inline para garantir visibilidade mesmo antes do CSS ser carregado
+            expandBtn.style.position = 'absolute';
+            expandBtn.style.top = '50%';
+            expandBtn.style.left = '50%';
+            expandBtn.style.transform = 'translate(-50%, -50%)';
+            expandBtn.style.width = '24px';
+            expandBtn.style.height = '24px';
+            expandBtn.style.zIndex = '2000';
+            expandBtn.style.background = 'var(--bg-element, #ffffff)';
+            expandBtn.style.border = '1px solid var(--border-color, #cccccc)';
+            expandBtn.style.borderRadius = '4px';
+            expandBtn.style.cursor = 'pointer';
+            expandBtn.style.display = 'none';  // Inicialmente oculto, será mostrado se necessário
+            
+            // Adicionar ao DOM
+            leftPanel.appendChild(expandBtn);
+            console.log('Botão de expansão esquerdo criado:', expandBtn);
+            
+            // Verificar imediatamente se o painel está colapsado
+            if (localStorage.getItem(LEFT_PANEL_KEY) === 'true') {
+                expandBtn.style.display = 'flex';
+                console.log('Botão de expansão esquerdo definido como visível');
+            }
         }
         
-        const expandBtn = document.createElement('button');
-        expandBtn.className = 'panel-expand-btn';
-        expandBtn.id = 'left-expand-btn'; // ID específico para facilitar depuração
-        expandBtn.title = 'Expandir painel';
-        expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg>';
-        expandBtn.setAttribute('data-target', 'left');
-        leftPanel.appendChild(expandBtn);
-        
-        console.log('Botão de expansão esquerdo adicionado:', expandBtn);
+        // Criar botão para o painel direito
+        if (rightPanel) {
+            // Remover qualquer botão existente para evitar duplicação
+            const existingBtn = rightPanel.querySelector('.panel-expand-btn');
+            if (existingBtn) existingBtn.remove();
+            
+            const expandBtn = document.createElement('button');
+            expandBtn.className = 'panel-expand-btn';
+            expandBtn.id = 'right-expand-btn';
+            expandBtn.title = 'Expandir painel';
+            expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"></path></svg>';
+            expandBtn.setAttribute('data-target', 'right');
+            
+            // Aplicar estilos inline para garantir visibilidade mesmo antes do CSS ser carregado
+            expandBtn.style.position = 'absolute';
+            expandBtn.style.top = '50%';
+            expandBtn.style.left = '50%';
+            expandBtn.style.transform = 'translate(-50%, -50%)';
+            expandBtn.style.width = '24px';
+            expandBtn.style.height = '24px';
+            expandBtn.style.zIndex = '2000';
+            expandBtn.style.background = 'var(--bg-element, #ffffff)';
+            expandBtn.style.border = '1px solid var(--border-color, #cccccc)';
+            expandBtn.style.borderRadius = '4px';
+            expandBtn.style.cursor = 'pointer';
+            expandBtn.style.display = 'none';  // Inicialmente oculto, será mostrado se necessário
+            
+            // Adicionar ao DOM
+            rightPanel.appendChild(expandBtn);
+            console.log('Botão de expansão direito criado:', expandBtn);
+            
+            // Verificar imediatamente se o painel está colapsado
+            if (localStorage.getItem(RIGHT_PANEL_KEY) === 'true') {
+                expandBtn.style.display = 'flex';
+                console.log('Botão de expansão direito definido como visível');
+            }
+        }
     }
     
-    if (rightPanel) {
-        // Remover qualquer botão de expansão existente para evitar duplicação
-        const existingBtn = rightPanel.querySelector('.panel-expand-btn');
-        if (existingBtn) {
-            existingBtn.remove();
+    // Função para aplicar estados colapsados aos painéis
+    function restorePanelStates() {
+        console.log('Restaurando estados dos painéis');
+        
+        // Aplicar estado do painel esquerdo
+        if (leftPanel) {
+            const isCollapsed = localStorage.getItem(LEFT_PANEL_KEY) === 'true';
+            
+            if (isCollapsed) {
+                leftPanel.classList.add('collapsed');
+                if (resizerLeft) resizerLeft.classList.add('disabled');
+                
+                // Garantir que o botão de expansão esteja visível
+                const expandBtn = document.getElementById('left-expand-btn');
+                if (expandBtn) {
+                    expandBtn.style.display = 'flex';
+                    expandBtn.style.alignItems = 'center';
+                    expandBtn.style.justifyContent = 'center';
+                    console.log('Botão de expansão esquerdo configurado como visível');
+                }
+            }
+            
+            // Remover classe do HTML
+            document.documentElement.classList.remove('left-panel-collapsed');
         }
         
-        const expandBtn = document.createElement('button');
-        expandBtn.className = 'panel-expand-btn';
-        expandBtn.id = 'right-expand-btn'; // ID específico para facilitar depuração
-        expandBtn.title = 'Expandir painel';
-        expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"></path></svg>';
-        expandBtn.setAttribute('data-target', 'right');
-        rightPanel.appendChild(expandBtn);
+        // Aplicar estado do painel direito
+        if (rightPanel) {
+            const isCollapsed = localStorage.getItem(RIGHT_PANEL_KEY) === 'true';
+            
+            if (isCollapsed) {
+                rightPanel.classList.add('collapsed');
+                if (resizerRight) resizerRight.classList.add('disabled');
+                
+                // Garantir que o botão de expansão esteja visível
+                const expandBtn = document.getElementById('right-expand-btn');
+                if (expandBtn) {
+                    expandBtn.style.display = 'flex';
+                    expandBtn.style.alignItems = 'center';
+                    expandBtn.style.justifyContent = 'center';
+                    console.log('Botão de expansão direito configurado como visível');
+                }
+            }
+            
+            // Remover classe do HTML
+            document.documentElement.classList.remove('right-panel-collapsed');
+        }
         
-        console.log('Botão de expansão direito adicionado:', expandBtn);
+        // Recalcular layout após aplicar estados
+        setTimeout(recalculateLayout, 10);
     }
     
     // Função para colapsar/expandir painel esquerdo
@@ -67,7 +174,20 @@ document.addEventListener('DOMContentLoaded', () => {
             resizerLeft.classList.toggle('disabled', isCollapsed);
         }
         
-        // Ajustar largura do editor
+        // Gerenciar visibilidade do botão de expansão
+        const expandBtn = document.getElementById('left-expand-btn');
+        if (expandBtn) {
+            expandBtn.style.display = isCollapsed ? 'flex' : 'none';
+            
+            if (isCollapsed) {
+                expandBtn.style.alignItems = 'center';
+                expandBtn.style.justifyContent = 'center';
+            }
+            
+            console.log(`Botão de expansão esquerdo definido como ${isCollapsed ? 'visível' : 'oculto'}`);
+        }
+        
+        // Ajustar layout
         recalculateLayout();
     }
     
@@ -83,7 +203,20 @@ document.addEventListener('DOMContentLoaded', () => {
             resizerRight.classList.toggle('disabled', isCollapsed);
         }
         
-        // Ajustar largura do editor
+        // Gerenciar visibilidade do botão de expansão
+        const expandBtn = document.getElementById('right-expand-btn');
+        if (expandBtn) {
+            expandBtn.style.display = isCollapsed ? 'flex' : 'none';
+            
+            if (isCollapsed) {
+                expandBtn.style.alignItems = 'center';
+                expandBtn.style.justifyContent = 'center';
+            }
+            
+            console.log(`Botão de expansão direito definido como ${isCollapsed ? 'visível' : 'oculto'}`);
+        }
+        
+        // Ajustar layout
         recalculateLayout();
     }
     
@@ -119,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Event listeners para botões de colapso
+    // Adicionar event listeners para botões de colapso
     document.querySelectorAll('.collapse-panel-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const target = btn.getAttribute('data-target');
@@ -128,69 +261,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Event listeners para botões de expansão
+    // Adicionar event listeners aos botões de expansão
     document.querySelectorAll('.panel-expand-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const target = btn.getAttribute('data-target');
+            console.log(`Botão de expansão ${target} clicado`);
             if (target === 'left') toggleLeftPanel();
             else if (target === 'right') toggleRightPanel();
         });
     });
     
-    // Restaurar estado dos painéis do localStorage e garantir visibilidade dos botões
-    function restorePanelStates() {
-        const leftCollapsed = localStorage.getItem(LEFT_PANEL_KEY) === 'true';
-        const rightCollapsed = localStorage.getItem(RIGHT_PANEL_KEY) === 'true';
-        
-        // Ajustar estados dos painéis conforme localStorage (sem transições)
-        if (leftPanel) {
-            // Apenas adicionar classe se ainda não foi adicionada pelo preload
-            if (leftCollapsed && !leftPanel.classList.contains('collapsed')) {
-                leftPanel.classList.add('collapsed');
-            }
-            
-            if (resizerLeft) {
-                resizerLeft.classList.toggle('disabled', leftCollapsed);
-            }
-            
-            // Remover classe do HTML - o painel específico já tem a classe agora
-            document.documentElement.classList.remove('left-panel-collapsed');
-        }
-        
-        if (rightPanel) {
-            // Apenas adicionar classe se ainda não foi adicionada pelo preload
-            if (rightCollapsed && !rightPanel.classList.contains('collapsed')) {
-                rightPanel.classList.add('collapsed');
-            }
-            
-            if (resizerRight) {
-                resizerRight.classList.toggle('disabled', rightCollapsed);
-            }
-            
-            // Remover classe do HTML - o painel específico já tem a classe agora
-            document.documentElement.classList.remove('right-panel-collapsed');
-        }
-        
-        // Mostrar o conteúdo do painel novamente (que estava oculto no preload)
-        if (leftPanel) {
-            Array.from(leftPanel.children).forEach(child => {
-                child.style.opacity = '';
-            });
-        }
-        
-        if (rightPanel) {
-            Array.from(rightPanel.children).forEach(child => {
-                child.style.opacity = '';
-            });
-        }
-        
-        // Recalcular layout com delay para garantir que as dimensões foram aplicadas
-        setTimeout(recalculateLayout, 0);
-    }
-    
-    // Restaurar estados no carregamento
+    // Restaurar estados dos painéis - depois de configurar event listeners
     restorePanelStates();
     
     // Recalcular layout quando a janela for redimensionada
     window.addEventListener('resize', recalculateLayout);
+    
+    // Verificação final da visibilidade dos botões após o carregamento completo
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            console.log('Verificação final da visibilidade dos botões');
+            
+            // Verificar painel esquerdo
+            if (leftPanel && leftPanel.classList.contains('collapsed')) {
+                const expandBtn = document.getElementById('left-expand-btn');
+                if (expandBtn && getComputedStyle(expandBtn).display !== 'flex') {
+                    console.log('Corrigindo visibilidade do botão esquerdo');
+                    expandBtn.style.display = 'flex';
+                    expandBtn.style.alignItems = 'center';
+                    expandBtn.style.justifyContent = 'center';
+                }
+            }
+            
+            // Verificar painel direito
+            if (rightPanel && rightPanel.classList.contains('collapsed')) {
+                const expandBtn = document.getElementById('right-expand-btn');
+                if (expandBtn && getComputedStyle(expandBtn).display !== 'flex') {
+                    console.log('Corrigindo visibilidade do botão direito');
+                    expandBtn.style.display = 'flex';
+                    expandBtn.style.alignItems = 'center';
+                    expandBtn.style.justifyContent = 'center';
+                }
+            }
+        }, 500);
+    });
 });

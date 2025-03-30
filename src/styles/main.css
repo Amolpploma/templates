@@ -102,7 +102,6 @@ body.resizing .right-panel {
 
 /* Botão de expansão quando colapsado - centralizado verticalmente */
 .panel-expand-btn {
-    display: none;
     position: absolute;
     top: 50%; /* Centralizado verticalmente */
     left: 50%;
@@ -113,26 +112,22 @@ body.resizing .right-panel {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: pointer;
-    z-index: 99; /* Aumentado para garantir que fique acima de outros elementos */
+    z-index: 2000; /* Aumentado para garantir que fique acima de outros elementos */
     align-items: center;
     justify-content: center;
+    pointer-events: auto !important; /* Garantir interação mesmo se o pai estiver com pointer-events: none */
+    
+    /* Remover display: none - o display será gerenciado via JavaScript */
 }
 
-/* Sempre exibir o botão de expansão quando o painel estiver colapsado */
-.left-panel.collapsed > .panel-expand-btn,
-.right-panel.collapsed > .panel-expand-btn {
+/* Este seletor não é mais necessário pois o display será controlado via JavaScript 
+.left-panel.collapsed .panel-expand-btn,
+.right-panel.collapsed .panel-expand-btn {
     display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
-
-.panel-expand-btn:hover {
-    background-color: var(--hover-color);
-}
-
-.panel-expand-btn svg {
-    width: 16px;
-    height: 16px;
-    fill: var(--text-secondary);
-}
+*/
 
 /* Desativar resizers quando o painel está colapsado */
 #resizer-left.disabled,
