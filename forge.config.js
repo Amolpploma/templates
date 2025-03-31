@@ -10,25 +10,50 @@ module.exports = {
       ]
     },
     extraResource: [
-      //'./recursos/database.sqlite'
-    ]
+      './LICENSE',
+      './NOTICE'
+    ],
+    // Configurar ícone para o packager (sem extensão)
+    icon: path.join(__dirname, 'recursos', 'icon')
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        // Configuração para Windows
+        name: 'TemplatesApp',
+        setupIcon: path.join(__dirname, 'recursos', 'icon.ico'),
+        iconUrl: path.join(__dirname, 'recursos', 'icon.ico'),
+      },
     },
     {
       name: '@electron-forge/maker-zip',
+      // Usa o ícone do packager
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        // Configuração para Linux (Debian)
+        options: {
+          icon: path.join(__dirname, 'recursos', 'icon.png'),
+          categories: ['Office', 'Utility'],
+          maintainer: 'Alfredo Rolim Pereira',
+          homepage: 'https://github.com/Amolpploma/templates'
+        }
+      },
     },
     {
       name: '@electron-forge/maker-rpm',
-      config: {},
+      config: {
+        // Configuração para Linux (RPM)
+        options: {
+          icon: path.join(__dirname, 'recursos', 'icon.png'),
+          categories: ['Office', 'Utility'],
+          maintainer: 'Alfredo Rolim Pereira',
+          homepage: 'https://github.com/Amolpploma/templates'
+        }
+      },
     },
   ],
   plugins: [

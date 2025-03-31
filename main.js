@@ -119,13 +119,14 @@ function createWindow(page = 'index.html') {
         titleBarStyle: 'hidden',   // Esconde a barra de título
         autoHideMenuBar: true,     // Esconde a barra de menu
         center: true,              // Centraliza a janela
+        icon: path.join(__dirname, 'recursos', 'icon.png'), // Ícone da janela
         backgroundColor: nativeTheme.shouldUseDarkColors ? '#1e1e1e' : '#ffffff', // Adicionar backgroundColor
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             sandbox: false,
             enableRemoteModule: false,
-            devTools: true,
+            devTools: !app.isPackaged, // Desabilitar DevTools em produção
             preload: path.join(__dirname, 'preload.js'),  // Caminho atualizado para a raiz
             spellcheck: true, // Habilitar corretor ortográfico
             spellcheckLanguages: ['pt-BR'],
