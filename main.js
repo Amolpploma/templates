@@ -1,9 +1,30 @@
 // main.js
 
+// Lidar com eventos Squirrel para Windows ANTES de qualquer importação do Electron
+if (process.platform === 'win32') {
+  try {
+    const setupEvents = require('./installerSetup');
+    if (setupEvents.handleSquirrelEvent()) {
+      // squirrel evento tratado e o aplicativo vai sair, então não faça mais nada
+      process.exit(0);
+    }
+  } catch (error) {
+    console.error('Erro ao processar eventos Squirrel:', error);
+  }
+}
+
+// *** APÓS o tratamento de Squirrel, é seguro importar os módulos do Electron ***
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, globalShortcut, ipcMain, dialog, nativeTheme, Menu, MenuItem } = require('electron')
-const path = require('node:path')
-const fs = require('fs')
+const { app, BrowserWindow, globalShortcut, ipcMain, dialog, nativeTheme, Menu, MenuItem } = require('electron');
+const path = require('node:path');
+const fs = require('fs');
+
+// Verificar se estamos em um instalador Squirrel após carregar app
+if (require('electron-squirrel-startup')) {
+  app.quit();
+  process.exit(0);
+}
+
 let store;
 
 async function loadStore() {
