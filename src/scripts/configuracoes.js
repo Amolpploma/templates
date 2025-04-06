@@ -645,4 +645,75 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Event listeners para botões de licença
+    const viewLicenseBtn = document.getElementById('view-license-btn');
+    const viewNoticeBtn = document.getElementById('view-notice-btn');
+    const fileContentModal = document.getElementById('file-content-modal');
+    const fileContentTitle = document.getElementById('file-content-title');
+    const fileContentText = document.getElementById('file-content-text');
+    const fileContentClose = document.getElementById('file-content-close');
+    const fileContentCloseBtn = document.getElementById('file-content-close-btn');
+
+    if (viewLicenseBtn) {
+        viewLicenseBtn.addEventListener('click', async () => {
+            try {
+                const result = await window.electronAPI.getLicenseContent();
+                if (result.success) {
+                    fileContentTitle.textContent = 'Arquivo LICENSE';
+                    fileContentText.textContent = result.content;
+                    fileContentModal.classList.add('active');
+                } else {
+                    statusMessage.textContent = result.error;
+                    statusMessage.className = 'status-message error';
+                }
+            } catch (err) {
+                console.error('Erro ao obter conteúdo do arquivo LICENSE:', err);
+                statusMessage.textContent = 'Erro ao obter conteúdo do arquivo LICENSE';
+                statusMessage.className = 'status-message error';
+            }
+        });
+    }
+
+    if (viewNoticeBtn) {
+        viewNoticeBtn.addEventListener('click', async () => {
+            try {
+                const result = await window.electronAPI.getNoticeContent();
+                if (result.success) {
+                    fileContentTitle.textContent = 'Arquivo NOTICE';
+                    fileContentText.textContent = result.content;
+                    fileContentModal.classList.add('active');
+                } else {
+                    statusMessage.textContent = result.error;
+                    statusMessage.className = 'status-message error';
+                }
+            } catch (err) {
+                console.error('Erro ao obter conteúdo do arquivo NOTICE:', err);
+                statusMessage.textContent = 'Erro ao obter conteúdo do arquivo NOTICE';
+                statusMessage.className = 'status-message error';
+            }
+        });
+    }
+
+    // Event listeners para fechar o modal
+    if (fileContentClose) {
+        fileContentClose.addEventListener('click', () => {
+            fileContentModal.classList.remove('active');
+        });
+    }
+
+    if (fileContentCloseBtn) {
+        fileContentCloseBtn.addEventListener('click', () => {
+            fileContentModal.classList.remove('active');
+        });
+    }
+
+    // Fechar modal ao clicar fora
+    if (fileContentModal) {
+        fileContentModal.addEventListener('click', (e) => {
+            if (e.target === fileContentModal) {
+                fileContentModal.classList.remove('active');
+            }
+        });
+    }
+
 });
