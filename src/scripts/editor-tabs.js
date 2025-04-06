@@ -112,7 +112,22 @@
     function createNewTab() {
         // Limitar número máximo de abas
         if (tabs.length >= MAX_TABS) {
-            alert(`Você atingiu o limite máximo de ${MAX_TABS} abas.`);
+            // Substituir alert por showDialog personalizado
+            if (window.showDialog) {
+                window.showDialog(
+                    'Limite de abas',
+                    `Você atingiu o limite máximo de ${MAX_TABS} abas.`,
+                    [{
+                        id: 'btn-ok',
+                        text: 'OK',
+                        class: 'btn-primary',
+                        value: true
+                    }]
+                );
+            } else {
+                // Fallback para alert apenas se necessário
+                alert(`Você atingiu o limite máximo de ${MAX_TABS} abas.`);
+            }
             return;
         }
         
@@ -199,25 +214,45 @@
         
         // Se a aba a ser fechada é a ativa, mudar para outra
         if (activeTabId === tabId) {
+            // Primeiro salvar o estado da aba atual antes de mudar
+            saveCurrentTabContent();
+            
             const currentIndex = tabs.findIndex(tab => tab.id === tabId);
             const newActiveIndex = currentIndex > 0 ? currentIndex - 1 : currentIndex + 1;
-            activeTabId = tabs[newActiveIndex].id;
+            
+            // Armazenar o ID da nova aba ativa
+            const newActiveTabId = tabs[newActiveIndex].id;
+            
+            // Limpar o editor antes de carregar o conteúdo da nova aba
+            const editor = tinymce.get('editor-container');
+            if (editor) {
+                editor.setContent('');
+            }
+            
+            // Remover a aba do array antes de ativar a nova
+            tabs = tabs.filter(tab => tab.id !== tabId);
+            
+            // Atualizar a exibição
+            renderTabs();
+            
+            // Limpar dados da aba fechada
+            localStorage.removeItem(`${TAB_CONTENT_PREFIX}${tabId}`);
+            localStorage.removeItem(`${TAB_CONTENT_PREFIX}${tabId}_form`);
+            
+            // Ativar a nova aba selecionada - com ID armazenado previamente
+            activateTab(newActiveTabId);
+        } else {
+            // Se a aba fechada não é a ativa, apenas remover e atualizar
+            tabs = tabs.filter(tab => tab.id !== tabId);
+            renderTabs();
+            
+            // Limpar dados da aba fechada
+            localStorage.removeItem(`${TAB_CONTENT_PREFIX}${tabId}`);
+            localStorage.removeItem(`${TAB_CONTENT_PREFIX}${tabId}_form`);
+            
+            // Salvar estado
+            saveTabsState();
         }
-        
-        // Remover a aba do array
-        tabs = tabs.filter(tab => tab.id !== tabId);
-        
-        // Atualizar a exibição
-        renderTabs();
-        
-        // Ativar a nova aba selecionada
-        activateTab(activeTabId);
-        
-        // Limpar dados da aba fechada
-        localStorage.removeItem(`${TAB_CONTENT_PREFIX}${tabId}`);
-        
-        // Salvar estado
-        saveTabsState();
     }
 
     // Salvar o conteúdo da aba atual
@@ -253,6 +288,9 @@
         const editor = tinymce.get('editor-container');
         if (editor) {
             try {
+                // Garantir que o conteúdo seja limpo antes de carregar o novo
+                editor.undoManager.clear();
+                
                 // Carregar conteúdo do editor
                 const content = localStorage.getItem(`${TAB_CONTENT_PREFIX}${tabId}`) || '';
                 editor.setContent(content);
