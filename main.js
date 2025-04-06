@@ -152,7 +152,7 @@ async function validateDatabase(dbPath) {
     }
 }
 
-function createWindow(page = 'index.html') {
+function createWindow(page = 'gerenciador-modelos.html') {
     // Modificar para usar a variável global mainWindow em vez de criar uma nova variável local
     mainWindow = new BrowserWindow({
         width: 960,
@@ -337,7 +337,7 @@ function registerIpcHandlers() {
     if (!result.canceled && result.filePaths.length > 0) {
         const success = await initializeDatabase(result.filePaths[0]);
         if (success) {
-            BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'index.html'));
+            BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'gerenciador-modelos.html'));
         }
         return success;
     }
@@ -370,7 +370,7 @@ function registerIpcHandlers() {
 
             const success = await initializeDatabase(result.filePath);
             if (success) {
-                BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'index.html'));
+                BrowserWindow.getAllWindows()[0].loadFile(path.join(__dirname, 'src', 'gerenciador-modelos.html'));
             }
             return success;
         } catch (err) {
@@ -840,7 +840,7 @@ app.whenReady().then(async () => {
   
   if (savedPath && fs.existsSync(savedPath)) {
     const success = await initializeDatabase(savedPath);
-    createWindow(success ? 'index.html' : 'select-database.html');
+    createWindow(success ? 'gerenciador-modelos.html' : 'select-database.html');
   } else {
     createWindow('select-database.html');
   }
