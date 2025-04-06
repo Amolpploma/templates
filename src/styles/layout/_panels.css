@@ -35,25 +35,25 @@
 
 /* Ajuste para editor inputs (área superior) */
 .editor-inputs {
-    margin-bottom: 10px;
+    /*margin-bottom: 10px;*/
     flex-shrink: 0; /* Impede que os inputs encolham */
 }
 
 /* Estilo específico para página de edição */
-body[data-page="editor"] .container {
-    justify-content: center;
-    min-width: 960px; /* Adicionada largura mínima */
-    width: auto;
-}
+/*body[data-page="editor"] .container {
+    justify-content: center;*/
+    /*min-width: 960px; /* Adicionada largura mínima */
+    /*width: auto;/
+}*/
 
-body[data-page="editor"] .editor-panel {
+/*body[data-page="editor"] .editor-panel {
     min-width: 624px;
     width: 65%; /* Aumentado para ocupar mais espaço */
-    max-width: none; /* Removido limite máximo */
-}
+    /*max-width: none; /* Removido limite máximo */
+/*}
 
 body[data-page="editor"] .right-panel {
     min-width: 336px;
     /*width: 35%; /* Ajustado para complementar o editor-panel */
-    max-width: none; /* Removido limite máximo */
-}
+    /*max-width: none; /* Removido limite máximo */
+/*}*/

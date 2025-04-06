@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tagInput = document.getElementById('tag-input');
     const searchInput = document.querySelector('.search-input');
 
-    // Remover o check pelo Quill e usar TinyMCE
+    // Verificar se o editor está pronto
     const waitForEditor = setInterval(async () => {
         if (window.tinymce?.activeEditor) {
             clearInterval(waitForEditor);
@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (transferContent) {
                 tinymce.get('editor-container').setContent(transferContent);
                 await window.electronAPI.setStore('transferContent', null); // Limpar após uso
+                
+                // Salvar na aba ativa se o sistema de abas estiver disponível
+                if (window.editorTabs) {
+                    window.editorTabs.saveCurrentTabContent();
+                }
             }
         }
     }, 100);
@@ -23,13 +28,24 @@ document.addEventListener('DOMContentLoaded', () => {
         nomeInput.value = '';
         tagInput.value = '';
         tinymce.activeEditor.setContent('');
+        
         // Limpar campo de pesquisa e disparar o evento input para atualizar a lista
         searchInput.value = '';
         searchInput.dispatchEvent(new Event('input'));
+        
+        // Se o sistema de abas estiver disponível, atualizar seu armazenamento
+        if (window.editorTabs) {
+            window.editorTabs.saveCurrentTabContent();
+        }
     }
 
-    function showDialog(title, message, buttons) {
+    // Tornar a função showDialog acessível globalmente usando os estilos de _dialog.css
+    window.showDialog = function(title, message, buttons) {
         return new Promise((resolve) => {
+            // Salvar o elemento que está com foco antes de abrir o diálogo
+            const activeElement = document.activeElement;
+            
+            // Remover diálogos existentes para evitar sobreposição
             const existingDialog = document.querySelector('.custom-dialog');
             if (existingDialog) {
                 document.body.classList.remove('dialog-open');
@@ -42,25 +58,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="dialog-content">
                     <h2>${title}</h2>
                     <p>${message}</p>
-                    <div class="dialog-buttons">${buttons.map(btn => `
-                        <button class="${btn.class}" id="${btn.id}">${btn.text}</button>
-                    `).join('')}</div>
+                    <div class="dialog-buttons">
+                        ${buttons.map(btn => `
+                            <button class="${btn.class}" id="${btn.id}">${btn.text}</button>
+                        `).join('')}
+                    </div>
                 </div>
             `;
-        
+            
             document.body.appendChild(dialog);
             document.body.classList.add('dialog-open');
-
-            // Configurar eventos dos botões
+            
+            // Focar no primeiro botão para melhor acessibilidade
+            if (buttons.length > 0) {
+                setTimeout(() => {
+                    const firstButton = dialog.querySelector(`#${buttons[0].id}`);
+                    if (firstButton) {
+                        firstButton.focus();
+                    }
+                }, 10);
+            }
+            
+            // Configurar eventos dos botões com restauração de foco
             buttons.forEach(btn => {
-                dialog.querySelector(`#${btn.id}`).onclick = () => {
+                dialog.querySelector(`#${btn.id}`).addEventListener('click', () => {
                     document.body.classList.remove('dialog-open');
                     dialog.remove();
+                    
+                    // Restaurar o foco ao elemento que estava ativo antes do diálogo
+                    if (activeElement && typeof activeElement.focus === 'function') {
+                        setTimeout(() => {
+                            try {
+                                activeElement.focus();
+                            } catch (e) {
+                                console.error('Erro ao restaurar foco:', e);
+                            }
+                        }, 10);
+                    }
+                    
                     resolve(btn.value);
-                };
+                });
             });
         });
-    }
+    };
 
     async function setupSaveHandler() {
         btnSalvar.addEventListener('click', async () => {
@@ -125,6 +165,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                     value: true
                                 }]
                             );
+                            
+                            // Se o sistema de abas estiver disponível e se for o primeiro modelo salvo desta aba
+                            // renomear a aba para o nome do modelo
+                            if (window.editorTabs && window.editorTabs.getCurrentTabId()) {
+                                window.editorTabs.renameTab(window.editorTabs.getCurrentTabId(), nome);
+                                // Criar uma nova aba para continuar editando
+                                window.editorTabs.createNewTab();
+                            }
                         } catch (err) {
                             console.error('Erro ao atualizar modelo:', err);
                             await window.showDialog(
@@ -140,28 +188,52 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 } else {
-                    await window.electronAPI.salvarDocumento({
-                        nome,
-                        tag: tags,
-                        modelo: modeloContent
-                    });
-                    limparCampos();
-                    await window.showDialog(
-                        'Sucesso',
-                        `Modelo <i><u>${nome}</u></i> salvo com sucesso!`,
-                        [{
-                            id: 'btn-ok',
-                            text: 'OK',
-                            class: 'btn-primary',
-                            value: true
-                        }]
-                    );
+                    try {
+                        const result = await window.electronAPI.salvarDocumento({
+                            nome,
+                            tag: tags,
+                            modelo: modeloContent
+                        });
+
+                        if (result) {
+                            limparCampos();
+                            await window.showDialog(
+                                'Sucesso',
+                                `Modelo <i><u>${nome}</u></i> salvo com sucesso!`,
+                                [{
+                                    id: 'btn-ok',
+                                    text: 'OK',
+                                    class: 'btn-primary',
+                                    value: true
+                                }]
+                            );
+                            
+                            // Se o sistema de abas estiver disponível
+                            if (window.editorTabs && window.editorTabs.getCurrentTabId()) {
+                                window.editorTabs.renameTab(window.editorTabs.getCurrentTabId(), nome);
+                                // Criar uma nova aba para continuar editando
+                                window.editorTabs.createNewTab();
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Erro ao salvar modelo:', err);
+                        await window.showDialog(
+                            'Erro',
+                            'Erro ao salvar o modelo',
+                            [{
+                                id: 'btn-ok',
+                                text: 'OK',
+                                class: 'btn-primary',
+                                value: false
+                            }]
+                        );
+                    }
                 }
             } catch (err) {
-                console.error('Erro ao salvar modelo:', err);
+                console.error('Erro ao verificar modelo existente:', err);
                 await window.showDialog(
                     'Erro',
-                    'Erro ao salvar o modelo',
+                    'Erro ao verificar modelo existente',
                     [{
                         id: 'btn-ok',
                         text: 'OK',

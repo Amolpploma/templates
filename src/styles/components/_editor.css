@@ -53,3 +53,144 @@
     background-color: var(--panel-bg);
     transition: height 0.2s ease;
 }
+
+/* Estilos para as abas do editor */
+.editor-tabs {
+    display: flex;
+    background-color: var(--bg-element);
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+    position: relative;
+    min-height: 36px;
+    overflow: hidden; /* Esconder overflow para evitar barras de rolagem */
+}
+
+.tab-list {
+    display: flex;
+    flex: 1;
+    transition: transform 0.3s ease; /* Para animação ao navegar */
+    overflow-x: hidden;
+    margin: 0 24px; /* Espaço para os botões de navegação */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Edge/IE */
+}
+
+.tab-list::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Opera */
+}
+
+/* Botões de navegação das abas */
+.tab-nav-button {
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-element);
+    border: none;
+    border-right: 1px solid var(--border-color);
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.2s;
+    color: var(--text-primary);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.tab-nav-button.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tab-nav-button:hover {
+    background-color: var(--bg-hover);
+}
+
+.tab-nav-prev {
+    left: 0;
+}
+
+.tab-nav-next {
+    right: 32px; /* Espaço para o botão de adicionar aba */
+    border-right: none;
+    border-left: 1px solid var(--border-color);
+}
+
+.editor-tab {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    height: 32px;
+    border-right: 1px solid var(--border-color);
+    background-color: var(--bg-element);
+    color: var(--text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+.editor-tab.active {
+    background-color: var(--bg-active);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.editor-tab:hover {
+    background-color: var(--bg-hover);
+}
+
+.editor-tab-title {
+    margin-right: 8px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.editor-tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.editor-tab-close:hover {
+    background-color: var(--error-color);
+    color: var(--text-on-primary);
+}
+
+.editor-tab-close svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+}
+
+.add-tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.add-tab-btn:hover {
+    background-color: var(--bg-hover);
+}
+
+.add-tab-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
