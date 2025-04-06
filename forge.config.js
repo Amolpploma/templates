@@ -27,6 +27,7 @@ module.exports = {
         iconUrl: path.join(__dirname, 'recursos', 'icon.ico'),
         shortcutName: 'Templates App',
         createDesktopShortcut: true,
+        removeDefaultAppData: true,
         //loadingGif: path.join(__dirname, 'recursos', 'installer.gif'), // Opcional: GIF durante a instalação
       },
     },
