@@ -58,6 +58,16 @@
         </div>
         <div id="resizer-left"></div>
         <div class="editor-panel">
+            <div class="editor-tabs">
+                <div class="tab-list" id="editor-tabs">
+                    <!-- As abas serão adicionadas dinamicamente aqui -->
+                </div>
+                <button id="add-tab-btn" class="add-tab-btn" title="Nova aba">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                </button>
+            </div>
             <div class="editor-inputs">
                 <div class="input-container">
                     <input type="text" class="editor-input" id="nome-input" placeholder="Nome do modelo">
@@ -120,6 +130,7 @@
     <!-- Adicionar script do diálogo de modelo antes da inicialização do TinyMCE -->
     <script src="scripts/modelo-dialog.js"></script>
     <script src="tinymce_init.js"></script>
+    <script src="scripts/editor-tabs.js"></script>
     <script src="window-controls.js"></script>
     <script src="theme-toggle.js"></script>
     <script src="highlight-utils.js"></script>
