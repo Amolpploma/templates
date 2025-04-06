@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!editorPanel || !tabList) return;
     
+    // Variáveis para controlar a rolagem contínua
+    let scrollInterval = null;
+    const scrollSpeed = 15; // Pixels por iteração
+    const scrollIntervalDelay = 50; // ms entre cada iteração
+    
     // Criar botões de navegação
     function createNavButtons() {
         const prevBtn = document.createElement('button');
@@ -27,14 +32,53 @@ document.addEventListener('DOMContentLoaded', () => {
         editorTabs.appendChild(prevBtn);
         editorTabs.appendChild(nextBtn);
         
-        // Adicionar eventos de clique
+        // Configurar eventos de clique único
         prevBtn.addEventListener('click', () => scrollTabs(-100));
         nextBtn.addEventListener('click', () => scrollTabs(100));
+        
+        // Configurar eventos para rolagem contínua quando pressionar e segurar
+        prevBtn.addEventListener('mousedown', () => startContinuousScroll(-scrollSpeed));
+        nextBtn.addEventListener('mousedown', () => startContinuousScroll(scrollSpeed));
+        
+        // Parar a rolagem quando soltar o botão ou sair da área
+        [prevBtn, nextBtn].forEach(btn => {
+            btn.addEventListener('mouseup', stopContinuousScroll);
+            btn.addEventListener('mouseleave', stopContinuousScroll);
+        });
         
         return { prevBtn, nextBtn };
     }
     
-    // Função para rolar as abas
+    // Iniciar rolagem contínua
+    function startContinuousScroll(amount) {
+        // Limpar qualquer intervalo anterior
+        stopContinuousScroll();
+        
+        // Iniciar novo intervalo para rolagem contínua
+        scrollInterval = setInterval(() => {
+            const currentScroll = tabList.scrollLeft;
+            
+            // Verificar se chegamos ao limite de rolagem
+            if ((amount < 0 && currentScroll <= 0) || 
+                (amount > 0 && currentScroll + tabList.clientWidth >= tabList.scrollWidth)) {
+                stopContinuousScroll();
+                return;
+            }
+            
+            tabList.scrollLeft = currentScroll + amount;
+            checkNavButtonsVisibility();
+        }, scrollIntervalDelay);
+    }
+    
+    // Parar rolagem contínua
+    function stopContinuousScroll() {
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
+    }
+    
+    // Função para rolar as abas (clique único)
     function scrollTabs(amount) {
         const currentScroll = tabList.scrollLeft;
         tabList.scrollTo({
@@ -109,6 +153,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Também monitorar scroll nas abas
         tabList.addEventListener('scroll', () => {
             checkNavButtonsVisibility();
+        });
+        
+        // Adicionar evento de wheel (roda do mouse) para rolagem
+        const editorTabs = document.querySelector('.editor-tabs');
+        editorTabs.addEventListener('wheel', (event) => {
+            if (tabList.scrollWidth > tabList.clientWidth) { // Só rolar se houver overflow
+                event.preventDefault(); // Evitar scroll na página
+                
+                // Determinar direção e aplicar rolagem
+                const direction = event.deltaY > 0 ? 1 : -1;
+                tabList.scrollLeft += direction * 50; // 50 pixels por movimento da roda
+                
+                // Verificar visibilidade dos botões
+                checkNavButtonsVisibility();
+            }
         });
     }
     
