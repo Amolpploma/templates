@@ -167,7 +167,6 @@
     async function closeTab(tabId) {
         // Não permitir fechar a última aba
         if (tabs.length <= 1) {
-            // Usar a função global showDialog que agora está corrigida
             if (window.showDialog) {
                 await window.showDialog(
                     'Aviso',

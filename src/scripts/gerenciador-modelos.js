@@ -39,42 +39,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Tornar a função showDialog acessível globalmente com estilos aprimorados
+    // Tornar a função showDialog acessível globalmente usando os estilos de _dialog.css
     window.showDialog = function(title, message, buttons) {
-        return new Promise((resolve, reject) => {
-            const dialog = document.createElement('div');
-            dialog.className = 'dialog-overlay';
-            // Adicionar estilos inline para garantir posicionamento correto
-            dialog.style.position = 'fixed';
-            dialog.style.top = '0';
-            dialog.style.left = '0';
-            dialog.style.right = '0';
-            dialog.style.bottom = '0';
-            dialog.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-            dialog.style.display = 'flex';
-            dialog.style.alignItems = 'center';
-            dialog.style.justifyContent = 'center';
-            dialog.style.zIndex = '10000';
+        return new Promise((resolve) => {
+            // Remover diálogos existentes para evitar sobreposição
+            const existingDialog = document.querySelector('.custom-dialog');
+            if (existingDialog) {
+                document.body.classList.remove('dialog-open');
+                existingDialog.remove();
+            }
             
+            const dialog = document.createElement('div');
+            dialog.className = 'custom-dialog';
             dialog.innerHTML = `
-                <div class="dialog" style="background-color: var(--bg-secondary, #ffffff); border-radius: 8px; padding: 20px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); max-width: 400px; width: 100%;">
-                    <div class="dialog-header">
-                        <h3>${title}</h3>
-                    </div>
-                    <div class="dialog-body">
-                        ${message}
-                    </div>
-                    <div class="dialog-footer">
+                <div class="dialog-content">
+                    <h2>${title}</h2>
+                    <p>${message}</p>
+                    <div class="dialog-buttons">
                         ${buttons.map(btn => `
-                            <button id="${btn.id}" class="dialog-btn ${btn.class || ''}">${btn.text}</button>
+                            <button class="${btn.class}" id="${btn.id}">${btn.text}</button>
                         `).join('')}
                     </div>
                 </div>
             `;
             
             document.body.appendChild(dialog);
+            document.body.classList.add('dialog-open');
             
-            // Focar no primeiro botão (melhoria de acessibilidade)
+            // Focar no primeiro botão para melhor acessibilidade
             if (buttons.length > 0) {
                 setTimeout(() => {
                     const firstButton = dialog.querySelector(`#${buttons[0].id}`);
@@ -84,8 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 10);
             }
             
+            // Configurar eventos dos botões
             buttons.forEach(btn => {
                 dialog.querySelector(`#${btn.id}`).addEventListener('click', () => {
+                    document.body.classList.remove('dialog-open');
                     dialog.remove();
                     resolve(btn.value);
                 });
