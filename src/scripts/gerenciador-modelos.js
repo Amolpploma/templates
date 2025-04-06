@@ -42,6 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tornar a função showDialog acessível globalmente usando os estilos de _dialog.css
     window.showDialog = function(title, message, buttons) {
         return new Promise((resolve) => {
+            // Salvar o elemento que está com foco antes de abrir o diálogo
+            const activeElement = document.activeElement;
+            
             // Remover diálogos existentes para evitar sobreposição
             const existingDialog = document.querySelector('.custom-dialog');
             if (existingDialog) {
@@ -76,11 +79,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 10);
             }
             
-            // Configurar eventos dos botões
+            // Configurar eventos dos botões com restauração de foco
             buttons.forEach(btn => {
                 dialog.querySelector(`#${btn.id}`).addEventListener('click', () => {
                     document.body.classList.remove('dialog-open');
                     dialog.remove();
+                    
+                    // Restaurar o foco ao elemento que estava ativo antes do diálogo
+                    if (activeElement && typeof activeElement.focus === 'function') {
+                        setTimeout(() => {
+                            try {
+                                activeElement.focus();
+                            } catch (e) {
+                                console.error('Erro ao restaurar foco:', e);
+                            }
+                        }, 10);
+                    }
+                    
                     resolve(btn.value);
                 });
             });

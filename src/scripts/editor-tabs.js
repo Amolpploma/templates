@@ -119,10 +119,20 @@
         // Salvar conteúdo da aba atual antes de criar uma nova
         saveCurrentTabContent();
         
+        // Gerar um nome único para a nova aba
+        let tabNumber = 1;
+        let tabTitle = `Modelo ${tabNumber}`;
+        
+        // Verificar se já existe uma aba com este nome e incrementar o número até encontrar um nome único
+        while (tabs.some(tab => tab.title === tabTitle)) {
+            tabNumber++;
+            tabTitle = `Modelo ${tabNumber}`;
+        }
+        
         // Criar nova aba com ID único
         const newTab = {
             id: 'tab_' + Date.now(),
-            title: `Modelo ${tabs.length + 1}`
+            title: tabTitle
         };
         
         // Adicionar a nova aba ao array
@@ -179,13 +189,7 @@
                     }]
                 );
                 
-                // Após fechar o diálogo, restaurar o foco ao editor
-                setTimeout(() => {
-                    const editor = tinymce.get('editor-container');
-                    if (editor) {
-                        editor.focus();
-                    }
-                }, 10);
+                // O foco será restaurado automaticamente pela nova implementação de showDialog
             } else {
                 // Fallback para alert() se showDialog não estiver disponível
                 alert('Não é possível fechar a última aba.');
