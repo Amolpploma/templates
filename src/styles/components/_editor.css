@@ -60,15 +60,62 @@
     background-color: var(--bg-element);
     border-bottom: 1px solid var(--border-color);
     align-items: center;
-    overflow-x: auto;
+    position: relative;
     min-height: 36px;
+    overflow: hidden; /* Esconder overflow para evitar barras de rolagem */
 }
 
 .tab-list {
     display: flex;
     flex: 1;
-    overflow-x: auto;
-    scrollbar-width: thin;
+    transition: transform 0.3s ease; /* Para animação ao navegar */
+    overflow-x: hidden;
+    margin: 0 24px; /* Espaço para os botões de navegação */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Edge/IE */
+}
+
+.tab-list::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Opera */
+}
+
+/* Botões de navegação das abas */
+.tab-nav-button {
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-element);
+    border: none;
+    border-right: 1px solid var(--border-color);
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.2s;
+    color: var(--text-primary);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.tab-nav-button.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tab-nav-button:hover {
+    background-color: var(--bg-hover);
+}
+
+.tab-nav-prev {
+    left: 0;
+}
+
+.tab-nav-next {
+    right: 32px; /* Espaço para o botão de adicionar aba */
+    border-right: none;
+    border-left: 1px solid var(--border-color);
 }
 
 .editor-tab {
