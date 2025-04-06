@@ -1,9 +1,30 @@
 // main.js
 
+// Lidar com eventos Squirrel para Windows ANTES de qualquer importação do Electron
+if (process.platform === 'win32') {
+  try {
+    const setupEvents = require('./installerSetup');
+    if (setupEvents.handleSquirrelEvent()) {
+      // squirrel evento tratado e o aplicativo vai sair, então não faça mais nada
+      process.exit(0);
+    }
+  } catch (error) {
+    console.error('Erro ao processar eventos Squirrel:', error);
+  }
+}
+
+// *** APÓS o tratamento de Squirrel, é seguro importar os módulos do Electron ***
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, globalShortcut, ipcMain, dialog, nativeTheme, Menu, MenuItem } = require('electron')
-const path = require('node:path')
-const fs = require('fs')
+const { app, BrowserWindow, globalShortcut, ipcMain, dialog, nativeTheme, Menu, MenuItem, shell } = require('electron');
+const path = require('node:path');
+const fs = require('fs');
+
+// Verificar se estamos em um instalador Squirrel após carregar app
+if (require('electron-squirrel-startup')) {
+  app.quit();
+  process.exit(0);
+}
+
 let store;
 
 async function loadStore() {
@@ -119,13 +140,14 @@ function createWindow(page = 'index.html') {
         titleBarStyle: 'hidden',   // Esconde a barra de título
         autoHideMenuBar: true,     // Esconde a barra de menu
         center: true,              // Centraliza a janela
+        icon: path.join(__dirname, 'recursos', 'icon.png'), // Ícone da janela
         backgroundColor: nativeTheme.shouldUseDarkColors ? '#1e1e1e' : '#ffffff', // Adicionar backgroundColor
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             sandbox: false,
             enableRemoteModule: false,
-            devTools: true,
+            devTools: !app.isPackaged, // Desabilitar DevTools em produção
             preload: path.join(__dirname, 'preload.js'),  // Caminho atualizado para a raiz
             spellcheck: true, // Habilitar corretor ortográfico
             spellcheckLanguages: ['pt-BR'],
@@ -713,6 +735,78 @@ function registerIpcHandlers() {
     } catch (err) {
         console.error('Erro na busca resumida:', err);
         return [];
+    }
+  });
+
+  // Handlers para abrir arquivos LICENSE e NOTICE
+  ipcMain.handle('open-license-file', async () => {
+    const licensePath = app.isPackaged 
+        ? path.join(process.resourcesPath, 'LICENSE')
+        : path.join(__dirname, 'LICENSE');
+    
+    if (fs.existsSync(licensePath)) {
+        shell.openPath(licensePath);
+        return true;
+    } else {
+        dialog.showMessageBox({
+            type: 'error',
+            title: 'Arquivo não encontrado',
+            message: 'O arquivo LICENSE não foi encontrado.'
+        });
+        return false;
+    }
+  });
+
+  ipcMain.handle('open-notice-file', async () => {
+    const noticePath = app.isPackaged 
+        ? path.join(process.resourcesPath, 'NOTICE')
+        : path.join(__dirname, 'NOTICE');
+    
+    if (fs.existsSync(noticePath)) {
+        shell.openPath(noticePath);
+        return true;
+    } else {
+        dialog.showMessageBox({
+            type: 'error',
+            title: 'Arquivo não encontrado',
+            message: 'O arquivo NOTICE não foi encontrado.'
+        });
+        return false;
+    }
+  });
+
+  // Substituir handlers para ler o conteúdo dos arquivos em vez de abri-los externamente
+  ipcMain.handle('get-license-content', async () => {
+    const licensePath = app.isPackaged 
+        ? path.join(process.resourcesPath, 'LICENSE')
+        : path.join(__dirname, 'LICENSE');
+    
+    if (fs.existsSync(licensePath)) {
+        try {
+            const content = fs.readFileSync(licensePath, 'utf8');
+            return { success: true, content };
+        } catch (err) {
+            return { success: false, error: `Erro ao ler o arquivo: ${err.message}` };
+        }
+    } else {
+        return { success: false, error: 'O arquivo LICENSE não foi encontrado.' };
+    }
+  });
+
+  ipcMain.handle('get-notice-content', async () => {
+    const noticePath = app.isPackaged 
+        ? path.join(process.resourcesPath, 'NOTICE')
+        : path.join(__dirname, 'NOTICE');
+    
+    if (fs.existsSync(noticePath)) {
+        try {
+            const content = fs.readFileSync(noticePath, 'utf8');
+            return { success: true, content };
+        } catch (err) {
+            return { success: false, error: `Erro ao ler o arquivo: ${err.message}` };
+        }
+    } else {
+        return { success: false, error: 'O arquivo NOTICE não foi encontrado.' };
     }
   });
 }

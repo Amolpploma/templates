@@ -42,6 +42,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     spellcheck: true !important;
                 }
                 
+                /* Estilização da barra de rolagem - consistente com os painéis */
+                ::-webkit-scrollbar {
+                    width: 8px !important;
+                    height: 10px !important;
+                }
+                
+                ::-webkit-scrollbar-track {
+                    background: transparent !important;
+                    border-radius: 4px !important;
+                }
+                
+                ::-webkit-scrollbar-thumb {
+                    background-color: ${isDarkTheme ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'} !important;
+                }
+                
+                ::-webkit-scrollbar-thumb:hover {
+                    background-color: ${isDarkTheme ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'} !important;
+                }
+                
                 /* Destaque para palavras incorretas */
                 .mce-spellchecker-word {
                     background-image: none !important;

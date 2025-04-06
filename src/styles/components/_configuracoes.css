@@ -593,7 +593,6 @@
 
 .modelo-associado-icon svg text {
     fill: currentColor;
-    font-family: Arial, sans-serif;
 }
 
 /* Estilo para modelo desabilitado */
@@ -626,4 +625,29 @@
 
 [data-theme="dark"] {
     --primary-color-rgb: 33, 150, 243; /* Versão RGB do azul primário para tema escuro */
+}
+
+/* Estilo para os botões de licença */
+.license-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+/* Estilo para o modal de conteúdo de arquivos */
+.file-content-pre {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: var(--bg-element);
+    color: var(--text-primary);
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin: 0;
 }
