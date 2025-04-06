@@ -35,7 +35,7 @@
 
 /* Ajuste para editor inputs (área superior) */
 .editor-inputs {
-    margin-bottom: 10px;
+    /*margin-bottom: 10px;*/
     flex-shrink: 0; /* Impede que os inputs encolham */
 }
 
