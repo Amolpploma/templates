@@ -25,6 +25,28 @@ if (require('electron-squirrel-startup')) {
   process.exit(0);
 }
 
+// Declarar mainWindow como variável global para poder referenciá-la em todo o arquivo
+let mainWindow = null;
+
+// Verificar se já existe uma instância do aplicativo em execução
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+
+if (!gotSingleInstanceLock) {
+  // Se não conseguimos o lock, então outra instância já está rodando
+  console.log('Aplicativo já está em execução. Encerrando esta instância...');
+  app.quit();
+} else {
+  // Esta é a primeira instância do aplicativo
+  // Configurar manipulador para quando outra instância tentar iniciar
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Alguém tentou executar uma segunda instância, devemos focar nossa janela
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
+
 let store;
 
 async function loadStore() {
@@ -131,7 +153,8 @@ async function validateDatabase(dbPath) {
 }
 
 function createWindow(page = 'index.html') {
-    const mainWindow = new BrowserWindow({
+    // Modificar para usar a variável global mainWindow em vez de criar uma nova variável local
+    mainWindow = new BrowserWindow({
         width: 960,
         height: 600,
         minWidth: 960,  // Tamanho mínimo
