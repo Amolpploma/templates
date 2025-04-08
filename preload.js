@@ -29,12 +29,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getNativeTheme: () => ipcRenderer.invoke('get-native-theme'),
     onNativeThemeUpdate: (callback) => ipcRenderer.on('native-theme-update', callback),
     
-    // Novos métodos para importar/exportar documentos
-    importDocumentos: () => ipcRenderer.invoke('import-documentos'),
-    exportarDocumentos: () => ipcRenderer.invoke('export-documentos'),
+    // Novos métodos para importar/exportar modelos
+    importModelos: () => ipcRenderer.invoke('import-modelos'),
+    exportModelos: () => ipcRenderer.invoke('export-modelos'),
     
-    // Modificar método para exportar documentos selecionados
-    exportarDocumentosSelecionados: (dados) => ipcRenderer.invoke('export-documentos-selecionados', dados),
+    // Método para exportar modelos selecionados
+    exportarModelosSelecionados: (modelos) => ipcRenderer.invoke('exportarModelosSelecionados', modelos),
     
     // Método para exportar modelos como texto
     exportarModelosComoTexto: (modelos) => ipcRenderer.invoke('export-modelos-como-texto', modelos),
@@ -45,7 +45,4 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Adicionar APIs para obter conteúdo dos arquivos em vez de abri-los externamente
     getLicenseContent: () => ipcRenderer.invoke('get-license-content'),
     getNoticeContent: () => ipcRenderer.invoke('get-notice-content'),
-    
-    // Método de diagnóstico removido ou comentado da exposição pública
-    // getAllDocuments: () => ipcRenderer.invoke('get-all-documents')
 });

@@ -78,13 +78,13 @@
                         <svg viewBox="0 0 24 24" class="config-icon">
                             <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
                         </svg>
-                        Importar Documentos
+                        Importar Modelos
                     </button>
                     <button id="export-btn" class="config-btn">
                         <svg viewBox="0 0 24 24" class="config-icon">
                             <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
                         </svg>
-                        Exportar Documentos
+                        Exportar Modelos
                     </button>
                 </div>
                 <div id="import-export-status" class="status-message"></div>
@@ -118,12 +118,12 @@
     <div class="modal-overlay" id="export-modal">
         <div class="modal">
             <div class="modal-header">
-                <h3>Exportar Documentos</h3>
+                <h3>Exportar Modelos</h3>
                 <button class="modal-close" id="export-modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="selection-container">
-                    <div class="selection-column">
+                    <div class="selection-column selection-column-full">
                         <div class="selection-header">
                             <div class="selection-header-left">
                                 <h4 class="selection-title">Modelos</h4>
@@ -139,22 +139,6 @@
                             <div class="selection-list-empty">Carregando modelos...</div>
                         </div>
                     </div>
-                    <div class="selection-column">
-                        <div class="selection-header">
-                            <div class="selection-header-left">
-                                <h4 class="selection-title">Checklists</h4>
-                                <label class="checkmark-container">
-                                    Selecionar todos
-                                    <input type="checkbox" id="select-all-checklists">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                            <span class="selection-count" id="checklists-count">0 selecionados</span>
-                        </div>
-                        <div class="selection-list" id="checklists-list">
-                            <div class="selection-list-empty">Carregando checklists...</div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -162,7 +146,7 @@
                     <svg viewBox="0 0 24 24" class="config-icon">
                         <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm0 2v14h14V5H5zm2 2h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/>
                     </svg>
-                    Exportar modelos como texto
+                    Exportar como texto
                 </button>
                 <div class="modal-footer-spacer"></div>
                 <button class="modal-btn" id="cancel-export">Cancelar</button>
@@ -187,6 +171,14 @@
             <div class="modal-footer">
                 <button class="modal-btn" id="file-content-close-btn">Fechar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Overlay de carregamento global -->
+    <div class="loading-overlay" id="global-loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner-large"></div>
+            <div class="loading-text" id="loading-text">Processando...</div>
         </div>
     </div>
 

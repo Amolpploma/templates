@@ -408,11 +408,11 @@ function registerIpcHandlers() {
     BrowserWindow.getFocusedWindow().loadFile(path.join(__dirname, 'src', page));
   });
 
-  // Modificar o handler de importação para verificar melhor os dados
-  ipcMain.handle('import-documentos', async () => {
+  // Modificar o handler de importação para tratar apenas modelos
+  ipcMain.handle('import-modelos', async () => {
     const mainWindow = BrowserWindow.getFocusedWindow();
     const result = await dialog.showOpenDialog(mainWindow, {
-      title: 'Importar Documentos',
+      title: 'Importar Modelos',
       properties: ['openFile'],
       filters: [
         { name: 'Arquivos JSON', extensions: ['json'] }
@@ -435,61 +435,40 @@ function registerIpcHandlers() {
       }
       
       // Verificar se os dados têm o formato esperado
-      if (!data.modelos && !data.checklists) {
-        return { success: false, message: 'O arquivo não contém documentos válidos para importação.' };
+      if (!data.modelos && !Array.isArray(data)) {
+        return { success: false, message: 'O arquivo não contém modelos válidos para importação.' };
+      }
+
+      // Determinar se é um array direto ou um objeto com propriedade modelos
+      const modelosArray = Array.isArray(data) ? data : data.modelos;
+      
+      if (!modelosArray || !Array.isArray(modelosArray)) {
+        return { success: false, message: 'Formato de arquivo inválido. Esperado array de modelos.' };
       }
 
       let modelosImportados = 0;
-      let checklistsImportados = 0;
       let modelosErro = 0;
-      let checklistsErro = 0;
 
       // Importar modelos
-      if (Array.isArray(data.modelos)) {
-        for (const modelo of data.modelos) {
-          // Validar estrutura
-          if (modelo.nome && (modelo.tag !== undefined) && modelo.modelo) {
-            try {
-              await database.inserirModelo(modelo.nome, modelo.tag, modelo.modelo);
-              modelosImportados++;
-            } catch (err) {
-              console.error('Erro ao importar modelo:', err);
-              modelosErro++;
-            }
-          } else {
-            console.warn('Modelo inválido encontrado', modelo);
+      for (const modelo of modelosArray) {
+        // Validar estrutura
+        if (modelo.nome && (modelo.tag !== undefined) && modelo.modelo) {
+          try {
+            await database.inserirModelo(modelo.nome, modelo.tag, modelo.modelo);
+            modelosImportados++;
+          } catch (err) {
+            console.error('Erro ao importar modelo:', err);
             modelosErro++;
           }
+        } else {
+          console.warn('Modelo inválido encontrado', modelo);
+          modelosErro++;
         }
       }
 
-      // Importar checklists
-      if (Array.isArray(data.checklists)) {
-        for (const checklist of data.checklists) {
-          // Validar estrutura
-          if (checklist.nome && (checklist.tag !== undefined) && checklist.checklist) {
-            try {
-              await database.inserirChecklist(
-                checklist.nome,
-                checklist.tag,
-                checklist.checklist,
-                checklist.modelo_id || null
-              );
-              checklistsImportados++;
-            } catch (err) {
-              console.error('Erro ao importar checklist:', err);
-              checklistsErro++;
-            }
-          } else {
-            console.warn('Checklist inválido encontrado', checklist);
-            checklistsErro++;
-          }
-        } // Fechar o loop for
-      } // Fechar o if
-
-      let mensagem = `Importação concluída: ${modelosImportados} modelos e ${checklistsImportados} checklists importados.`;
-      if (modelosErro > 0 || checklistsErro > 0) {
-        mensagem += ` (${modelosErro} modelos e ${checklistsErro} checklists com erro)`;
+      let mensagem = `Importação concluída: ${modelosImportados} modelos importados.`;
+      if (modelosErro > 0) {
+        mensagem += ` (${modelosErro} modelos com erro)`;
       }
       return { success: true, message: mensagem };
     } catch (err) {
@@ -498,11 +477,12 @@ function registerIpcHandlers() {
     }
   });
 
-  ipcMain.handle('export-documentos', async () => {
+  // Substituir export-documentos por export-modelos
+  ipcMain.handle('export-modelos', async () => {
     const mainWindow = BrowserWindow.getFocusedWindow();
     const result = await dialog.showSaveDialog(mainWindow, {
-      title: 'Exportar Documentos',
-      defaultPath: 'documentos_exportados.json',
+      title: 'Exportar Modelos',
+      defaultPath: 'modelos_exportados.json',
       filters: [
         { name: 'Arquivos JSON', extensions: ['json'] }
       ]
@@ -513,13 +493,11 @@ function registerIpcHandlers() {
     }
 
     try {
-      // Buscar todos os modelos e checklists
+      // Buscar todos os modelos
       const modelos = await database.executarQuery('SELECT * FROM modelos');
-      const checklists = await database.executarQuery('SELECT * FROM checklists');
 
       const dados = {
         modelos,
-        checklists,
         data_exportacao: new Date().toISOString(),
         versao: app.getVersion()
       };
@@ -528,7 +506,7 @@ function registerIpcHandlers() {
 
       return { 
         success: true, 
-        message: `Exportação concluída: ${modelos.length} modelos e ${checklists.length} checklists exportados.`
+        message: `Exportação concluída: ${modelos.length} modelos exportados.`
       };
     } catch (err) {
       console.error('Erro na exportação:', err);
@@ -536,12 +514,12 @@ function registerIpcHandlers() {
     }
   });
 
-  // Adicionar handler para exportação seletiva
-  ipcMain.handle('export-documentos-selecionados', async (event, dados) => {
+  // Substituir export-documentos-selecionados por exportarModelosSelecionados
+  ipcMain.handle('exportarModelosSelecionados', async (event, modelos) => {
     const mainWindow = BrowserWindow.getFocusedWindow();
     const result = await dialog.showSaveDialog(mainWindow, {
-      title: 'Exportar Documentos Selecionados',
-      defaultPath: 'documentos_exportados.json',
+      title: 'Exportar Modelos Selecionados',
+      defaultPath: 'modelos_exportados.json',
       filters: [
         { name: 'Arquivos JSON', extensions: ['json'] }
       ]
@@ -552,12 +530,9 @@ function registerIpcHandlers() {
     }
 
     try {
-      // Usar os dados selecionados já fornecidos
-      const { modelos, checklists } = dados;
-
+      // Usar os modelos selecionados já fornecidos
       const dadosExportacao = {
         modelos,
-        checklists,
         data_exportacao: new Date().toISOString(),
         versao: app.getVersion()
       };
@@ -566,34 +541,11 @@ function registerIpcHandlers() {
 
       return { 
         success: true, 
-        message: `Exportação concluída: ${modelos.length} modelos e ${checklists.length} checklists exportados.` 
+        message: `Exportação concluída: ${modelos.length} modelos exportados.` 
       };
     } catch (err) {
       console.error('Erro na exportação:', err);
       return { success: false, message: `Erro na exportação: ${err.message}` };
-    }
-  });
-
-  ipcMain.handle('get-all-documents', async () => {
-    try {
-      // Executar consultas diretamente no banco de dados para depuração
-      const modelos = await database.executarQuery('SELECT id, nome FROM modelos ORDER BY nome LIMIT 10');
-      const checklists = await database.executarQuery('SELECT id, nome FROM checklists ORDER BY nome LIMIT 10');
-      
-      console.log('Diagnóstico - Modelos:', modelos.length);
-      console.log('Diagnóstico - Checklists:', checklists.length);
-      
-      return {
-        modelos,
-        checklists,
-        success: true
-      };
-    } catch (err) {
-      console.error('Erro no diagnóstico:', err);
-      return { 
-        success: false, 
-        error: err.message 
-      };
     }
   });
 
