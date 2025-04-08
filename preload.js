@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     
     // Novos métodos para importar/exportar modelos
     importModelos: () => ipcRenderer.invoke('import-modelos'),
+    importarModelosTexto: () => ipcRenderer.invoke('importar-modelos-texto'), // Nova função adicionada
     exportModelos: () => ipcRenderer.invoke('export-modelos'),
     
     // Método para exportar modelos selecionados
