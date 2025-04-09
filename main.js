@@ -632,8 +632,8 @@ function registerIpcHandlers() {
           // Adicionar conteúdo sem as tags HTML
           content += '\n\nconteúdo:\n' + stripHtml(modelo.modelo);
           
-          // Sanitizar o nome do arquivo
-          const sanitizedName = modelo.nome.replace(/[/\\?%*:|"<>]/g, '-');
+          // Sanitizar o nome do arquivo e adicionar prefixo [MODELO]
+          const sanitizedName = `[MODELO] ${modelo.nome.replace(/[/\\?%*:|"<>]/g, '-')}`;
           const filePath = path.join(destinationFolder, `${sanitizedName}.txt`);
           
           // Salvar o arquivo
@@ -665,6 +665,105 @@ function registerIpcHandlers() {
     } catch (err) {
       console.error('Erro geral na exportação de modelos como texto:', err);
       return { success: false, message: `Erro na exportação como texto: ${err.message}` };
+    }
+  });
+
+  // Handler para importar modelos a partir de arquivos de texto
+  ipcMain.handle('importar-modelos-texto', async () => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Importar Modelos de Texto',
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        { name: 'Arquivos de texto', extensions: ['txt'] }
+      ]
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false, message: 'Importação cancelada' };
+    }
+
+    try {
+      let modelosImportados = 0;
+      let modelosErro = 0;
+      let modelosIgnorados = 0;
+
+      for (const filePath of result.filePaths) {
+        try {
+          const baseFileName = path.basename(filePath, '.txt');
+          
+          // Verificar se o nome do arquivo começa com "[MODELO]"
+          if (!baseFileName.startsWith('[MODELO]')) {
+            console.log(`Ignorando arquivo ${filePath}: não começa com [MODELO]`);
+            modelosIgnorados++;
+            continue;
+          }
+          
+          // Remover o prefixo "[MODELO] " para obter o nome real do modelo
+          const fileName = baseFileName.substring(9);  // "[MODELO] " tem 9 caracteres
+          
+          console.log(`Processando arquivo: ${filePath} => nome do modelo: ${fileName}`);
+          
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          
+          // Extrair tags e conteúdo do arquivo
+          let tags = [];
+          let modelo = '';
+          
+          // Formato esperado: "tags:" seguido de lista, depois "conteúdo:" seguido do texto
+          const tagMatch = fileContent.match(/tags:\s*(.*?)(?:\n\s*\n|\r\n\s*\r\n)/s);
+          const contentMatch = fileContent.match(/conteúdo:\s*([\s\S]*$)/s);
+          
+          if (tagMatch && tagMatch[1]) {
+            tags = tagMatch[1].split(',').map(tag => tag.trim()).filter(tag => tag);
+            console.log(`Tags encontradas: ${tags.join(', ')}`);
+          } else {
+            console.log('Nenhuma tag encontrada no arquivo');
+          }
+          
+          let rawContent = '';
+          if (contentMatch && contentMatch[1]) {
+            rawContent = contentMatch[1].trim();
+            console.log('Conteúdo extraído do arquivo com formato "conteúdo:"');
+          } else {
+            // Se não encontrar o formato esperado, usar todo o conteúdo como modelo
+            rawContent = fileContent.trim();
+            console.log('Formato "conteúdo:" não encontrado, usando texto completo');
+          }
+
+          // Converter o texto para HTML com parágrafos formatados
+          const paragrafos = rawContent.split(/\r?\n\r?\n/);
+          modelo = paragrafos.map(p => 
+            `<p style="line-height: 1; text-align: justify;">` + 
+            `<span style="font-size: 12pt; font-family: ''times new roman'', times, serif;">` + 
+            // Preservar quebras de linha dentro dos parágrafos como <br>
+            p.replace(/\r?\n/g, '<br>') + 
+            `</span></p>`
+          ).join('\n');
+          
+          console.log(`Inserindo modelo "${fileName}" no banco de dados...`);
+          // Inserir no banco de dados
+          await database.inserirModelo(fileName, tags, modelo);
+          modelosImportados++;
+          console.log(`Modelo "${fileName}" importado com sucesso`);
+        } catch (err) {
+          console.error(`Erro ao importar arquivo ${filePath}:`, err);
+          modelosErro++;
+        }
+      }
+
+      let mensagem = `Importação concluída: ${modelosImportados} modelos importados de arquivos de texto.`;
+      if (modelosErro > 0) {
+        mensagem += ` (${modelosErro} arquivos com erro)`;
+      }
+      if (modelosIgnorados > 0) {
+        mensagem += ` (${modelosIgnorados} arquivos ignorados por não começarem com [MODELO])`;
+      }
+      
+      return { success: true, message: mensagem };
+    } catch (err) {
+      console.error('Erro na importação de arquivos de texto:', err);
+      return { success: false, message: `Erro na importação: ${err.message}` };
     }
   });
 
@@ -782,81 +881,6 @@ function registerIpcHandlers() {
         }
     } else {
         return { success: false, error: 'O arquivo NOTICE não foi encontrado.' };
-    }
-  });
-
-  // Handler para importar modelos a partir de arquivos de texto
-  ipcMain.handle('importar-modelos-texto', async () => {
-    const mainWindow = BrowserWindow.getFocusedWindow();
-    const result = await dialog.showOpenDialog(mainWindow, {
-      title: 'Importar Modelos de Texto',
-      properties: ['openFile', 'multiSelections'],
-      filters: [
-        { name: 'Arquivos de texto', extensions: ['txt'] }
-      ]
-    });
-
-    if (result.canceled || result.filePaths.length === 0) {
-      return { success: false, message: 'Importação cancelada' };
-    }
-
-    try {
-      let modelosImportados = 0;
-      let modelosErro = 0;
-
-      for (const filePath of result.filePaths) {
-        try {
-          const fileName = path.basename(filePath, '.txt');
-          const fileContent = fs.readFileSync(filePath, 'utf8');
-          
-          // Extrair tags e conteúdo do arquivo
-          let tags = [];
-          let modelo = '';
-          
-          // Formato esperado: "tags:" seguido de lista, depois "conteúdo:" seguido do texto
-          const tagMatch = fileContent.match(/tags:\s*(.*?)(?:\n\s*\n|\r\n\s*\r\n)/s);
-          const contentMatch = fileContent.match(/conteúdo:\s*([\s\S]*$)/s);
-          
-          if (tagMatch && tagMatch[1]) {
-            tags = tagMatch[1].split(',').map(tag => tag.trim()).filter(tag => tag);
-          }
-          
-          let rawContent = '';
-          if (contentMatch && contentMatch[1]) {
-            rawContent = contentMatch[1].trim();
-          } else {
-            // Se não encontrar o formato esperado, usar todo o conteúdo como modelo
-            rawContent = fileContent.trim();
-          }
-
-          // Converter o texto para HTML com parágrafos formatados
-          const paragrafos = rawContent.split(/\r?\n\r?\n/);
-          modelo = paragrafos.map(p => 
-            `<p style="line-height: 1; text-align: justify;">` + 
-            `<span style="font-size: 12pt; font-family: ''times new roman'', times, serif;">` + 
-            // Preservar quebras de linha dentro dos parágrafos como <br>
-            p.replace(/\r?\n/g, '<br>') + 
-            `</span></p>`
-          ).join('\n');
-          
-          // Inserir no banco de dados
-          await database.inserirModelo(fileName, tags, modelo);
-          modelosImportados++;
-        } catch (err) {
-          console.error(`Erro ao importar arquivo ${filePath}:`, err);
-          modelosErro++;
-        }
-      }
-
-      let mensagem = `Importação concluída: ${modelosImportados} modelos importados de arquivos de texto.`;
-      if (modelosErro > 0) {
-        mensagem += ` (${modelosErro} arquivos com erro)`;
-      }
-      
-      return { success: true, message: mensagem };
-    } catch (err) {
-      console.error('Erro na importação de arquivos de texto:', err);
-      return { success: false, message: `Erro na importação: ${err.message}` };
     }
   });
 }
