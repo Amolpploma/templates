@@ -40,6 +40,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Método para exportar modelos como texto
     exportarModelosComoTexto: (modelos) => ipcRenderer.invoke('export-modelos-como-texto', modelos),
     
+    // Novo método para resolver conflitos de importação
+    resolverConflitoModelo: (dados) => ipcRenderer.invoke('resolver-conflito-modelo', dados),
+    
     // Adicionar nova função para buscar apenas IDs e nomes de modelos
     buscarModelosResumidos: (termo) => ipcRenderer.invoke('buscar-modelos-resumidos', termo),
     

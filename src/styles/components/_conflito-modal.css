@@ -1,0 +1,177 @@
+.conflito-modal {
+    max-width: 90%;
+    width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.conflict-progress-info {
+    font-size: 14px;
+    margin-bottom: 15px;
+    color: var(--text-secondary);
+    padding: 5px 10px;
+    background-color: var(--bg-primary);
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.conflict-details {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: var(--bg-primary);
+    border-radius: 4px;
+}
+
+.conflict-diff-container {
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.diff-header {
+    display: flex;
+    background-color: var(--bg-primary);
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.diff-header div {
+    flex: 1;
+    font-weight: bold;
+    text-align: center;
+}
+
+.diff-content {
+    display: flex;
+    flex: 1;
+    overflow: auto;
+}
+
+.diff-existente, .diff-novo {
+    flex: 1;
+    padding: 10px;
+    overflow: auto;
+    border-right: 1px solid var(--border-color);
+}
+
+.diff-novo {
+    border-right: none;
+}
+
+.diff-content-html {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    background-color: var(--bg-secondary);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    min-height: 200px;
+    max-height: 300px;
+    overflow: auto;
+}
+
+.diff-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.diff-tags .tag {
+    background-color: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.conflict-options {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+}
+
+.conflict-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-manter {
+    background-color: var(--btn-bg);
+}
+
+.btn-sobrescrever {
+    background-color: var(--btn-hover);
+}
+
+.btn-novo-nome {
+    background-color: var(--btn-bg);
+}
+
+.novo-nome-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.novo-nome-container.hidden {
+    display: none;
+}
+
+.novo-nome-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-right: 10px;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.btn-confirmar-novo {
+    background-color: var(--btn-hover);
+    color: var(--text-primary);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Estilos para o resumo da importação */
+.import-summary {
+    background-color: var(--bg-primary);
+    border-radius: 4px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.import-summary p {
+    margin: 8px 0;
+}
+
+.summary-total {
+    font-weight: bold;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Destacar diferenças */
+.diff-highlight {
+    background-color: rgba(255, 255, 0, 0.3);
+    padding: 0 2px;
+}
+
+.diff-added {
+    background-color: rgba(0, 255, 0, 0.2);
+}
+
+.diff-removed {
+    background-color: rgba(255, 0, 0, 0.2);
+    text-decoration: line-through;
+}

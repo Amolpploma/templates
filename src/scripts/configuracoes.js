@@ -117,7 +117,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 result = await window.electronAPI.importModelos();
             }
             
-            if (result.success) {
+            // Verificar se há conflitos que precisam ser resolvidos
+            if (result.success && result.requiresResolution) {
+                // Criar e mostrar diálogo de resolução de conflitos
+                await mostrarDialogoResolucaoConflitos(result.pendentes, result.ignorados || 0);
+                // Atualizar mensagem após resolução de conflitos
+                statusMessage.textContent = 'Importação concluída com resolução de conflitos';
+                statusMessage.className = 'status-message success';
+            } else if (result.success) {
                 statusMessage.textContent = result.message;
                 statusMessage.className = 'status-message success';
             } else {
@@ -135,6 +142,283 @@ document.addEventListener('DOMContentLoaded', async () => {
             hideGlobalLoading();
         }
     });
+
+    // Nova função para mostrar diálogo de resolução de conflitos
+    async function mostrarDialogoResolucaoConflitos(modelosPendentes, ignorados) {
+        // Filtrar apenas os conflitos
+        const conflitos = modelosPendentes.filter(item => item.tipo === 'conflito');
+        const novos = modelosPendentes.filter(item => item.tipo === 'novo');
+        
+        // Container que mostrará os conflitos um por um
+        const conflitosContainer = document.createElement('div');
+        conflitosContainer.id = 'conflitos-container';
+        conflitosContainer.className = 'conflitos-container';
+        
+        // Criar o modal de conflitos
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay active';
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal conflito-modal';
+        
+        // Criar cabeçalho do modal
+        const modalHeader = document.createElement('div');
+        modalHeader.className = 'modal-header';
+        
+        const modalTitle = document.createElement('h3');
+        modalTitle.textContent = `Conflitos de Importação (${conflitos.length})`;
+        
+        modalHeader.appendChild(modalTitle);
+        
+        // Criar corpo do modal
+        const modalBody = document.createElement('div');
+        modalBody.className = 'modal-body';
+        
+        // Informação de progresso
+        const progressInfo = document.createElement('div');
+        progressInfo.className = 'conflict-progress-info';
+        progressInfo.innerHTML = `<span id="conflict-current">1</span> de ${conflitos.length} conflitos`;
+        
+        // Container para exibir as diferenças
+        const diffContainer = document.createElement('div');
+        diffContainer.className = 'conflict-diff-container';
+        
+        // Container para as opções
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'conflict-options';
+        
+        // Detalhes do conflito atual
+        const conflictDetails = document.createElement('div');
+        conflictDetails.className = 'conflict-details';
+        conflictDetails.innerHTML = `<strong>Nome do modelo:</strong> <span id="conflict-name"></span>`;
+        
+        modalBody.appendChild(progressInfo);
+        modalBody.appendChild(conflictDetails);
+        modalBody.appendChild(diffContainer);
+        modalBody.appendChild(optionsContainer);
+        
+        // Criar rodapé do modal
+        const modalFooter = document.createElement('div');
+        modalFooter.className = 'modal-footer conflict-footer';
+        
+        // Botões para resolver o conflito atual
+        const btnManter = document.createElement('button');
+        btnManter.className = 'modal-btn btn-manter';
+        btnManter.textContent = 'Manter existente';
+        
+        const btnSobrescrever = document.createElement('button');
+        btnSobrescrever.className = 'modal-btn btn-sobrescrever';
+        btnSobrescrever.textContent = 'Sobrescrever';
+        
+        const btnNovoNome = document.createElement('button');
+        btnNovoNome.className = 'modal-btn btn-novo-nome';
+        btnNovoNome.textContent = 'Salvar como novo';
+        
+        // Campo para inserir novo nome
+        const novoNomeContainer = document.createElement('div');
+        novoNomeContainer.className = 'novo-nome-container hidden';
+        novoNomeContainer.innerHTML = `
+            <input type="text" id="novo-nome-input" class="novo-nome-input" placeholder="Novo nome para o modelo">
+            <button class="modal-btn btn-confirmar-novo">Confirmar</button>
+        `;
+        
+        modalFooter.appendChild(btnManter);
+        modalFooter.appendChild(btnSobrescrever);
+        modalFooter.appendChild(btnNovoNome);
+        modalFooter.appendChild(novoNomeContainer);
+        
+        // Montar o modal
+        modal.appendChild(modalHeader);
+        modal.appendChild(modalBody);
+        modal.appendChild(modalFooter);
+        modalOverlay.appendChild(modal);
+        
+        // Adicionar ao DOM
+        document.body.appendChild(modalOverlay);
+        
+        // Função para mostrar as diferenças entre os modelos
+        function mostrarDiferencas(existente, novo) {
+            // Criar elementos para mostrar as diferenças lado a lado
+            diffContainer.innerHTML = `
+                <div class="diff-header">
+                    <div>Modelo Existente</div>
+                    <div>Modelo a Importar</div>
+                </div>
+                <div class="diff-content">
+                    <div class="diff-existente">
+                        <h4>Conteúdo:</h4>
+                        <div class="diff-content-html">${existente.modelo}</div>
+                        <h4>Tags:</h4>
+                        <div class="diff-tags">${formatarTags(existente.tag)}</div>
+                    </div>
+                    <div class="diff-novo">
+                        <h4>Conteúdo:</h4>
+                        <div class="diff-content-html">${novo.modelo}</div>
+                        <h4>Tags:</h4>
+                        <div class="diff-tags">${formatarTags(novo.tag)}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Destacar as diferenças (aqui você pode adicionar uma lógica mais sofisticada)
+            // Por exemplo, usando uma biblioteca como diff ou jsdiff
+        }
+        
+        // Função para formatar tags
+        function formatarTags(tags) {
+            if (!tags) return 'Nenhuma tag';
+            
+            // Se for string JSON, converter para array
+            let tagsArray = tags;
+            if (typeof tags === 'string') {
+                try {
+                    tagsArray = JSON.parse(tags);
+                } catch (e) {
+                    tagsArray = [tags];
+                }
+            }
+            
+            if (!Array.isArray(tagsArray)) {
+                return String(tagsArray);
+            }
+            
+            return tagsArray.map(tag => `<span class="tag">${tag}</span>`).join(' ');
+        }
+        
+        // Função para processar o conflito atual
+        let indiceAtual = 0;
+        let importados = 0;
+        let mantidos = 0;
+        let sobrescritos = 0;
+        
+        async function processarConflitoAtual() {
+            if (indiceAtual >= conflitos.length) {
+                // Todos os conflitos foram processados, finalizar
+                finalizarProcessamento();
+                return;
+            }
+            
+            const conflito = conflitos[indiceAtual];
+            const existente = conflito.existente;
+            const novo = conflito.novo;
+            
+            // Atualizar contadores
+            document.getElementById('conflict-current').textContent = (indiceAtual + 1);
+            document.getElementById('conflict-name').textContent = existente.nome;
+            
+            // Mostrar diferenças
+            mostrarDiferencas(existente, novo);
+            
+            // Resetar UI de novo nome
+            novoNomeContainer.classList.add('hidden');
+            const novoNomeInput = document.getElementById('novo-nome-input');
+            if (novoNomeInput) {
+                novoNomeInput.value = `${existente.nome} (cópia)`;
+            }
+        }
+        
+        // Iniciar com o primeiro conflito
+        processarConflitoAtual();
+        
+        // Handlers para os botões
+        btnManter.addEventListener('click', async () => {
+            await window.electronAPI.resolverConflitoModelo({
+                modeloExistente: conflitos[indiceAtual].existente,
+                modeloNovo: conflitos[indiceAtual].novo,
+                acao: 'manter'
+            });
+            
+            mantidos++;
+            indiceAtual++;
+            processarConflitoAtual();
+        });
+        
+        btnSobrescrever.addEventListener('click', async () => {
+            await window.electronAPI.resolverConflitoModelo({
+                modeloExistente: conflitos[indiceAtual].existente,
+                modeloNovo: conflitos[indiceAtual].novo,
+                acao: 'sobrescrever'
+            });
+            
+            sobrescritos++;
+            indiceAtual++;
+            processarConflitoAtual();
+        });
+        
+        btnNovoNome.addEventListener('click', () => {
+            // Mostrar campo para inserir novo nome
+            novoNomeContainer.classList.remove('hidden');
+        });
+        
+        // Botão de confirmar novo nome
+        const btnConfirmarNovo = novoNomeContainer.querySelector('.btn-confirmar-novo');
+        btnConfirmarNovo.addEventListener('click', async () => {
+            const novoNome = document.getElementById('novo-nome-input').value.trim();
+            
+            if (!novoNome) {
+                alert('Por favor, informe um nome válido para o modelo.');
+                return;
+            }
+            
+            // Verificar se o novo nome já existe
+            const verificacao = await window.electronAPI.verificarModelo(novoNome);
+            if (verificacao) {
+                alert(`Já existe um modelo com o nome "${novoNome}". Por favor, escolha outro nome.`);
+                return;
+            }
+            
+            await window.electronAPI.resolverConflitoModelo({
+                modeloExistente: conflitos[indiceAtual].existente,
+                modeloNovo: conflitos[indiceAtual].novo,
+                acao: 'novo',
+                novoNome: novoNome
+            });
+            
+            importados++;
+            indiceAtual++;
+            processarConflitoAtual();
+        });
+        
+        // Função para finalizar o processamento
+        async function finalizarProcessamento() {
+            // Importar os modelos sem conflito
+            for (const novo of novos) {
+                try {
+                    await window.electronAPI.salvarDocumento({
+                        nome: novo.modelo.nome,
+                        tag: novo.modelo.tag,
+                        modelo: novo.modelo.modelo
+                    });
+                    importados++;
+                } catch (err) {
+                    console.error('Erro ao importar modelo sem conflito:', err);
+                }
+            }
+            
+            // Mostrar resumo
+            modalBody.innerHTML = `
+                <h3>Importação concluída</h3>
+                <div class="import-summary">
+                    <p>Modelos importados sem conflito: ${novos.length}</p>
+                    <p>Modelos mantidos (versão existente): ${mantidos}</p>
+                    <p>Modelos sobrescritos: ${sobrescritos}</p>
+                    <p>Modelos importados com novo nome: ${importados - novos.length}</p>
+                    ${ignorados > 0 ? `<p>Arquivos ignorados: ${ignorados}</p>` : ''}
+                    <p class="summary-total">Total de modelos processados: ${novos.length + conflitos.length}</p>
+                </div>
+            `;
+            
+            // Simplificar os botões
+            modalFooter.innerHTML = `
+                <button class="modal-btn modal-btn-primary btn-finalizar">Concluir</button>
+            `;
+            
+            const btnFinalizar = modalFooter.querySelector('.btn-finalizar');
+            btnFinalizar.addEventListener('click', () => {
+                document.body.removeChild(modalOverlay);
+            });
+        }
+    }
 
     // Função para resetar todos os checkboxes do modal
     function resetCheckboxes() {
