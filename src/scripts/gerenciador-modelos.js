@@ -194,12 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }]
                             );
                             
-                            // Se o sistema de abas estiver disponível e se for o primeiro modelo salvo desta aba
-                            // renomear a aba para o nome do modelo
+                            // Apenas renomear a aba atual quando editar um modelo existente
                             if (window.editorTabs && window.editorTabs.getCurrentTabId()) {
                                 window.editorTabs.renameTab(window.editorTabs.getCurrentTabId(), nome);
-                                // Criar uma nova aba para continuar editando
-                                window.editorTabs.createNewTab();
                             }
                         } catch (err) {
                             console.error('Erro ao atualizar modelo:', err);
@@ -236,11 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }]
                             );
                             
-                            // Se o sistema de abas estiver disponível
+                            // Apenas renomear a aba atual ao salvar um novo modelo
                             if (window.editorTabs && window.editorTabs.getCurrentTabId()) {
                                 window.editorTabs.renameTab(window.editorTabs.getCurrentTabId(), nome);
-                                // Criar uma nova aba para continuar editando
-                                window.editorTabs.createNewTab();
                             }
                         }
                     } catch (err) {
