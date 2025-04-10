@@ -103,3 +103,10 @@
 body[data-page="checklist-editor"] .resultado-modelo-container {
     margin-bottom: 0px;
 }
+
+/* Estilo para botão durante salvamento */
+.btn-salvar[data-saving="true"] {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: var(--btn-bg);
+}

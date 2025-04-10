@@ -271,7 +271,8 @@ class Database {
     }
 
     async verificarModeloExistente(nome) {
-        const query = 'SELECT * FROM modelos WHERE nome = ?';
+        // Modificada a query para usar COLLATE NOCASE para tornar a busca insensível a maiúsculas/minúsculas
+        const query = 'SELECT * FROM modelos WHERE nome = ? COLLATE NOCASE';
         const rows = await this.executarQuery(query, [nome]);
         return rows.length > 0 ? rows[0] : null;
     }

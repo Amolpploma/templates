@@ -4,11 +4,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const tagInput = document.getElementById('tag-input');
     const searchInput = document.querySelector('.search-input');
 
+    // Flag para controlar se o handler já foi configurado
+    let saveHandlerConfigured = false;
+
     // Verificar se o editor está pronto
     const waitForEditor = setInterval(async () => {
         if (window.tinymce?.activeEditor) {
             clearInterval(waitForEditor);
-            setupSaveHandler();
+            
+            // Verificar se o handler já foi configurado
+            if (!saveHandlerConfigured) {
+                setupSaveHandler();
+                saveHandlerConfigured = true;
+            }
             
             // Verificar se há conteúdo transferido
             const transferContent = await window.electronAPI.getStore('transferContent');
@@ -103,7 +111,27 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     async function setupSaveHandler() {
-        btnSalvar.addEventListener('click', async () => {
+        // Remover qualquer handler existente para evitar duplicação
+        btnSalvar.removeEventListener('click', handleSaveClick);
+        
+        // Adicionar o novo handler
+        btnSalvar.addEventListener('click', handleSaveClick);
+    }
+    
+    // Extrair a função de tratamento do clique para poder removê-la se necessário
+    async function handleSaveClick() {
+        // Verificar se o botão já está em processo de salvamento
+        if (btnSalvar.hasAttribute('data-saving')) {
+            return; // Evitar múltiplas chamadas simultâneas
+        }
+        
+        // Desabilitar botão durante o salvamento
+        btnSalvar.setAttribute('data-saving', 'true');
+        btnSalvar.disabled = true;
+        const originalText = btnSalvar.textContent;
+        btnSalvar.textContent = 'Salvando...';
+        
+        try {
             const nome = nomeInput.value.trim();
             if (!nome) {
                 await window.showDialog(
@@ -242,6 +270,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }]
                 );
             }
-        });
+        } finally {
+            // Restaurar o estado do botão
+            btnSalvar.disabled = false;
+            btnSalvar.textContent = originalText;
+            btnSalvar.removeAttribute('data-saving');
+        }
     }
 });
