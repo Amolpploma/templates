@@ -408,11 +408,44 @@ function registerIpcHandlers() {
     BrowserWindow.getFocusedWindow().loadFile(path.join(__dirname, 'src', page));
   });
 
-  // Modificar o handler de importação para verificar melhor os dados
-  ipcMain.handle('import-documentos', async () => {
+  // Novo handler para resolver conflito de modelo
+  ipcMain.handle('resolver-conflito-modelo', async (event, { modeloExistente, modeloNovo, acao, novoNome }) => {
+    try {
+      // Verificar a ação escolhida pelo usuário
+      switch (acao) {
+        case 'manter':
+          // Não faz nada, mantém o modelo existente
+          return { success: true, action: 'manter' };
+        
+        case 'sobrescrever':
+          // Atualizar o modelo existente com o novo conteúdo
+          await database.atualizarModelo(
+            modeloExistente.id,
+            modeloExistente.nome,
+            modeloNovo.tag,
+            modeloNovo.modelo
+          );
+          return { success: true, action: 'sobrescrever', id: modeloExistente.id };
+        
+        case 'novo':
+          // Inserir como novo modelo com nome modificado
+          const lastId = await database.inserirModelo(novoNome, modeloNovo.tag, modeloNovo.modelo);
+          return { success: true, action: 'novo', id: lastId };
+        
+        default:
+          return { success: false, message: 'Ação inválida' };
+      }
+    } catch (err) {
+      console.error('Erro ao resolver conflito:', err);
+      return { success: false, message: `Erro ao resolver conflito: ${err.message}` };
+    }
+  });
+
+  // Modificar o handler de importação para tratar conflitos
+  ipcMain.handle('import-modelos', async () => {
     const mainWindow = BrowserWindow.getFocusedWindow();
     const result = await dialog.showOpenDialog(mainWindow, {
-      title: 'Importar Documentos',
+      title: 'Importar Modelos',
       properties: ['openFile'],
       filters: [
         { name: 'Arquivos JSON', extensions: ['json'] }
@@ -435,284 +468,249 @@ function registerIpcHandlers() {
       }
       
       // Verificar se os dados têm o formato esperado
-      if (!data.modelos && !data.checklists) {
-        return { success: false, message: 'O arquivo não contém documentos válidos para importação.' };
+      if (!data.modelos && !Array.isArray(data)) {
+        return { success: false, message: 'O arquivo não contém modelos válidos para importação.' };
+      }
+
+      // Determinar se é um array direto ou um objeto com propriedade modelos
+      const modelosArray = Array.isArray(data) ? data : data.modelos;
+      
+      if (!modelosArray || !Array.isArray(modelosArray)) {
+        return { success: false, message: 'Formato de arquivo inválido. Esperado array de modelos.' };
       }
 
       let modelosImportados = 0;
-      let checklistsImportados = 0;
       let modelosErro = 0;
-      let checklistsErro = 0;
+      let modelosConflito = 0;
+      let modelosPendentes = [];
 
-      // Importar modelos
-      if (Array.isArray(data.modelos)) {
-        for (const modelo of data.modelos) {
-          // Validar estrutura
-          if (modelo.nome && (modelo.tag !== undefined) && modelo.modelo) {
-            try {
-              await database.inserirModelo(modelo.nome, modelo.tag, modelo.modelo);
-              modelosImportados++;
-            } catch (err) {
-              console.error('Erro ao importar modelo:', err);
-              modelosErro++;
+      // Primeiro passo: verificar todos os modelos e identificar conflitos
+      for (const modelo of modelosArray) {
+        // Validar estrutura
+        if (modelo.nome && (modelo.tag !== undefined) && modelo.modelo) {
+          try {
+            // Verificar se já existe um modelo com este nome
+            const modeloExistente = await database.verificarModeloExistente(modelo.nome);
+            
+            if (modeloExistente) {
+              // Marcar como conflito e adicionar à lista de pendentes
+              modelosPendentes.push({
+                tipo: 'conflito',
+                novo: modelo,
+                existente: modeloExistente
+              });
+              modelosConflito++;
+            } else {
+              // Se não há conflito, adicionar como pendente para importação direta
+              modelosPendentes.push({
+                tipo: 'novo',
+                modelo: modelo
+              });
             }
-          } else {
-            console.warn('Modelo inválido encontrado', modelo);
+          } catch (err) {
+            console.error('Erro ao verificar modelo:', err);
+            modelosErro++;
+          }
+        } else {
+          console.warn('Modelo inválido encontrado', modelo);
+          modelosErro++;
+        }
+      }
+
+      // Se houver conflitos, retornar para o renderer decidir como tratar
+      if (modelosConflito > 0) {
+        return {
+          success: true,
+          requiresResolution: true,
+          message: `Encontrados ${modelosConflito} modelos com nomes já existentes no banco de dados.`,
+          pendentes: modelosPendentes
+        };
+      }
+
+      // Se não houver conflitos, importar diretamente
+      for (const pendente of modelosPendentes) {
+        if (pendente.tipo === 'novo') {
+          try {
+            await database.inserirModelo(
+              pendente.modelo.nome, 
+              pendente.modelo.tag, 
+              pendente.modelo.modelo
+            );
+            modelosImportados++;
+          } catch (err) {
+            console.error('Erro ao importar modelo:', err);
             modelosErro++;
           }
         }
       }
 
-      // Importar checklists
-      if (Array.isArray(data.checklists)) {
-        for (const checklist of data.checklists) {
-          // Validar estrutura
-          if (checklist.nome && (checklist.tag !== undefined) && checklist.checklist) {
-            try {
-              await database.inserirChecklist(
-                checklist.nome,
-                checklist.tag,
-                checklist.checklist,
-                checklist.modelo_id || null
-              );
-              checklistsImportados++;
-            } catch (err) {
-              console.error('Erro ao importar checklist:', err);
-              checklistsErro++;
-            }
-          } else {
-            console.warn('Checklist inválido encontrado', checklist);
-            checklistsErro++;
-          }
-        } // Fechar o loop for
-      } // Fechar o if
-
-      let mensagem = `Importação concluída: ${modelosImportados} modelos e ${checklistsImportados} checklists importados.`;
-      if (modelosErro > 0 || checklistsErro > 0) {
-        mensagem += ` (${modelosErro} modelos e ${checklistsErro} checklists com erro)`;
+      let mensagem = `Importação concluída: ${modelosImportados} modelos importados.`;
+      if (modelosErro > 0) {
+        mensagem += ` (${modelosErro} modelos com erro)`;
       }
-      return { success: true, message: mensagem };
+      
+      return { 
+        success: true, 
+        message: mensagem,
+        requiresResolution: false
+      };
     } catch (err) {
       console.error('Erro na importação:', err);
       return { success: false, message: `Erro na importação: ${err.message}` };
     }
   });
 
-  ipcMain.handle('export-documentos', async () => {
+  // Modificar o handler de importação de modelos de texto para verificar conflitos
+  ipcMain.handle('importar-modelos-texto', async () => {
     const mainWindow = BrowserWindow.getFocusedWindow();
-    const result = await dialog.showSaveDialog(mainWindow, {
-      title: 'Exportar Documentos',
-      defaultPath: 'documentos_exportados.json',
-      filters: [
-        { name: 'Arquivos JSON', extensions: ['json'] }
-      ]
-    });
-
-    if (result.canceled || !result.filePath) {
-      return { success: false, message: 'Exportação cancelada' };
-    }
-
-    try {
-      // Buscar todos os modelos e checklists
-      const modelos = await database.executarQuery('SELECT * FROM modelos');
-      const checklists = await database.executarQuery('SELECT * FROM checklists');
-
-      const dados = {
-        modelos,
-        checklists,
-        data_exportacao: new Date().toISOString(),
-        versao: app.getVersion()
-      };
-
-      fs.writeFileSync(result.filePath, JSON.stringify(dados, null, 2), 'utf8');
-
-      return { 
-        success: true, 
-        message: `Exportação concluída: ${modelos.length} modelos e ${checklists.length} checklists exportados.`
-      };
-    } catch (err) {
-      console.error('Erro na exportação:', err);
-      return { success: false, message: `Erro na exportação: ${err.message}` };
-    }
-  });
-
-  // Adicionar handler para exportação seletiva
-  ipcMain.handle('export-documentos-selecionados', async (event, dados) => {
-    const mainWindow = BrowserWindow.getFocusedWindow();
-    const result = await dialog.showSaveDialog(mainWindow, {
-      title: 'Exportar Documentos Selecionados',
-      defaultPath: 'documentos_exportados.json',
-      filters: [
-        { name: 'Arquivos JSON', extensions: ['json'] }
-      ]
-    });
-
-    if (result.canceled || !result.filePath) {
-      return { success: false, message: 'Exportação cancelada' };
-    }
-
-    try {
-      // Usar os dados selecionados já fornecidos
-      const { modelos, checklists } = dados;
-
-      const dadosExportacao = {
-        modelos,
-        checklists,
-        data_exportacao: new Date().toISOString(),
-        versao: app.getVersion()
-      };
-
-      fs.writeFileSync(result.filePath, JSON.stringify(dadosExportacao, null, 2), 'utf8');
-
-      return { 
-        success: true, 
-        message: `Exportação concluída: ${modelos.length} modelos e ${checklists.length} checklists exportados.` 
-      };
-    } catch (err) {
-      console.error('Erro na exportação:', err);
-      return { success: false, message: `Erro na exportação: ${err.message}` };
-    }
-  });
-
-  ipcMain.handle('get-all-documents', async () => {
-    try {
-      // Executar consultas diretamente no banco de dados para depuração
-      const modelos = await database.executarQuery('SELECT id, nome FROM modelos ORDER BY nome LIMIT 10');
-      const checklists = await database.executarQuery('SELECT id, nome FROM checklists ORDER BY nome LIMIT 10');
-      
-      console.log('Diagnóstico - Modelos:', modelos.length);
-      console.log('Diagnóstico - Checklists:', checklists.length);
-      
-      return {
-        modelos,
-        checklists,
-        success: true
-      };
-    } catch (err) {
-      console.error('Erro no diagnóstico:', err);
-      return { 
-        success: false, 
-        error: err.message 
-      };
-    }
-  });
-
-  // Handler para exportar modelos como texto
-  ipcMain.handle('export-modelos-como-texto', async (event, modelos) => {
-    const mainWindow = BrowserWindow.getFocusedWindow();
-    
-    // Verificar se há modelos para exportar
-    if (!modelos || modelos.length === 0) {
-      return { success: false, message: 'Nenhum modelo selecionado para exportação' };
-    }
-    
-    // Abrir diálogo para selecionar pasta de destino
     const result = await dialog.showOpenDialog(mainWindow, {
-      title: 'Selecione a pasta para salvar os arquivos de texto',
-      properties: ['openDirectory']
+      title: 'Importar Modelos de Texto',
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        { name: 'Arquivos de texto', extensions: ['txt'] }
+      ]
     });
-    
+
     if (result.canceled || result.filePaths.length === 0) {
-      return { success: false, message: 'Seleção de pasta cancelada' };
+      return { success: false, message: 'Importação cancelada' };
     }
-    
-    const destinationFolder = result.filePaths[0];
-    let successCount = 0;
-    let errorCount = 0;
-    let errorDetails = []; // Array para armazenar detalhes de erros
-    
+
     try {
-      // Função para remover tags HTML e decodificar entidades preservando quebras de linha
-      function stripHtml(html) {
-        // Se não for string, retornar como está
-        if (typeof html !== 'string') {
-          return html;
-        }
-        
-        // Criar elemento temporário para converter entidades HTML
-        const { JSDOM } = require('jsdom');
-        const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
-        const document = dom.window.document;
-        
-        // Converter quebras de linha em HTML para caracteres de quebra de linha real
-        // Substituir elementos de bloco comuns por quebras de linha
-        let processedHtml = html
-          .replace(/<br\s*\/?>/gi, '\n')
-          .replace(/<\/(p|div|h\d|tr|li)>/gi, '\n')
-          .replace(/<\/(td|th)>/gi, '\t')
-          .replace(/<hr\s*\/?>/gi, '\n---\n');
-        
-        // Criar um elemento temporário
-        const tmp = document.createElement('div');
-        tmp.innerHTML = processedHtml;
-        
-        // Obter o texto puro (converte automaticamente todas entidades HTML)
-        let text = tmp.textContent || tmp.innerText || '';
-        
-        // Normalizar quebras de linha (remover quebras de linha duplicadas)
-        text = text.replace(/\n{3,}/g, '\n\n');
-        
-        return text;
-      }
-      
-      // Exportar cada modelo como um arquivo de texto separado
-      for (const modelo of modelos) {
+      let modelosImportados = 0;
+      let modelosErro = 0;
+      let modelosIgnorados = 0;
+      let modelosConflito = 0;
+      let modelosPendentes = [];
+
+      for (const filePath of result.filePaths) {
         try {
-          // Formatar o conteúdo conforme especificado
-          let content = 'tags:\n';
+          const baseFileName = path.basename(filePath, '.txt');
           
-          // Processar tags (pode ser string JSON ou array)
-          let tags = modelo.tag;
-          if (typeof tags === 'string') {
-            try {
-              tags = JSON.parse(tags);
-            } catch (e) {
-              tags = [tags];
-            }
+          // Verificar se o nome do arquivo começa com "[MODELO]"
+          if (!baseFileName.startsWith('[MODELO]')) {
+            console.log(`Ignorando arquivo ${filePath}: não começa com [MODELO]`);
+            modelosIgnorados++;
+            continue;
           }
           
-          if (Array.isArray(tags)) {
-            content += tags.join(',');
+          // Remover o prefixo "[MODELO] " para obter o nome real do modelo
+          const fileName = baseFileName.substring(9);  // "[MODELO] " tem 9 caracteres
+          
+          console.log(`Processando arquivo: ${filePath} => nome do modelo: ${fileName}`);
+          
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          
+          // Extrair tags e conteúdo do arquivo
+          let tags = [];
+          let modelo = '';
+          
+          // Formato esperado: "tags:" seguido de lista, depois "conteúdo:" seguido do texto
+          const tagMatch = fileContent.match(/tags:\s*(.*?)(?:\n\s*\n|\r\n\s*\r\n)/s);
+          const contentMatch = fileContent.match(/conteúdo:\s*([\s\S]*$)/s);
+          
+          if (tagMatch && tagMatch[1]) {
+            tags = tagMatch[1].split(',').map(tag => tag.trim()).filter(tag => tag);
+            console.log(`Tags encontradas: ${tags.join(', ')}`);
           } else {
-            content += String(tags);
+            console.log('Nenhuma tag encontrada no arquivo');
           }
           
-          // Adicionar conteúdo sem as tags HTML
-          content += '\n\nconteúdo:\n' + stripHtml(modelo.modelo);
+          let rawContent = '';
+          if (contentMatch && contentMatch[1]) {
+            rawContent = contentMatch[1].trim();
+            console.log('Conteúdo extraído do arquivo com formato "conteúdo:"');
+          } else {
+            // Se não encontrar o formato esperado, usar todo o conteúdo como modelo
+            rawContent = fileContent.trim();
+            console.log('Formato "conteúdo:" não encontrado, usando texto completo');
+          }
+
+          // Converter o texto para HTML com parágrafos formatados
+          const paragrafos = rawContent.split(/\r?\n\r?\n/);
+          modelo = paragrafos.map(p => 
+            `<p style="line-height: 1; text-align: justify;">` + 
+            `<span style="font-size: 12pt; font-family: ''times new roman'', times, serif;">` + 
+            // Preservar quebras de linha dentro dos parágrafos como <br>
+            p.replace(/\r?\n/g, '<br>') + 
+            `</span></p>`
+          ).join('\n');
+
+          // Verificar se já existe um modelo com este nome
+          const modeloExistente = await database.verificarModeloExistente(fileName);
           
-          // Sanitizar o nome do arquivo
-          const sanitizedName = modelo.nome.replace(/[/\\?%*:|"<>]/g, '-');
-          const filePath = path.join(destinationFolder, `${sanitizedName}.txt`);
-          
-          // Salvar o arquivo
-          fs.writeFileSync(filePath, content, 'utf8');
-          successCount++;
+          if (modeloExistente) {
+            // Marcar como conflito e adicionar à lista de pendentes
+            modelosPendentes.push({
+              tipo: 'conflito',
+              novo: {
+                nome: fileName,
+                tag: tags,
+                modelo: modelo
+              },
+              existente: modeloExistente
+            });
+            modelosConflito++;
+          } else {
+            // Se não há conflito, adicionar como pendente para importação direta
+            modelosPendentes.push({
+              tipo: 'novo',
+              modelo: {
+                nome: fileName,
+                tag: tags,
+                modelo: modelo
+              }
+            });
+          }
         } catch (err) {
-          console.error(`Erro ao exportar modelo "${modelo.nome}":`, err);
-          errorCount++;
-          // Armazenar detalhes do erro
-          errorDetails.push({
-            nome: modelo.nome,
-            erro: err.message || 'Erro desconhecido'
-          });
+          console.error(`Erro ao importar arquivo ${filePath}:`, err);
+          modelosErro++;
         }
       }
+
+      // Se houver conflitos, retornar para o renderer decidir como tratar
+      if (modelosConflito > 0) {
+        return {
+          success: true,
+          requiresResolution: true,
+          message: `Encontrados ${modelosConflito} modelos com nomes já existentes no banco de dados.`,
+          pendentes: modelosPendentes,
+          ignorados: modelosIgnorados
+        };
+      }
       
-      // Retornar resultado com detalhes dos erros
-      let message = `Exportação como texto concluída: ${successCount} modelo(s) exportado(s) com sucesso`;
-      if (errorCount > 0) {
-        message += ` (${errorCount} com erro)`;
+      // Se não houver conflitos, importar diretamente
+      for (const pendente of modelosPendentes) {
+        if (pendente.tipo === 'novo') {
+          try {
+            await database.inserirModelo(
+              pendente.modelo.nome, 
+              pendente.modelo.tag, 
+              pendente.modelo.modelo
+            );
+            modelosImportados++;
+          } catch (err) {
+            console.error('Erro ao importar modelo:', err);
+            modelosErro++;
+          }
+        }
+      }
+
+      let mensagem = `Importação concluída: ${modelosImportados} modelos importados de arquivos de texto.`;
+      if (modelosErro > 0) {
+        mensagem += ` (${modelosErro} arquivos com erro)`;
+      }
+      if (modelosIgnorados > 0) {
+        mensagem += ` (${modelosIgnorados} arquivos ignorados por não começarem com [MODELO])`;
       }
       
       return { 
         success: true, 
-        message,
-        errorCount,
-        errorDetails // Incluir detalhes dos erros na resposta
+        message: mensagem,
+        requiresResolution: false
       };
     } catch (err) {
-      console.error('Erro geral na exportação de modelos como texto:', err);
-      return { success: false, message: `Erro na exportação como texto: ${err.message}` };
+      console.error('Erro na importação de arquivos de texto:', err);
+      return { success: false, message: `Erro na importação: ${err.message}` };
     }
   });
 
@@ -830,6 +828,197 @@ function registerIpcHandlers() {
         }
     } else {
         return { success: false, error: 'O arquivo NOTICE não foi encontrado.' };
+    }
+  });
+
+  // Substituir export-documentos por export-modelos
+  ipcMain.handle('export-modelos', async () => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Exportar Modelos',
+      defaultPath: 'modelos_exportados.json',
+      filters: [
+        { name: 'Arquivos JSON', extensions: ['json'] }
+      ]
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { success: false, message: 'Exportação cancelada' };
+    }
+
+    try {
+      // Buscar todos os modelos
+      const modelos = await database.executarQuery('SELECT * FROM modelos');
+
+      const dados = {
+        modelos,
+        data_exportacao: new Date().toISOString(),
+        versao: app.getVersion()
+      };
+
+      fs.writeFileSync(result.filePath, JSON.stringify(dados, null, 2), 'utf8');
+
+      return { 
+        success: true, 
+        message: `Exportação concluída: ${modelos.length} modelos exportados.`
+      };
+    } catch (err) {
+      console.error('Erro na exportação:', err);
+      return { success: false, message: `Erro na exportação: ${err.message}` };
+    }
+  });
+
+  // Adicionar handler para exportarModelosSelecionados
+  ipcMain.handle('exportarModelosSelecionados', async (event, modelos) => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Exportar Modelos Selecionados',
+      defaultPath: 'modelos_exportados.json',
+      filters: [
+        { name: 'Arquivos JSON', extensions: ['json'] }
+      ]
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { success: false, message: 'Exportação cancelada' };
+    }
+
+    try {
+      // Usar os modelos selecionados já fornecidos
+      const dadosExportacao = {
+        modelos,
+        data_exportacao: new Date().toISOString(),
+        versao: app.getVersion()
+      };
+
+      fs.writeFileSync(result.filePath, JSON.stringify(dadosExportacao, null, 2), 'utf8');
+
+      return { 
+        success: true, 
+        message: `Exportação concluída: ${modelos.length} modelos exportados.` 
+      };
+    } catch (err) {
+      console.error('Erro na exportação:', err);
+      return { success: false, message: `Erro na exportação: ${err.message}` };
+    }
+  });
+
+  // Adicionar handler para exportação como texto
+  ipcMain.handle('export-modelos-como-texto', async (event, modelos) => {
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    
+    // Verificar se há modelos para exportar
+    if (!modelos || modelos.length === 0) {
+      return { success: false, message: 'Nenhum modelo selecionado para exportação' };
+    }
+    
+    // Abrir diálogo para selecionar pasta de destino
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Selecione a pasta para salvar os arquivos de texto',
+      properties: ['openDirectory']
+    });
+    
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false, message: 'Seleção de pasta cancelada' };
+    }
+    
+    const destinationFolder = result.filePaths[0];
+    let successCount = 0;
+    let errorCount = 0;
+    let errorDetails = []; // Array para armazenar detalhes de erros
+    
+    try {
+      // Função para remover tags HTML e decodificar entidades preservando quebras de linha
+      function stripHtml(html) {
+        // Se não for string, retornar como está
+        if (typeof html !== 'string') {
+          return html;
+        }
+        
+        // Criar elemento temporário para converter entidades HTML
+        const { JSDOM } = require('jsdom');
+        const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+        const document = dom.window.document;
+        
+        // Converter quebras de linha em HTML para caracteres de quebra de linha real
+        // Substituir elementos de bloco comuns por quebras de linha
+        let processedHtml = html
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<\/(p|div|h\d|tr|li)>/gi, '\n')
+          .replace(/<\/(td|th)>/gi, '\t')
+          .replace(/<hr\s*\/?>/gi, '\n---\n');
+        
+        // Criar um elemento temporário
+        const tmp = document.createElement('div');
+        tmp.innerHTML = processedHtml;
+        
+        // Obter o texto puro (converte automaticamente todas entidades HTML)
+        let text = tmp.textContent || tmp.innerText || '';
+        
+        // Normalizar quebras de linha (remover quebras de linha duplicadas)
+        text = text.replace(/\n{3,}/g, '\n\n');
+        
+        return text;
+      }
+      
+      // Exportar cada modelo como um arquivo de texto separado
+      for (const modelo of modelos) {
+        try {
+          // Formatar o conteúdo conforme especificado
+          let content = 'tags:\n';
+          
+          // Processar tags (pode ser string JSON ou array)
+          let tags = modelo.tag;
+          if (typeof tags === 'string') {
+            try {
+              tags = JSON.parse(tags);
+            } catch (e) {
+              tags = [tags];
+            }
+          }
+          
+          if (Array.isArray(tags)) {
+            content += tags.join(',');
+          } else {
+            content += String(tags);
+          }
+          
+          // Adicionar conteúdo sem as tags HTML
+          content += '\n\nconteúdo:\n' + stripHtml(modelo.modelo);
+          
+          // Sanitizar o nome do arquivo e adicionar prefixo [MODELO]
+          const sanitizedName = `[MODELO] ${modelo.nome.replace(/[/\\?%*:|"<>]/g, '-')}`;
+          const filePath = path.join(destinationFolder, `${sanitizedName}.txt`);
+          
+          // Salvar o arquivo
+          fs.writeFileSync(filePath, content, 'utf8');
+          successCount++;
+        } catch (err) {
+          console.error(`Erro ao exportar modelo "${modelo.nome}":`, err);
+          errorCount++;
+          // Armazenar detalhes do erro
+          errorDetails.push({
+            nome: modelo.nome,
+            erro: err.message || 'Erro desconhecido'
+          });
+        }
+      }
+      
+      // Retornar resultado com detalhes dos erros
+      let message = `Exportação como texto concluída: ${successCount} modelo(s) exportado(s) com sucesso`;
+      if (errorCount > 0) {
+        message += ` (${errorCount} com erro)`;
+      }
+      
+      return { 
+        success: true, 
+        message,
+        errorCount,
+        errorDetails // Incluir detalhes dos erros na resposta
+      };
+    } catch (err) {
+      console.error('Erro geral na exportação de modelos como texto:', err);
+      return { success: false, message: `Erro na exportação como texto: ${err.message}` };
     }
   });
 }

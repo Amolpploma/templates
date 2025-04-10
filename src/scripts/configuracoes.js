@@ -9,25 +9,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const createDbBtn = document.getElementById('create-db-btn');
     const dbPathConfig = document.getElementById('db-path-config');
     const appVersion = document.getElementById('app-version');
+    
+    // Elemento do overlay de loading global
+    const loadingOverlay = document.getElementById('global-loading-overlay');
+    const loadingText = document.getElementById('loading-text');
 
     // Elementos do modal de exportação
     const exportModal = document.getElementById('export-modal');
     const exportModalClose = document.getElementById('export-modal-close');
     const modelosList = document.getElementById('modelos-list');
-    const checklistsList = document.getElementById('checklists-list');
     const selectAllModelos = document.getElementById('select-all-modelos');
-    const selectAllChecklists = document.getElementById('select-all-checklists');
     const cancelExport = document.getElementById('cancel-export');
     const confirmExport = document.getElementById('confirm-export');
     const modelosCount = document.getElementById('modelos-count');
-    const checklistsCount = document.getElementById('checklists-count');
 
     let modelos = [];
-    let checklists = [];
     let selectedModelos = [];
-    let selectedChecklists = [];
-    // Mapa para rastrear modelos associados a checklists selecionados
-    let modelosAssociados = new Map(); // modeloId -> [checklistId1, checklistId2, ...]
 
     // Inicializar o tema atual
     const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -59,15 +56,75 @@ document.addEventListener('DOMContentLoaded', async () => {
         dbPathConfig.textContent = 'Erro ao carregar caminho';
     }
 
+    // Função para mostrar o overlay de loading global
+    function showGlobalLoading(message = 'Processando...') {
+        if (loadingText) {
+            loadingText.textContent = message;
+        }
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('active');
+        }
+    }
+
+    // Função para esconder o overlay de loading global
+    function hideGlobalLoading() {
+        if (loadingOverlay) {
+            loadingOverlay.classList.remove('active');
+        }
+    }
+
     // Event listener para importar documentos
     importBtn.addEventListener('click', async () => {
         try {
+            // Mostrar diálogo de escolha do tipo de importação
+            const importChoice = await window.showDialog(
+                'Importar Modelos',
+                'Escolha o tipo de importação:',
+                [
+                    {
+                        id: 'btn-text',
+                        text: 'Importar modelos em formato de texto',
+                        class: 'btn-secondary',
+                        value: 'text'
+                    },
+                    {
+                        id: 'btn-json',
+                        text: 'Importar modelos em formato JSON',
+                        class: 'btn-primary',
+                        value: 'json'
+                    }
+                ]
+            );
+
+            if (!importChoice) return; // Usuário cancelou
+            
+            // Mostrar indicadores de loading
             importBtn.disabled = true;
-            importBtn.textContent = 'Importando...';
+            importBtn.innerHTML = '<span class="loading-spinner"></span> Importando...';
+            importBtn.classList.add('loading');
             
-            const result = await window.electronAPI.importDocumentos();
+            // Mostrar overlay global
+            showGlobalLoading(importChoice === 'text' ? 
+                'Importando modelos de texto...' : 
+                'Importando modelos JSON...');
             
-            if (result.success) {
+            let result;
+            if (importChoice === 'text') {
+                // Importar modelos a partir de arquivos de texto
+                result = await window.electronAPI.importarModelosTexto();
+            } else {
+                // Importar a partir de arquivos JSON
+                result = await window.electronAPI.importModelos();
+            }
+            
+            // Verificar se há conflitos que precisam ser resolvidos
+            if (result.success && result.requiresResolution) {
+                // Criar e mostrar diálogo de resolução de conflitos
+                await mostrarDialogoResolucaoConflitos(result.pendentes, result.ignorados || 0);
+                // Atualizar mensagem após resolução de conflitos
+                statusMessage.textContent = 'Importação concluída com resolução de conflitos';
+                statusMessage.className = 'status-message success';
+            } else if (result.success) {
                 statusMessage.textContent = result.message;
                 statusMessage.className = 'status-message success';
             } else {
@@ -78,48 +135,310 @@ document.addEventListener('DOMContentLoaded', async () => {
             statusMessage.textContent = `Erro na importação: ${error.message}`;
             statusMessage.className = 'status-message error';
         } finally {
+            // Esconder indicadores de loading
             importBtn.disabled = false;
-            importBtn.innerHTML = '<svg viewBox="0 0 24 24" class="config-icon"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" /></svg> Importar Documentos';
+            importBtn.classList.remove('loading');
+            importBtn.innerHTML = '<svg viewBox="0 0 24 24" class="config-icon"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" /></svg> Importar Modelos';
+            hideGlobalLoading();
         }
     });
+
+    // Nova função para mostrar diálogo de resolução de conflitos
+    async function mostrarDialogoResolucaoConflitos(modelosPendentes, ignorados) {
+        // Filtrar apenas os conflitos
+        const conflitos = modelosPendentes.filter(item => item.tipo === 'conflito');
+        const novos = modelosPendentes.filter(item => item.tipo === 'novo');
+        
+        // Container que mostrará os conflitos um por um
+        const conflitosContainer = document.createElement('div');
+        conflitosContainer.id = 'conflitos-container';
+        conflitosContainer.className = 'conflitos-container';
+        
+        // Criar o modal de conflitos
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay active';
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal conflito-modal';
+        
+        // Criar cabeçalho do modal
+        const modalHeader = document.createElement('div');
+        modalHeader.className = 'modal-header';
+        
+        const modalTitle = document.createElement('h3');
+        modalTitle.textContent = `Conflitos de Importação (${conflitos.length})`;
+        
+        modalHeader.appendChild(modalTitle);
+        
+        // Criar corpo do modal
+        const modalBody = document.createElement('div');
+        modalBody.className = 'modal-body';
+        
+        // Informação de progresso
+        const progressInfo = document.createElement('div');
+        progressInfo.className = 'conflict-progress-info';
+        progressInfo.innerHTML = `<span id="conflict-current">1</span> de ${conflitos.length} conflitos`;
+        
+        // Container para exibir as diferenças
+        const diffContainer = document.createElement('div');
+        diffContainer.className = 'conflict-diff-container';
+        
+        // Container para as opções
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'conflict-options';
+        
+        // Detalhes do conflito atual
+        const conflictDetails = document.createElement('div');
+        conflictDetails.className = 'conflict-details';
+        conflictDetails.innerHTML = `<strong>Nome do modelo:</strong> <span id="conflict-name"></span>`;
+        
+        modalBody.appendChild(progressInfo);
+        modalBody.appendChild(conflictDetails);
+        modalBody.appendChild(diffContainer);
+        modalBody.appendChild(optionsContainer);
+        
+        // Criar rodapé do modal
+        const modalFooter = document.createElement('div');
+        modalFooter.className = 'modal-footer conflict-footer';
+        
+        // Botões para resolver o conflito atual
+        const btnManter = document.createElement('button');
+        btnManter.className = 'modal-btn btn-manter';
+        btnManter.textContent = 'Manter existente';
+        
+        const btnSobrescrever = document.createElement('button');
+        btnSobrescrever.className = 'modal-btn btn-sobrescrever';
+        btnSobrescrever.textContent = 'Sobrescrever';
+        
+        const btnNovoNome = document.createElement('button');
+        btnNovoNome.className = 'modal-btn btn-novo-nome';
+        btnNovoNome.textContent = 'Salvar como novo';
+        
+        // Campo para inserir novo nome
+        const novoNomeContainer = document.createElement('div');
+        novoNomeContainer.className = 'novo-nome-container hidden';
+        novoNomeContainer.innerHTML = `
+            <input type="text" id="novo-nome-input" class="novo-nome-input" placeholder="Novo nome para o modelo">
+            <button class="modal-btn btn-confirmar-novo">Confirmar</button>
+        `;
+        
+        modalFooter.appendChild(btnManter);
+        modalFooter.appendChild(btnSobrescrever);
+        modalFooter.appendChild(btnNovoNome);
+        modalFooter.appendChild(novoNomeContainer);
+        
+        // Montar o modal
+        modal.appendChild(modalHeader);
+        modal.appendChild(modalBody);
+        modal.appendChild(modalFooter);
+        modalOverlay.appendChild(modal);
+        
+        // Adicionar ao DOM
+        document.body.appendChild(modalOverlay);
+        
+        // Função para mostrar as diferenças entre os modelos
+        function mostrarDiferencas(existente, novo) {
+            // Criar elementos para mostrar as diferenças lado a lado
+            diffContainer.innerHTML = `
+                <div class="diff-header">
+                    <div>Modelo Existente</div>
+                    <div>Modelo a Importar</div>
+                </div>
+                <div class="diff-content">
+                    <div class="diff-existente">
+                        <h4>Conteúdo:</h4>
+                        <div class="diff-content-html">${existente.modelo}</div>
+                        <h4>Tags:</h4>
+                        <div class="diff-tags">${formatarTags(existente.tag)}</div>
+                    </div>
+                    <div class="diff-novo">
+                        <h4>Conteúdo:</h4>
+                        <div class="diff-content-html">${novo.modelo}</div>
+                        <h4>Tags:</h4>
+                        <div class="diff-tags">${formatarTags(novo.tag)}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Destacar as diferenças (aqui você pode adicionar uma lógica mais sofisticada)
+            // Por exemplo, usando uma biblioteca como diff ou jsdiff
+        }
+        
+        // Função para formatar tags
+        function formatarTags(tags) {
+            if (!tags) return 'Nenhuma tag';
+            
+            // Se for string JSON, converter para array
+            let tagsArray = tags;
+            if (typeof tags === 'string') {
+                try {
+                    tagsArray = JSON.parse(tags);
+                } catch (e) {
+                    tagsArray = [tags];
+                }
+            }
+            
+            if (!Array.isArray(tagsArray)) {
+                return String(tagsArray);
+            }
+            
+            return tagsArray.map(tag => `<span class="tag">${tag}</span>`).join(' ');
+        }
+        
+        // Função para processar o conflito atual
+        let indiceAtual = 0;
+        let importados = 0;
+        let mantidos = 0;
+        let sobrescritos = 0;
+        
+        async function processarConflitoAtual() {
+            if (indiceAtual >= conflitos.length) {
+                // Todos os conflitos foram processados, finalizar
+                finalizarProcessamento();
+                return;
+            }
+            
+            const conflito = conflitos[indiceAtual];
+            const existente = conflito.existente;
+            const novo = conflito.novo;
+            
+            // Atualizar contadores
+            document.getElementById('conflict-current').textContent = (indiceAtual + 1);
+            document.getElementById('conflict-name').textContent = existente.nome;
+            
+            // Mostrar diferenças
+            mostrarDiferencas(existente, novo);
+            
+            // Resetar UI de novo nome
+            novoNomeContainer.classList.add('hidden');
+            const novoNomeInput = document.getElementById('novo-nome-input');
+            if (novoNomeInput) {
+                novoNomeInput.value = `${existente.nome} (cópia)`;
+            }
+        }
+        
+        // Iniciar com o primeiro conflito
+        processarConflitoAtual();
+        
+        // Handlers para os botões
+        btnManter.addEventListener('click', async () => {
+            await window.electronAPI.resolverConflitoModelo({
+                modeloExistente: conflitos[indiceAtual].existente,
+                modeloNovo: conflitos[indiceAtual].novo,
+                acao: 'manter'
+            });
+            
+            mantidos++;
+            indiceAtual++;
+            processarConflitoAtual();
+        });
+        
+        btnSobrescrever.addEventListener('click', async () => {
+            await window.electronAPI.resolverConflitoModelo({
+                modeloExistente: conflitos[indiceAtual].existente,
+                modeloNovo: conflitos[indiceAtual].novo,
+                acao: 'sobrescrever'
+            });
+            
+            sobrescritos++;
+            indiceAtual++;
+            processarConflitoAtual();
+        });
+        
+        btnNovoNome.addEventListener('click', () => {
+            // Mostrar campo para inserir novo nome
+            novoNomeContainer.classList.remove('hidden');
+        });
+        
+        // Botão de confirmar novo nome
+        const btnConfirmarNovo = novoNomeContainer.querySelector('.btn-confirmar-novo');
+        btnConfirmarNovo.addEventListener('click', async () => {
+            const novoNome = document.getElementById('novo-nome-input').value.trim();
+            
+            if (!novoNome) {
+                alert('Por favor, informe um nome válido para o modelo.');
+                return;
+            }
+            
+            // Verificar se o novo nome já existe
+            const verificacao = await window.electronAPI.verificarModelo(novoNome);
+            if (verificacao) {
+                alert(`Já existe um modelo com o nome "${novoNome}". Por favor, escolha outro nome.`);
+                return;
+            }
+            
+            await window.electronAPI.resolverConflitoModelo({
+                modeloExistente: conflitos[indiceAtual].existente,
+                modeloNovo: conflitos[indiceAtual].novo,
+                acao: 'novo',
+                novoNome: novoNome
+            });
+            
+            importados++;
+            indiceAtual++;
+            processarConflitoAtual();
+        });
+        
+        // Função para finalizar o processamento
+        async function finalizarProcessamento() {
+            // Importar os modelos sem conflito
+            for (const novo of novos) {
+                try {
+                    await window.electronAPI.salvarDocumento({
+                        nome: novo.modelo.nome,
+                        tag: novo.modelo.tag,
+                        modelo: novo.modelo.modelo
+                    });
+                    importados++;
+                } catch (err) {
+                    console.error('Erro ao importar modelo sem conflito:', err);
+                }
+            }
+            
+            // Mostrar resumo
+            modalBody.innerHTML = `
+                <h3>Importação concluída</h3>
+                <div class="import-summary">
+                    <p>Modelos importados sem conflito: ${novos.length}</p>
+                    <p>Modelos mantidos (versão existente): ${mantidos}</p>
+                    <p>Modelos sobrescritos: ${sobrescritos}</p>
+                    <p>Modelos importados com novo nome: ${importados - novos.length}</p>
+                    ${ignorados > 0 ? `<p>Arquivos ignorados: ${ignorados}</p>` : ''}
+                    <p class="summary-total">Total de modelos processados: ${novos.length + conflitos.length}</p>
+                </div>
+            `;
+            
+            // Simplificar os botões
+            modalFooter.innerHTML = `
+                <button class="modal-btn modal-btn-primary btn-finalizar">Concluir</button>
+            `;
+            
+            const btnFinalizar = modalFooter.querySelector('.btn-finalizar');
+            btnFinalizar.addEventListener('click', () => {
+                document.body.removeChild(modalOverlay);
+            });
+        }
+    }
 
     // Função para resetar todos os checkboxes do modal
     function resetCheckboxes() {
         // Resetar checkbox "Selecionar todos"
         selectAllModelos.checked = false;
         selectAllModelos.indeterminate = false;
-        selectAllChecklists.checked = false;
-        selectAllChecklists.indeterminate = false;
         
         // Resetar checkboxes individuais
-        document.querySelectorAll('.modelo-checkbox, .checklist-checkbox').forEach(checkbox => {
+        document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
             checkbox.checked = false;
-            checkbox.disabled = false; // Garantir que todos os checkboxes estejam habilitados
-        });
-        
-        // Ocultar todos os ícones de associação (mas manter espaço)
-        document.querySelectorAll('.modelo-associado-icon').forEach(icon => {
-            icon.classList.remove('visible');
-            icon.title = '';
-        });
-        
-        // Remover destaques
-        document.querySelectorAll('.selection-item').forEach(item => {
-            item.style.backgroundColor = '';
         });
         
         // Limpar arrays de seleção
         selectedModelos = [];
-        selectedChecklists = [];
-        
-        // Limpar mapa de modelos associados
-        modelosAssociados.clear();
         
         // Atualizar contadores
         updateSelectionCounts();
     }
 
-    // Event listener para exportar documentos (agora com diagnóstico adicional)
+    // Event listener para exportar documentos
     exportBtn.addEventListener('click', async () => {
         try {
             console.log('Clique no botão de exportar detectado');
@@ -127,18 +446,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Limpar seleções anteriores e resetar checkboxes
             resetCheckboxes();
             
+            // Mostrar indicador de loading no botão
+            exportBtn.disabled = true;
+            exportBtn.classList.add('loading');
+            exportBtn.innerHTML = '<span class="loading-spinner"></span> Carregando...';
+            
+            // Mostrar loading global para carregamento
+            showGlobalLoading('Carregando modelos para exportação...');
+            
             // Primeiro, mostrar o modal
             exportModal.classList.add('active');
             console.log('Modal de exportação aberto');
             
-            // Depois, carregar os documentos
-            console.log('Iniciando carregamento de documentos...');
+            // Depois, carregar os modelos
+            console.log('Iniciando carregamento de modelos...');
             await loadDocuments();
-            console.log('Carregamento de documentos concluído');
+            console.log('Carregamento de modelos concluído');
+            
+            // Restaurar botão após carregamento
+            exportBtn.disabled = false;
+            exportBtn.classList.remove('loading');
+            exportBtn.innerHTML = '<svg viewBox="0 0 24 24" class="config-icon"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" /></svg> Exportar Modelos';
+            hideGlobalLoading();
         } catch (error) {
             console.error('Erro ao abrir modal de exportação:', error);
             statusMessage.textContent = `Erro ao preparar exportação: ${error.message}`;
             statusMessage.className = 'status-message error';
+            
+            // Restaurar botão em caso de erro
+            exportBtn.disabled = false;
+            exportBtn.classList.remove('loading');
+            exportBtn.innerHTML = '<svg viewBox="0 0 24 24" class="config-icon"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" /></svg> Exportar Modelos';
+            hideGlobalLoading();
         }
     });
 
@@ -168,91 +507,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Erro ao obter versão do aplicativo:', error);
     }
 
-    // Função para carregar modelos e checklists
+    // Função para carregar modelos
     async function loadDocuments() {
         try {
-            // Limpar listas e mostrar mensagem de carregamento
+            // Limpar lista e mostrar mensagem de carregamento
             modelosList.innerHTML = '<div class="selection-list-empty">Carregando modelos...</div>';
-            checklistsList.innerHTML = '<div class="selection-list-empty">Carregando checklists...</div>';
             
             // Buscar todos os modelos sem filtro
             modelos = await window.electronAPI.buscarDocumentos('', { nome: true });
             console.log('Modelos carregados:', modelos.length);
             
-            // Buscar todos os checklists sem filtro
-            checklists = await window.electronAPI.buscarChecklists('', { nome: true });
-            console.log('Checklists carregados:', checklists.length);
-            
-            // Verificar se os modelos e checklists foram realmente carregados
+            // Verificar se os modelos foram realmente carregados
             if (modelos && modelos.length > 0) {
                 console.log('Exemplo de modelo:', modelos[0]);
             }
             
-            if (checklists && checklists.length > 0) {
-                console.log('Exemplo de checklist:', checklists[0]);
-            }
-            
-            // Processo adicional para analisar associações de checklists e modelos
-            mapearModelosAssociados();
-            
-            // Renderizar listas mesmo que estejam vazias
+            // Renderizar lista mesmo que esteja vazia
             renderModelosList();
-            renderChecklistsList();
             
             // Resetar estado de seleção
             selectedModelos = [];
-            selectedChecklists = [];
             updateSelectionCounts();
         } catch (error) {
-            console.error('Erro ao carregar documentos:', error);
+            console.error('Erro ao carregar modelos:', error);
             modelosList.innerHTML = '<div class="selection-list-empty">Erro ao carregar modelos: ' + error.message + '</div>';
-            checklistsList.innerHTML = '<div class="selection-list-empty">Erro ao carregar checklists: ' + error.message + '</div>';
         }
     }
 
-    // Função para mapear todos os modelos associados a checklists
-    function mapearModelosAssociados() {
-        // Limpar mapa existente
-        modelosAssociados.clear();
-        
-        // Construir mapa de todos os modelos associados a checklists
-        if (checklists && Array.isArray(checklists)) {
-            checklists.forEach(checklist => {
-                if (checklist.modelo_id) {
-                    if (!modelosAssociados.has(checklist.modelo_id)) {
-                        modelosAssociados.set(checklist.modelo_id, []);
-                    }
-                    modelosAssociados.get(checklist.modelo_id).push(checklist.id);
-                }
-                
-                // Verificar também associações dentro dos itens do checklist
-                try {
-                    const itens = typeof checklist.checklist === 'string' 
-                        ? JSON.parse(checklist.checklist) 
-                        : checklist.checklist;
-                    
-                    if (Array.isArray(itens)) {
-                        itens.forEach(item => {
-                            if (item.modelo_id && !isNaN(parseInt(item.modelo_id))) {
-                                const modeloId = parseInt(item.modelo_id);
-                                if (!modelosAssociados.has(modeloId)) {
-                                    modelosAssociados.set(modeloId, []);
-                                }
-                                if (!modelosAssociados.get(modeloId).includes(checklist.id)) {
-                                    modelosAssociados.get(modeloId).push(checklist.id);
-                                }
-                            }
-                        });
-                    }
-                } catch (e) {
-                    console.error('Erro ao processar itens do checklist:', e);
-                }
-            });
-        }
-        console.log('Mapa de modelos associados:', Object.fromEntries(modelosAssociados));
-    }
-
-    // Função para renderizar lista de modelos com verificação adicional
+    // Função para renderizar lista de modelos
     function renderModelosList() {
         console.log('Renderizando lista de modelos:', modelos ? modelos.length : 0);
         
@@ -274,7 +556,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span class="checkmark"></span>
                         <div class="modelo-info">
                             <span class="selection-item-label" title="${modeloNome}">${modeloNome}</span>
-                            <span class="modelo-associado-icon" title=""><svg viewBox="0 0 24 24"><text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="bold">A</text></svg></span>
                         </div>
                     </label>
                 </div>
@@ -286,9 +567,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Adicionar event listeners para checkboxes
         document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
-                // Evitar processamento se estiver desabilitado
-                if (this.disabled) return;
-                
                 const id = parseInt(this.getAttribute('data-id'));
                 if (this.checked) {
                     if (!selectedModelos.includes(id)) {
@@ -303,62 +581,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Função para renderizar lista de checklists com verificação adicional
-    function renderChecklistsList() {
-        console.log('Renderizando lista de checklists:', checklists ? checklists.length : 0);
-        
-        if (!checklists || checklists.length === 0) {
-            checklistsList.innerHTML = '<div class="selection-list-empty">Nenhum checklist encontrado.</div>';
-            return;
-        }
-
-        let html = '';
-        checklists.forEach(checklist => {
-            const checklistNome = checklist.nome || 'Sem nome';
-            const checklistId = checklist.id || '0';
-            console.log(`Adicionando checklist: ${checklistId} - ${checklistNome}`);
-            
-            html += `
-                <div class="selection-item">
-                    <label class="checkmark-container">
-                        <input type="checkbox" class="checklist-checkbox" data-id="${checklistId}">
-                        <span class="checkmark"></span>
-                        <span class="selection-item-label" title="${checklistNome}">${checklistNome}</span>
-                    </label>
-                </div>
-            `;
-        });
-
-        checklistsList.innerHTML = html;
-        
-        // Adicionar event listeners para checkboxes
-        document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const id = parseInt(this.getAttribute('data-id'));
-                if (this.checked) {
-                    if (!selectedChecklists.includes(id)) {
-                        selectedChecklists.push(id);
-                    }
-                } else {
-                    selectedChecklists = selectedChecklists.filter(item => item !== id);
-                }
-                // Atualizar modelos associados após alteração na seleção de checklists
-                atualizarModelosAssociados();
-                updateSelectionCounts();
-                updateSelectAllCheckbox(selectAllChecklists, '.checklist-checkbox');
-            });
-        });
-    }
-
     // Função para atualizar contadores de seleção
     function updateSelectionCounts() {
         modelosCount.textContent = `${selectedModelos.length} selecionados`;
-        checklistsCount.textContent = `${selectedChecklists.length} selecionados`;
         
         // Habilitar/desabilitar botões de exportação
-        confirmExport.disabled = selectedModelos.length === 0 && selectedChecklists.length === 0;
+        confirmExport.disabled = selectedModelos.length === 0;
         
-        // Habilitar "Exportar modelos como texto" apenas quando houver modelos selecionados
+        // Habilitar "Exportar como texto" apenas quando houver modelos selecionados
         exportAsTextBtn.disabled = selectedModelos.length === 0;
     }
 
@@ -378,93 +608,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Função para atualizar estado dos checkboxes de modelos associados
-    function atualizarModelosAssociados() {
-        console.log('Atualizando modelos associados...'); // Log para debug
-        
-        // Redefinir todos os ícones para invisível (mas mantendo espaço)
-        document.querySelectorAll('.modelo-associado-icon').forEach(icon => {
-            icon.classList.remove('visible');
-            icon.title = '';
-        });
-
-        // Habilitar todos os checkboxes de modelos
-        document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
-            checkbox.disabled = false;
-            // Remover estilo de destaque do item pai
-            const selectionItem = checkbox.closest('.selection-item');
-            selectionItem.style.backgroundColor = '';
-        });
-        
-        // Mapa para armazenar relações de modelos -> checklists (usado para tooltips)
-        const modeloToChecklists = new Map();
-        
-        // Identificar todos os modelos associados a checklists selecionados
-        selectedChecklists.forEach(checklistId => {
-            // Buscar nome do checklist para o tooltip
-            const checklist = checklists.find(c => c.id === checklistId);
-            const checklistNome = checklist ? checklist.nome : 'Checklist desconhecido';
-            
-            modelosAssociados.forEach((checklistsAssociados, modeloId) => {
-                if (checklistsAssociados.includes(checklistId)) {
-                    // Armazenar a relação para o tooltip
-                    if (!modeloToChecklists.has(modeloId)) {
-                        modeloToChecklists.set(modeloId, []);
-                    }
-                    modeloToChecklists.get(modeloId).push(checklistNome);
-                }
-            });
-        });
-        
-        console.log('Modelos que serão associados:', Object.fromEntries(modeloToChecklists));
-        
-        // Agora atualizar a UI com base nas relações
-        modeloToChecklists.forEach((checklistNomes, modeloId) => {
-            // Buscar o checkbox do modelo
-            const checkbox = document.querySelector(`.modelo-checkbox[data-id="${modeloId}"]`);
-            if (checkbox) {
-                console.log(`Aplicando associação ao modelo ID ${modeloId}`);
-                
-                // Selecionar e desabilitar o checkbox
-                checkbox.checked = true;
-                checkbox.disabled = true;
-                
-                // Mostrar o ícone de associação
-                const selectionItem = checkbox.closest('.selection-item');
-                // Aplicar estilo de destaque diretamente ao item, sem usar a classe modelo-associado
-                selectionItem.style.backgroundColor = 'rgba(var(--primary-color-rgb), 0.08)';
-                
-                const icon = selectionItem.querySelector('.modelo-associado-icon');
-                if (icon) {
-                    // Usar classe para mostrar o ícone em vez de mudar display
-                    icon.classList.add('visible');
-                    icon.title = `Associado a: ${checklistNomes.join(', ')}`;
-                    console.log('Ícone exibido com título:', icon.title);
-                } else {
-                    console.warn('Ícone não encontrado para o modelo ID', modeloId);
-                }
-                
-                // Garantir que está na lista de selecionados
-                if (!selectedModelos.includes(modeloId)) {
-                    selectedModelos.push(modeloId);
-                }
-            } else {
-                console.warn('Checkbox não encontrado para o modelo ID', modeloId);
-            }
-        });
-        
-        // Atualizar contador e estado do "selecionar todos"
-        updateSelectionCounts();
-        updateSelectAllCheckbox(selectAllModelos, '.modelo-checkbox');
-    }
-
     // Event listener para o botão "selecionar todos modelos"
     selectAllModelos.addEventListener('change', function() {
         const isChecked = this.checked;
         document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
-            // Não alterar checkboxes desabilitados
-            if (checkbox.disabled) return;
-            
             checkbox.checked = isChecked;
             const id = parseInt(checkbox.getAttribute('data-id'));
             
@@ -474,24 +621,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 selectedModelos = selectedModelos.filter(item => item !== id);
             }
         });
-        updateSelectionCounts();
-    });
-
-    // Event listener para o botão "selecionar todos checklists"
-    selectAllChecklists.addEventListener('change', function() {
-        const isChecked = this.checked;
-        document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
-            checkbox.checked = isChecked;
-            const id = parseInt(checkbox.getAttribute('data-id'));
-            
-            if (isChecked && !selectedChecklists.includes(id)) {
-                selectedChecklists.push(id);
-            } else if (!isChecked) {
-                selectedChecklists = selectedChecklists.filter(item => item !== id);
-            }
-        });
-        // Atualizar modelos associados após alteração na seleção de checklists
-        atualizarModelosAssociados();
         updateSelectionCounts();
     });
 
@@ -509,24 +638,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event listener para confirmar exportação
     confirmExport.addEventListener('click', async () => {
         try {
-            // Mostrar loading
+            // Mostrar loading nos botões
             confirmExport.classList.add('loading');
             confirmExport.disabled = true;
             
-            // Filtrar modelos e checklists selecionados
-            const modelosToExport = modelos.filter(modelo => selectedModelos.includes(modelo.id));
-            const checklistsToExport = checklists.filter(checklist => selectedChecklists.includes(checklist.id));
+            // Mostrar overlay global
+            showGlobalLoading('Exportando modelos selecionados...');
             
-            console.log('Exportando documentos selecionados:', {
-                modelos: modelosToExport.length,
-                checklists: checklistsToExport.length
+            // Filtrar modelos selecionados
+            const modelosToExport = modelos.filter(modelo => selectedModelos.includes(modelo.id));
+            
+            console.log('Exportando modelos selecionados:', {
+                modelos: modelosToExport.length
             });
             
             // Chamar API para exportar
-            const result = await window.electronAPI.exportarDocumentosSelecionados({
-                modelos: modelosToExport,
-                checklists: checklistsToExport
-            });
+            const result = await window.electronAPI.exportarModelosSelecionados(modelosToExport);
             
             // Esconder modal
             exportModal.classList.remove('active');
@@ -545,9 +672,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             statusMessage.textContent = `Erro na exportação: ${error.message}`;
             statusMessage.className = 'status-message error';
         } finally {
-            // Remover loading
+            // Remover indicadores de loading
             confirmExport.classList.remove('loading');
             confirmExport.disabled = false;
+            hideGlobalLoading();
         }
     });
 
@@ -576,9 +704,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             
-            // Mostrar loading
+            // Mostrar indicadores de loading
             exportAsTextBtn.classList.add('loading');
             exportAsTextBtn.disabled = true;
+            
+            // Mostrar overlay global
+            showGlobalLoading('Exportando modelos como texto...');
             
             // Filtrar apenas os modelos selecionados
             const modelosToExport = modelos.filter(modelo => selectedModelos.includes(modelo.id));
@@ -639,9 +770,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             statusMessage.textContent = `Erro na exportação como texto: ${error.message}`;
             statusMessage.className = 'status-message error';
         } finally {
-            // Remover loading
+            // Remover indicadores de loading
             exportAsTextBtn.classList.remove('loading');
             exportAsTextBtn.disabled = false;
+            hideGlobalLoading();
         }
     });
 
@@ -715,5 +847,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
-
 });
