@@ -289,7 +289,10 @@
         if (editor) {
             try {
                 // Garantir que o conteúdo seja limpo antes de carregar o novo
-                editor.undoManager.clear();
+                // Verificar se undoManager existe antes de tentar usar
+                if (editor.undoManager) {
+                    editor.undoManager.clear();
+                }
                 
                 // Carregar conteúdo do editor
                 const content = localStorage.getItem(`${TAB_CONTENT_PREFIX}${tabId}`) || '';
@@ -305,27 +308,25 @@
                     
                     if (nomeInput && formData.nome !== undefined) {
                         nomeInput.value = formData.nome;
-                    } else {
-                        nomeInput.value = '';
                     }
                     
                     if (tagInput && formData.tag !== undefined) {
                         tagInput.value = formData.tag;
-                    } else {
-                        tagInput.value = '';
                     }
                 } else {
-                    // Limpar campos se não houver dados
-                    document.getElementById('nome-input').value = '';
-                    document.getElementById('tag-input').value = '';
+                    // Limpar campos se não houver dados salvos
+                    const nomeInput = document.getElementById('nome-input');
+                    const tagInput = document.getElementById('tag-input');
+                    
+                    if (nomeInput) nomeInput.value = '';
+                    if (tagInput) tagInput.value = '';
                 }
+                
+                // Resetar o histórico de desfazer
+                editor.undoManager && editor.undoManager.clear();
+                
             } catch (error) {
                 console.error('Erro ao carregar conteúdo da aba:', error);
-                
-                // Em caso de erro, limpar os campos
-                editor.setContent('');
-                document.getElementById('nome-input').value = '';
-                document.getElementById('tag-input').value = '';
             }
         }
     }
