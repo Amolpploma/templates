@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Evitar múltiplas inicializações
     if (window.editorPersistenceInitialized) return;
     window.editorPersistenceInitialized = true;
+
+    // Se o sistema de abas está presente, não usar persistência global
+    if (window.editorTabs) {
+        console.log('Persistência global desabilitada: sistema de abas detectado');
+        return;
+    }
     
     // Determinar qual é a página atual e a chave de armazenamento apropriada
     const isSearchPage = !document.body.hasAttribute('data-page');
