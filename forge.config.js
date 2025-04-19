@@ -47,18 +47,6 @@ module.exports = {
         }
       },
     },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {
-        // Configuração para Linux (RPM)
-        options: {
-          icon: path.join(__dirname, 'recursos', 'icon.png'),
-          categories: ['Office', 'Utility'],
-          maintainer: 'Alfredo Rolim Pereira',
-          homepage: 'https://github.com/Amolpploma/templates'
-        }
-      },
-    },
   ],
   plugins: [
     {
