@@ -203,15 +203,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Botões para resolver o conflito atual
         const btnManter = document.createElement('button');
-        btnManter.className = 'modal-btn btn-manter';
+        btnManter.className = 'modal-btn btn-secondary btn-manter'; // Classe atualizada
         btnManter.textContent = 'Manter existente';
         
         const btnSobrescrever = document.createElement('button');
-        btnSobrescrever.className = 'modal-btn btn-sobrescrever';
+        btnSobrescrever.className = 'modal-btn btn-primary btn-sobrescrever'; // Classe atualizada
         btnSobrescrever.textContent = 'Sobrescrever';
         
         const btnNovoNome = document.createElement('button');
-        btnNovoNome.className = 'modal-btn btn-novo-nome';
+        btnNovoNome.className = 'modal-btn btn-secondary btn-novo-nome'; // Classe atualizada
         btnNovoNome.textContent = 'Salvar como novo';
         
         // Campo para inserir novo nome
@@ -219,13 +219,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         novoNomeContainer.className = 'novo-nome-container hidden';
         novoNomeContainer.innerHTML = `
             <input type="text" id="novo-nome-input" class="novo-nome-input" placeholder="Novo nome para o modelo">
-            <button class="modal-btn btn-confirmar-novo">Confirmar</button>
+            <button class="modal-btn btn-primary btn-confirmar-novo">Confirmar</button> // Classe atualizada
         `;
         
         modalFooter.appendChild(btnManter);
         modalFooter.appendChild(btnSobrescrever);
         modalFooter.appendChild(btnNovoNome);
         modalFooter.appendChild(novoNomeContainer);
+
+        // Botões para resolver todos os conflitos de uma vez
+        const btnManterTodos = document.createElement('button');
+        btnManterTodos.className = 'modal-btn btn-secondary btn-manter-todos'; // Classe atualizada
+        btnManterTodos.textContent = 'Manter todos os existentes';
+
+        const btnSobrescreverTodos = document.createElement('button');
+        btnSobrescreverTodos.className = 'modal-btn btn-primary btn-sobrescrever-todos'; // Classe atualizada
+        btnSobrescreverTodos.textContent = 'Sobrescrever todos os existentes';
+
+        modalFooter.appendChild(btnManterTodos);
+        modalFooter.appendChild(btnSobrescreverTodos);
+
+        // Botão Cancelar
+        const btnCancelar = document.createElement('button');
+        btnCancelar.className = 'modal-btn btn-secondary btn-cancelar'; // Classe para estilo
+        btnCancelar.textContent = 'Cancelar Importação';
+        modalFooter.appendChild(btnCancelar);
         
         // Montar o modal
         modal.appendChild(modalHeader);
@@ -377,6 +395,46 @@ document.addEventListener('DOMContentLoaded', async () => {
             importados++;
             indiceAtual++;
             processarConflitoAtual();
+        });
+
+        // Handlers para os novos botões
+        btnManterTodos.addEventListener('click', async () => {
+            for (const [index, conflito] of conflitos.entries()) {
+                // Pular conflitos já resolvidos individualmente
+                if (indiceAtual > index) continue;
+
+                await window.electronAPI.resolverConflitoModelo({
+                    modeloExistente: conflito.existente,
+                    modeloNovo: conflito.novo,
+                    acao: 'manter'
+                });
+                mantidos++;
+            }
+            finalizarProcessamento();
+        });
+
+        btnSobrescreverTodos.addEventListener('click', async () => {
+            for (const [index, conflito] of conflitos.entries()) {
+                // Pular conflitos já resolvidos individualmente
+                if (indiceAtual > index) continue;
+
+                await window.electronAPI.resolverConflitoModelo({
+                    modeloExistente: conflito.existente,
+                    modeloNovo: conflito.novo,
+                    acao: 'sobrescrever'
+                });
+                sobrescritos++;
+            }
+            finalizarProcessamento();
+        });
+
+        // Handler para o botão Cancelar
+        btnCancelar.addEventListener('click', () => {
+            // Simplesmente remove o modal sem processar mais nada
+            document.body.removeChild(modalOverlay);
+            // Opcional: Mostrar mensagem de cancelamento
+            statusMessage.textContent = 'Importação cancelada pelo usuário.';
+            statusMessage.className = 'status-message warning'; 
         });
         
         // Função para finalizar o processamento
@@ -775,6 +833,243 @@ document.addEventListener('DOMContentLoaded', async () => {
             exportAsTextBtn.disabled = false;
             hideGlobalLoading();
         }
+    });
+
+    // Adicionar input de pesquisa ao modal de exportação
+    const exportSearchContainer = document.createElement('div');
+    exportSearchContainer.className = 'export-search-container';
+    
+    const exportSearchInput = document.createElement('input');
+    exportSearchInput.className = 'export-search-input input input-search';
+    exportSearchInput.type = 'text';
+    exportSearchInput.placeholder = 'Pesquisar modelos para exportação...';
+    
+    const clearSearchButton = document.createElement('button');
+    clearSearchButton.className = 'clear-search-button';
+    clearSearchButton.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+    clearSearchButton.title = 'Limpar pesquisa';
+    
+    // Adicionar os elementos ao container
+    exportSearchContainer.appendChild(exportSearchInput);
+    exportSearchContainer.appendChild(clearSearchButton);
+    
+    // Adicionar controles de ordenação à direita do input de pesquisa
+    const sortControlsContainer = document.createElement('div');
+    sortControlsContainer.className = 'export-sort-controls';
+    sortControlsContainer.style.display = 'flex';
+    sortControlsContainer.style.marginLeft = '10px';
+    sortControlsContainer.style.alignItems = 'center';
+    
+    // Seletor de tipo de ordenação
+    const sortTypeSelect = document.createElement('select');
+    sortTypeSelect.className = 'export-sort-select';
+    sortTypeSelect.style.padding = '4px 8px';
+    sortTypeSelect.style.borderRadius = '4px';
+    sortTypeSelect.style.border = '1px solid var(--border-color, #ccc)';
+    sortTypeSelect.style.background = 'var(--input-bg, #fff)';
+    sortTypeSelect.style.color = 'var(--text-primary, #222)';
+    
+    // Opções para o seletor
+    const sortTypeOptions = [
+        { value: 'alphabetical', text: 'Alfabética' },
+        { value: 'date', text: 'Data de inclusão' }
+    ];
+    
+    sortTypeOptions.forEach(option => {
+        const optElement = document.createElement('option');
+        optElement.value = option.value;
+        optElement.textContent = option.text;
+        sortTypeSelect.appendChild(optElement);
+    });
+    
+    // Botões de direção da ordenação
+    const sortDirButtons = document.createElement('div');
+    sortDirButtons.className = 'export-sort-dir-buttons';
+    sortDirButtons.style.display = 'flex';
+    sortDirButtons.style.marginLeft = '8px';
+    
+    const sortAscButton = document.createElement('button');
+    sortAscButton.className = 'export-sort-btn export-sort-asc active';
+    sortAscButton.title = 'Ordem crescente';
+    sortAscButton.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>';
+    sortAscButton.style.width = '32px';
+    sortAscButton.style.height = '32px';
+    sortAscButton.style.padding = '4px';
+    sortAscButton.style.border = '1px solid var(--border-color, #ccc)';
+    sortAscButton.style.borderRadius = '4px 0 0 4px';
+    sortAscButton.style.display = 'flex';
+    sortAscButton.style.alignItems = 'center';
+    sortAscButton.style.justifyContent = 'center';
+    sortAscButton.style.background = 'var(--btn-bg, #f0f0f0)';
+    sortAscButton.style.cursor = 'pointer';
+    
+    const sortDescButton = document.createElement('button');
+    sortDescButton.className = 'export-sort-btn export-sort-desc';
+    sortDescButton.title = 'Ordem decrescente';
+    sortDescButton.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+    sortDescButton.style.width = '32px';
+    sortDescButton.style.height = '32px';
+    sortDescButton.style.padding = '4px';
+    sortDescButton.style.border = '1px solid var(--border-color, #ccc)';
+    sortDescButton.style.borderRadius = '0 4px 4px 0';
+    sortDescButton.style.borderLeft = 'none';
+    sortDescButton.style.display = 'flex';
+    sortDescButton.style.alignItems = 'center';
+    sortDescButton.style.justifyContent = 'center';
+    sortDescButton.style.background = 'var(--btn-bg, #f0f0f0)';
+    sortDescButton.style.cursor = 'pointer';
+    
+    // Adicionar botões ao container
+    sortDirButtons.appendChild(sortAscButton);
+    sortDirButtons.appendChild(sortDescButton);
+    
+    // Adicionar elementos de ordenação ao container principal
+    sortControlsContainer.appendChild(sortTypeSelect);
+    sortControlsContainer.appendChild(sortDirButtons);
+    
+    // Estado atual da ordenação
+    let currentSortType = 'alphabetical';
+    let currentSortDir = 'asc';
+    
+    // Função para aplicar ordenação
+    function applySort() {
+        // Marcar botão ativo
+        sortAscButton.classList.toggle('active', currentSortDir === 'asc');
+        sortDescButton.classList.toggle('active', currentSortDir === 'desc');
+        
+        // Atualizar estilos visuais dos botões ativos
+        sortAscButton.style.background = currentSortDir === 'asc' 
+            ? 'var(--primary-color, #0078d4)' 
+            : 'var(--btn-bg, #f0f0f0)';
+        sortAscButton.style.color = currentSortDir === 'asc' 
+            ? 'white' 
+            : 'var(--text-primary, #222)';
+            
+        sortDescButton.style.background = currentSortDir === 'desc' 
+            ? 'var(--primary-color, #0078d4)' 
+            : 'var(--btn-bg, #f0f0f0)';
+        sortDescButton.style.color = currentSortDir === 'desc' 
+            ? 'white' 
+            : 'var(--text-primary, #222)';
+            
+        // Aplicar ordenação aos modelos
+        if (modelos && modelos.length > 0) {
+            modelos.sort((a, b) => {
+                if (currentSortType === 'alphabetical') {
+                    const aName = a.nome?.toLowerCase() || '';
+                    const bName = b.nome?.toLowerCase() || '';
+                    return currentSortDir === 'asc' 
+                        ? aName.localeCompare(bName) 
+                        : bName.localeCompare(aName);
+                } else { // date
+                    // Ordenação por ID (assumindo que IDs maiores são mais recentes)
+                    // ou por data de criação se disponível
+                    const aValue = a.data_criacao || a.id || 0;
+                    const bValue = b.data_criacao || b.id || 0;
+                    return currentSortDir === 'asc' 
+                        ? aValue - bValue 
+                        : bValue - aValue;
+                }
+            });
+            
+            // Renderizar lista ordenada
+            renderModelosList();
+        }
+    }
+    
+    // Event listeners para os controles de ordenação
+    sortTypeSelect.addEventListener('change', () => {
+        currentSortType = sortTypeSelect.value;
+        applySort();
+    });
+    
+    sortAscButton.addEventListener('click', () => {
+        currentSortDir = 'asc';
+        applySort();
+    });
+    
+    sortDescButton.addEventListener('click', () => {
+        currentSortDir = 'desc';
+        applySort();
+    });
+    
+    // Configurar o CSS diretamente para garantir visibilidade
+    clearSearchButton.style.position = 'absolute';
+    clearSearchButton.style.right = '8px';
+    clearSearchButton.style.top = '50%';
+    clearSearchButton.style.transform = 'translateY(-50%)';
+    clearSearchButton.style.display = 'flex';
+    
+    // Criar um container para agrupar a pesquisa e os controles de ordenação
+    const searchAndSortContainer = document.createElement('div');
+    searchAndSortContainer.style.display = 'flex';
+    searchAndSortContainer.style.width = '100%';
+    searchAndSortContainer.style.marginBottom = '10px';
+    searchAndSortContainer.style.alignItems = 'center';
+    
+    // Ajustar o container de pesquisa para ocupar espaço flexível
+    exportSearchContainer.style.position = 'relative';
+    exportSearchContainer.style.flex = '1';
+    exportSearchContainer.style.marginBottom = '0';
+    
+    // Organizar elementos
+    searchAndSortContainer.appendChild(exportSearchContainer);
+    searchAndSortContainer.appendChild(sortControlsContainer);
+    
+    // Inserir o container completo acima da lista
+    if (modelosList && modelosList.parentNode) {
+        modelosList.parentNode.insertBefore(searchAndSortContainer, modelosList);
+    }
+    
+    // Evento para o botão limpar pesquisa
+    clearSearchButton.addEventListener('click', () => {
+        exportSearchInput.value = '';
+        exportSearchInput.focus();
+        // Recarregar a lista original de modelos
+        loadDocuments();
+    });
+    
+    // Modificar a função loadDocuments para aplicar ordenação após carregar
+    const originalLoadDocuments = loadDocuments;
+    loadDocuments = async function() {
+        await originalLoadDocuments();
+        applySort(); // Aplicar ordenação depois de carregar os modelos
+    };
+
+    // Função para buscar modelos resumidos (nome/id) para exportação
+    async function buscarModelosParaExportacao(termo) {
+        try {
+            // Usa a mesma API do modelo-dialog.js
+            const resultados = await window.electronAPI.buscarModelosResumidos(termo);
+            return resultados || [];
+        } catch (e) {
+            console.error('Erro ao buscar modelos para exportação:', e);
+            return [];
+        }
+    }
+
+    // Atualizar lista de modelos conforme pesquisa
+    exportSearchInput.addEventListener('input', async function() {
+        const termo = exportSearchInput.value.trim();
+        currentSearchTerm = termo; // Armazenar o termo atual para uso nas ordenações
+        modelosList.innerHTML = '<div class="selection-list-empty">Carregando modelos...</div>';
+        
+        // Buscar resultados
+        const resultados = termo ? await buscarModelosParaExportacao(termo) : modelos;
+        
+        if (!resultados || resultados.length === 0) {
+            modelosList.innerHTML = '<div class="selection-list-empty">Nenhum modelo encontrado.</div>';
+            return;
+        }
+        
+        // Salvar os resultados filtrados para uso na ordenação
+        modelos = resultados;
+        
+        // Aplicar ordenação aos resultados da pesquisa antes de renderizar
+        applySort();
+        
+        // Atualizar contadores
+        updateSelectionCounts();
     });
 
     // Event listeners para botões de licença
