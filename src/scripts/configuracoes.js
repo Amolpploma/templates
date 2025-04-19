@@ -203,15 +203,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Botões para resolver o conflito atual
         const btnManter = document.createElement('button');
-        btnManter.className = 'modal-btn btn-manter';
+        btnManter.className = 'modal-btn btn-secondary btn-manter'; // Classe atualizada
         btnManter.textContent = 'Manter existente';
         
         const btnSobrescrever = document.createElement('button');
-        btnSobrescrever.className = 'modal-btn btn-sobrescrever';
+        btnSobrescrever.className = 'modal-btn btn-primary btn-sobrescrever'; // Classe atualizada
         btnSobrescrever.textContent = 'Sobrescrever';
         
         const btnNovoNome = document.createElement('button');
-        btnNovoNome.className = 'modal-btn btn-novo-nome';
+        btnNovoNome.className = 'modal-btn btn-secondary btn-novo-nome'; // Classe atualizada
         btnNovoNome.textContent = 'Salvar como novo';
         
         // Campo para inserir novo nome
@@ -219,13 +219,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         novoNomeContainer.className = 'novo-nome-container hidden';
         novoNomeContainer.innerHTML = `
             <input type="text" id="novo-nome-input" class="novo-nome-input" placeholder="Novo nome para o modelo">
-            <button class="modal-btn btn-confirmar-novo">Confirmar</button>
+            <button class="modal-btn btn-primary btn-confirmar-novo">Confirmar</button> // Classe atualizada
         `;
         
         modalFooter.appendChild(btnManter);
         modalFooter.appendChild(btnSobrescrever);
         modalFooter.appendChild(btnNovoNome);
         modalFooter.appendChild(novoNomeContainer);
+
+        // Botões para resolver todos os conflitos de uma vez
+        const btnManterTodos = document.createElement('button');
+        btnManterTodos.className = 'modal-btn btn-secondary btn-manter-todos'; // Classe atualizada
+        btnManterTodos.textContent = 'Manter todos os existentes';
+
+        const btnSobrescreverTodos = document.createElement('button');
+        btnSobrescreverTodos.className = 'modal-btn btn-primary btn-sobrescrever-todos'; // Classe atualizada
+        btnSobrescreverTodos.textContent = 'Subscrever todos os existentes';
+
+        modalFooter.appendChild(btnManterTodos);
+        modalFooter.appendChild(btnSobrescreverTodos);
+
+        // Botão Cancelar
+        const btnCancelar = document.createElement('button');
+        btnCancelar.className = 'modal-btn btn-secondary btn-cancelar'; // Classe para estilo
+        btnCancelar.textContent = 'Cancelar Importação';
+        modalFooter.appendChild(btnCancelar);
         
         // Montar o modal
         modal.appendChild(modalHeader);
@@ -377,6 +395,46 @@ document.addEventListener('DOMContentLoaded', async () => {
             importados++;
             indiceAtual++;
             processarConflitoAtual();
+        });
+
+        // Handlers para os novos botões
+        btnManterTodos.addEventListener('click', async () => {
+            for (const [index, conflito] of conflitos.entries()) {
+                // Pular conflitos já resolvidos individualmente
+                if (indiceAtual > index) continue;
+
+                await window.electronAPI.resolverConflitoModelo({
+                    modeloExistente: conflito.existente,
+                    modeloNovo: conflito.novo,
+                    acao: 'manter'
+                });
+                mantidos++;
+            }
+            finalizarProcessamento();
+        });
+
+        btnSobrescreverTodos.addEventListener('click', async () => {
+            for (const [index, conflito] of conflitos.entries()) {
+                // Pular conflitos já resolvidos individualmente
+                if (indiceAtual > index) continue;
+
+                await window.electronAPI.resolverConflitoModelo({
+                    modeloExistente: conflito.existente,
+                    modeloNovo: conflito.novo,
+                    acao: 'sobrescrever'
+                });
+                sobrescritos++;
+            }
+            finalizarProcessamento();
+        });
+
+        // Handler para o botão Cancelar
+        btnCancelar.addEventListener('click', () => {
+            // Simplesmente remove o modal sem processar mais nada
+            document.body.removeChild(modalOverlay);
+            // Opcional: Mostrar mensagem de cancelamento
+            statusMessage.textContent = 'Importação cancelada pelo usuário.';
+            statusMessage.className = 'status-message warning'; 
         });
         
         // Função para finalizar o processamento
