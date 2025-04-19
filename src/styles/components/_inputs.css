@@ -270,3 +270,28 @@
     overflow-y: auto;
     padding: 0 10px 0 10px;
 }
+
+.export-search-input,
+.input-search {
+    /* Estilos iguais ao .modelo-search-input */
+    width: 100%;
+    padding: 8px 36px 8px 12px;
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 6px;
+    font-size: 1rem;
+    background: var(--input-bg, #fff);
+    color: var(--text-primary, #222);
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.export-search-input:focus,
+.input-search:focus {
+    border-color: var(--primary-color, #0078d4);
+    background: var(--input-bg, #fff);
+}
+
+.export-search-container {
+    margin-bottom: 12px;
+}

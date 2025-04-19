@@ -835,6 +835,77 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Adicionar input de pesquisa ao modal de exportação
+    const exportSearchContainer = document.createElement('div');
+    exportSearchContainer.className = 'export-search-container';
+    const exportSearchInput = document.createElement('input');
+    exportSearchInput.className = 'export-search-input input input-search'; // Adiciona classes para estilização
+    exportSearchInput.type = 'text';
+    exportSearchInput.placeholder = 'Pesquisar modelos para exportação...';
+    exportSearchContainer.appendChild(exportSearchInput);
+    // Inserir o campo de pesquisa acima da lista
+    if (modelosList && modelosList.parentNode) {
+        modelosList.parentNode.insertBefore(exportSearchContainer, modelosList);
+    }
+
+    // Função para buscar modelos resumidos (nome/id) para exportação
+    async function buscarModelosParaExportacao(termo) {
+        try {
+            // Usa a mesma API do modelo-dialog.js
+            const resultados = await window.electronAPI.buscarModelosResumidos(termo);
+            return resultados || [];
+        } catch (e) {
+            console.error('Erro ao buscar modelos para exportação:', e);
+            return [];
+        }
+    }
+
+    // Atualizar lista de modelos conforme pesquisa
+    exportSearchInput.addEventListener('input', async function() {
+        const termo = exportSearchInput.value.trim();
+        modelosList.innerHTML = '<div class="selection-list-empty">Carregando modelos...</div>';
+        const resultados = termo ? await buscarModelosParaExportacao(termo) : modelos;
+        if (!resultados || resultados.length === 0) {
+            modelosList.innerHTML = '<div class="selection-list-empty">Nenhum modelo encontrado.</div>';
+            return;
+        }
+        // Renderizar lista filtrada
+        let html = '';
+        resultados.forEach(modelo => {
+            const modeloNome = modelo.nome || 'Sem nome';
+            const modeloId = modelo.id || '0';
+            html += `
+                <div class="selection-item">
+                    <label class="checkmark-container">
+                        <input type="checkbox" class="modelo-checkbox" data-id="${modeloId}">
+                        <span class="checkmark"></span>
+                        <div class="modelo-info">
+                            <span class="selection-item-label" title="${modeloNome}">${modeloNome}</span>
+                        </div>
+                    </label>
+                </div>
+            `;
+        });
+        modelosList.innerHTML = html;
+        // Adicionar event listeners para checkboxes
+        document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const id = parseInt(this.getAttribute('data-id'));
+                if (this.checked) {
+                    if (!selectedModelos.includes(id)) {
+                        selectedModelos.push(id);
+                    }
+                } else {
+                    selectedModelos = selectedModelos.filter(item => item !== id);
+                }
+                updateSelectionCounts();
+                updateSelectAllCheckbox(selectAllModelos, '.modelo-checkbox');
+            });
+        });
+        // Atualizar contadores
+        updateSelectionCounts();
+    });
+
     // Event listeners para botões de licença
     const viewLicenseBtn = document.getElementById('view-license-btn');
     const viewNoticeBtn = document.getElementById('view-notice-btn');
