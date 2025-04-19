@@ -853,12 +853,173 @@ document.addEventListener('DOMContentLoaded', async () => {
     exportSearchContainer.appendChild(exportSearchInput);
     exportSearchContainer.appendChild(clearSearchButton);
     
+    // Adicionar controles de ordenação à direita do input de pesquisa
+    const sortControlsContainer = document.createElement('div');
+    sortControlsContainer.className = 'export-sort-controls';
+    sortControlsContainer.style.display = 'flex';
+    sortControlsContainer.style.marginLeft = '10px';
+    sortControlsContainer.style.alignItems = 'center';
+    
+    // Seletor de tipo de ordenação
+    const sortTypeSelect = document.createElement('select');
+    sortTypeSelect.className = 'export-sort-select';
+    sortTypeSelect.style.padding = '4px 8px';
+    sortTypeSelect.style.borderRadius = '4px';
+    sortTypeSelect.style.border = '1px solid var(--border-color, #ccc)';
+    sortTypeSelect.style.background = 'var(--input-bg, #fff)';
+    sortTypeSelect.style.color = 'var(--text-primary, #222)';
+    
+    // Opções para o seletor
+    const sortTypeOptions = [
+        { value: 'alphabetical', text: 'Alfabética' },
+        { value: 'date', text: 'Data de inclusão' }
+    ];
+    
+    sortTypeOptions.forEach(option => {
+        const optElement = document.createElement('option');
+        optElement.value = option.value;
+        optElement.textContent = option.text;
+        sortTypeSelect.appendChild(optElement);
+    });
+    
+    // Botões de direção da ordenação
+    const sortDirButtons = document.createElement('div');
+    sortDirButtons.className = 'export-sort-dir-buttons';
+    sortDirButtons.style.display = 'flex';
+    sortDirButtons.style.marginLeft = '8px';
+    
+    const sortAscButton = document.createElement('button');
+    sortAscButton.className = 'export-sort-btn export-sort-asc active';
+    sortAscButton.title = 'Ordem crescente';
+    sortAscButton.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>';
+    sortAscButton.style.width = '32px';
+    sortAscButton.style.height = '32px';
+    sortAscButton.style.padding = '4px';
+    sortAscButton.style.border = '1px solid var(--border-color, #ccc)';
+    sortAscButton.style.borderRadius = '4px 0 0 4px';
+    sortAscButton.style.display = 'flex';
+    sortAscButton.style.alignItems = 'center';
+    sortAscButton.style.justifyContent = 'center';
+    sortAscButton.style.background = 'var(--btn-bg, #f0f0f0)';
+    sortAscButton.style.cursor = 'pointer';
+    
+    const sortDescButton = document.createElement('button');
+    sortDescButton.className = 'export-sort-btn export-sort-desc';
+    sortDescButton.title = 'Ordem decrescente';
+    sortDescButton.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+    sortDescButton.style.width = '32px';
+    sortDescButton.style.height = '32px';
+    sortDescButton.style.padding = '4px';
+    sortDescButton.style.border = '1px solid var(--border-color, #ccc)';
+    sortDescButton.style.borderRadius = '0 4px 4px 0';
+    sortDescButton.style.borderLeft = 'none';
+    sortDescButton.style.display = 'flex';
+    sortDescButton.style.alignItems = 'center';
+    sortDescButton.style.justifyContent = 'center';
+    sortDescButton.style.background = 'var(--btn-bg, #f0f0f0)';
+    sortDescButton.style.cursor = 'pointer';
+    
+    // Adicionar botões ao container
+    sortDirButtons.appendChild(sortAscButton);
+    sortDirButtons.appendChild(sortDescButton);
+    
+    // Adicionar elementos de ordenação ao container principal
+    sortControlsContainer.appendChild(sortTypeSelect);
+    sortControlsContainer.appendChild(sortDirButtons);
+    
+    // Estado atual da ordenação
+    let currentSortType = 'alphabetical';
+    let currentSortDir = 'asc';
+    
+    // Função para aplicar ordenação
+    function applySort() {
+        // Marcar botão ativo
+        sortAscButton.classList.toggle('active', currentSortDir === 'asc');
+        sortDescButton.classList.toggle('active', currentSortDir === 'desc');
+        
+        // Atualizar estilos visuais dos botões ativos
+        sortAscButton.style.background = currentSortDir === 'asc' 
+            ? 'var(--primary-color, #0078d4)' 
+            : 'var(--btn-bg, #f0f0f0)';
+        sortAscButton.style.color = currentSortDir === 'asc' 
+            ? 'white' 
+            : 'var(--text-primary, #222)';
+            
+        sortDescButton.style.background = currentSortDir === 'desc' 
+            ? 'var(--primary-color, #0078d4)' 
+            : 'var(--btn-bg, #f0f0f0)';
+        sortDescButton.style.color = currentSortDir === 'desc' 
+            ? 'white' 
+            : 'var(--text-primary, #222)';
+            
+        // Aplicar ordenação aos modelos
+        if (modelos && modelos.length > 0) {
+            modelos.sort((a, b) => {
+                if (currentSortType === 'alphabetical') {
+                    const aName = a.nome?.toLowerCase() || '';
+                    const bName = b.nome?.toLowerCase() || '';
+                    return currentSortDir === 'asc' 
+                        ? aName.localeCompare(bName) 
+                        : bName.localeCompare(aName);
+                } else { // date
+                    // Ordenação por ID (assumindo que IDs maiores são mais recentes)
+                    // ou por data de criação se disponível
+                    const aValue = a.data_criacao || a.id || 0;
+                    const bValue = b.data_criacao || b.id || 0;
+                    return currentSortDir === 'asc' 
+                        ? aValue - bValue 
+                        : bValue - aValue;
+                }
+            });
+            
+            // Renderizar lista ordenada
+            renderModelosList();
+        }
+    }
+    
+    // Event listeners para os controles de ordenação
+    sortTypeSelect.addEventListener('change', () => {
+        currentSortType = sortTypeSelect.value;
+        applySort();
+    });
+    
+    sortAscButton.addEventListener('click', () => {
+        currentSortDir = 'asc';
+        applySort();
+    });
+    
+    sortDescButton.addEventListener('click', () => {
+        currentSortDir = 'desc';
+        applySort();
+    });
+    
     // Configurar o CSS diretamente para garantir visibilidade
     clearSearchButton.style.position = 'absolute';
     clearSearchButton.style.right = '8px';
     clearSearchButton.style.top = '50%';
     clearSearchButton.style.transform = 'translateY(-50%)';
     clearSearchButton.style.display = 'flex';
+    
+    // Criar um container para agrupar a pesquisa e os controles de ordenação
+    const searchAndSortContainer = document.createElement('div');
+    searchAndSortContainer.style.display = 'flex';
+    searchAndSortContainer.style.width = '100%';
+    searchAndSortContainer.style.marginBottom = '10px';
+    searchAndSortContainer.style.alignItems = 'center';
+    
+    // Ajustar o container de pesquisa para ocupar espaço flexível
+    exportSearchContainer.style.position = 'relative';
+    exportSearchContainer.style.flex = '1';
+    exportSearchContainer.style.marginBottom = '0';
+    
+    // Organizar elementos
+    searchAndSortContainer.appendChild(exportSearchContainer);
+    searchAndSortContainer.appendChild(sortControlsContainer);
+    
+    // Inserir o container completo acima da lista
+    if (modelosList && modelosList.parentNode) {
+        modelosList.parentNode.insertBefore(searchAndSortContainer, modelosList);
+    }
     
     // Evento para o botão limpar pesquisa
     clearSearchButton.addEventListener('click', () => {
@@ -868,10 +1029,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadDocuments();
     });
     
-    // Inserir o campo de pesquisa acima da lista
-    if (modelosList && modelosList.parentNode) {
-        modelosList.parentNode.insertBefore(exportSearchContainer, modelosList);
-    }
+    // Modificar a função loadDocuments para aplicar ordenação após carregar
+    const originalLoadDocuments = loadDocuments;
+    loadDocuments = async function() {
+        await originalLoadDocuments();
+        applySort(); // Aplicar ordenação depois de carregar os modelos
+    };
 
     // Função para buscar modelos resumidos (nome/id) para exportação
     async function buscarModelosParaExportacao(termo) {
