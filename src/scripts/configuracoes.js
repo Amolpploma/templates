@@ -838,11 +838,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Adicionar input de pesquisa ao modal de exportação
     const exportSearchContainer = document.createElement('div');
     exportSearchContainer.className = 'export-search-container';
+    
     const exportSearchInput = document.createElement('input');
-    exportSearchInput.className = 'export-search-input input input-search'; // Adiciona classes para estilização
+    exportSearchInput.className = 'export-search-input input input-search';
     exportSearchInput.type = 'text';
     exportSearchInput.placeholder = 'Pesquisar modelos para exportação...';
+    
+    const clearSearchButton = document.createElement('button');
+    clearSearchButton.className = 'clear-search-button';
+    clearSearchButton.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+    clearSearchButton.title = 'Limpar pesquisa';
+    
+    // Adicionar os elementos ao container
     exportSearchContainer.appendChild(exportSearchInput);
+    exportSearchContainer.appendChild(clearSearchButton);
+    
+    // Configurar o CSS diretamente para garantir visibilidade
+    clearSearchButton.style.position = 'absolute';
+    clearSearchButton.style.right = '8px';
+    clearSearchButton.style.top = '50%';
+    clearSearchButton.style.transform = 'translateY(-50%)';
+    clearSearchButton.style.display = 'flex';
+    
+    // Evento para o botão limpar pesquisa
+    clearSearchButton.addEventListener('click', () => {
+        exportSearchInput.value = '';
+        exportSearchInput.focus();
+        // Recarregar a lista original de modelos
+        loadDocuments();
+    });
+    
     // Inserir o campo de pesquisa acima da lista
     if (modelosList && modelosList.parentNode) {
         modelosList.parentNode.insertBefore(exportSearchContainer, modelosList);
