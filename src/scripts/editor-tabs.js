@@ -375,93 +375,43 @@
     }
 
     // Carregar o conteúdo de uma aba (simplificado para usar apenas localStorage)
-    function loadTabContent(tabId) { // Tornar síncrona novamente
-        console.log(`loadTabContent: Iniciando carregamento para ${tabId}`);
-        const editor = tinymce.get('editor-container');
+    function loadTabContent(tabId) {
+        const MAX_RETRIES = 3;
+        let retryCount = 0;
+        const BASE_DELAY = 100;
 
-        // Verifica se o editor existe e tem o método setContent
-        if (editor && typeof editor.setContent === 'function') {
-            // Verifica se o editor já foi destruído
-            if (editor.destroyed) {
-                console.warn(`loadTabContent: Editor para ${tabId} já está destruído.`);
+        function attemptLoadContent() {
+            const editor = tinymce.get('editor-container');
+            if (retryCount >= MAX_RETRIES) {
+                console.warn(`loadTabContent: Desistindo após ${MAX_RETRIES} tentativas para ${tabId}`);
                 return;
             }
-
-            try {
-                let content = '';
-                let formData = null;
-
-                // Carregar APENAS do localStorage por enquanto
-                console.log(`loadTabContent: Tentando carregar dados da aba ${tabId} via localStorage.`);
-                const localContent = localStorage.getItem(`${TAB_CONTENT_PREFIX}${tabId}`);
-                const localFormDataStr = localStorage.getItem(`${TAB_CONTENT_PREFIX}${tabId}_form`);
-
-                if (typeof localContent === 'string') {
-                    content = localContent;
-                    console.log(`loadTabContent: Conteúdo da aba ${tabId} carregado via localStorage (tamanho: ${content.length}).`);
-                } else {
-                    console.log(`loadTabContent: Nenhum conteúdo encontrado para ${tabId} via localStorage.`);
-                }
-
-                if (localFormDataStr) {
-                    try {
-                        formData = JSON.parse(localFormDataStr);
-                        console.log(`loadTabContent: FormData da aba ${tabId} carregado via localStorage.`);
-                    } catch (e) {
-                        console.error(`loadTabContent: Erro ao analisar formData do localStorage para ${tabId}:`, e);
-                        formData = null; // Garante que formData seja nulo em caso de erro
-                    }
-                }
-
-                // Garantir que content seja uma string válida
-                content = (typeof content === 'string' && content !== 'undefined' && content !== null) ? content : '';
-
-                // Pequeno delay antes de setContent para garantir que o editor esteja pronto
-                console.log(`loadTabContent: Agendando setContent para ${tabId} em 50ms.`);
-                setTimeout(() => {
-                    // Re-verificar o estado do editor DENTRO do setTimeout
-                    const currentEditor = tinymce.get('editor-container');
-                    if (currentEditor && !currentEditor.destroyed && currentEditor.initialized) { // Verifica editor.initialized
-                         try {
-                             console.log(`loadTabContent: Executando setContent para ${tabId} (tamanho: ${content.length}).`);
-                             currentEditor.setContent(content);
-                             console.log(`loadTabContent: setContent executado para ${tabId}.`);
-                             // Resetar histórico DEPOIS de definir o conteúdo
-                             if (currentEditor.undoManager) {
-                                 currentEditor.undoManager.clear();
-                                 console.log(`loadTabContent: Histórico de undo limpo para ${tabId}.`);
-                             }
-                         } catch (setContentError) {
-                              console.error(`loadTabContent: Erro durante setContent para ${tabId} dentro do setTimeout:`, setContentError);
-                         }
-                    } else {
-                         const status = currentEditor ? (currentEditor.destroyed ? 'destruído' : (!currentEditor.initialized ? 'não inicializado' : 'outro')) : 'não encontrado';
-                         console.warn(`loadTabContent: Editor ${status} no momento do setTimeout para ${tabId}. setContent não executado.`);
-                    }
-                }, 50); // Delay de 50ms (ajuste se necessário)
-
-
-                // Carregar campos de formulário (fora do setTimeout, pois não dependem do editor)
-                console.log(`loadTabContent: Carregando campos de formulário para ${tabId}.`);
-                const nomeInput = document.getElementById('nome-input');
-                const tagInput = document.getElementById('tag-input');
-                if (formData) {
-                    if (nomeInput) nomeInput.value = formData.nome !== undefined ? formData.nome : '';
-                    if (tagInput) tagInput.value = formData.tag !== undefined ? formData.tag : '';
-                    console.log(`loadTabContent: Campos de formulário preenchidos para ${tabId}.`);
-                } else {
-                    if (nomeInput) nomeInput.value = '';
-                    if (tagInput) tagInput.value = '';
-                    console.log(`loadTabContent: Campos de formulário limpos para ${tabId} (sem formData).`);
-                }
-
-            } catch (error) {
-                console.error(`loadTabContent: Erro geral ao carregar conteúdo da aba ${tabId}:`, error);
+            if (!editor || editor.destroyed || !editor.initialized) {
+                const delay = BASE_DELAY * Math.pow(2, retryCount);
+                retryCount++;
+                setTimeout(attemptLoadContent, delay);
+                return;
             }
-        } else {
-            const editorStatus = editor ? (editor.destroyed ? 'destruído' : 'sem setContent') : 'não encontrado';
-            console.warn(`loadTabContent: Editor TinyMCE ${editorStatus} ao tentar iniciar carregamento para a aba ${tabId}.`);
+            let content = localStorage.getItem(`${TAB_CONTENT_PREFIX}${tabId}`) || '';
+            // Validação simples: se não for string ou for inválido, usa vazio
+            if (typeof content !== 'string' || content === 'undefined' || content === null) content = '';
+            // Se o conteúdo não parece HTML, evita erro
+            if (content && !(content.trim().startsWith('<') && content.includes('</'))) content = '';
+            try {
+                editor.setContent(content);
+                if (editor.undoManager) editor.undoManager.clear();
+            } catch (e) {
+                if (e.message && e.message.includes('isValidChild')) {
+                    // Conteúdo corrompido, limpa o localStorage e o editor
+                    localStorage.setItem(`${TAB_CONTENT_PREFIX}${tabId}`, '');
+                    try { editor.setContent(''); } catch {}
+                } else {
+                    throw e;
+                }
+            }
+            // ...carregar campos do formulário, se necessário...
         }
+        setTimeout(attemptLoadContent, 50);
     }
 
     // Salvar o estado das abas no localStorage
