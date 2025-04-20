@@ -6,6 +6,8 @@
 (function() {
     // Variável para rastrear instância ativa do diálogo
     let activeModeloDialog = null;
+    // Variável para armazenar o termo de pesquisa atual
+    let currentSearchTerm = '';
 
     // Função principal para exibir o diálogo de seleção de modelo
     function showModeloDialog(editor) {
@@ -237,7 +239,7 @@
             { duration: 150 }
         );
         
-        // SOLUÇÃO MELHORADA: Garantir visibilidade com cálculo manual da rolagem
+        // Garantir visibilidade com cálculo manual da rolagem
         ensureVisibility(selectedItem, activeModeloDialog.resultsContainer);
         
         // Atualizar ID do modelo selecionado

@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const btnSobrescreverTodos = document.createElement('button');
         btnSobrescreverTodos.className = 'modal-btn btn-primary btn-sobrescrever-todos'; // Classe atualizada
-        btnSobrescreverTodos.textContent = 'Subscrever todos os existentes';
+        btnSobrescreverTodos.textContent = 'Sobrescrever todos os existentes';
 
         modalFooter.appendChild(btnManterTodos);
         modalFooter.appendChild(btnSobrescreverTodos);
@@ -1051,45 +1051,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Atualizar lista de modelos conforme pesquisa
     exportSearchInput.addEventListener('input', async function() {
         const termo = exportSearchInput.value.trim();
+        currentSearchTerm = termo; // Armazenar o termo atual para uso nas ordenações
         modelosList.innerHTML = '<div class="selection-list-empty">Carregando modelos...</div>';
+        
+        // Buscar resultados
         const resultados = termo ? await buscarModelosParaExportacao(termo) : modelos;
+        
         if (!resultados || resultados.length === 0) {
             modelosList.innerHTML = '<div class="selection-list-empty">Nenhum modelo encontrado.</div>';
             return;
         }
-        // Renderizar lista filtrada
-        let html = '';
-        resultados.forEach(modelo => {
-            const modeloNome = modelo.nome || 'Sem nome';
-            const modeloId = modelo.id || '0';
-            html += `
-                <div class="selection-item">
-                    <label class="checkmark-container">
-                        <input type="checkbox" class="modelo-checkbox" data-id="${modeloId}">
-                        <span class="checkmark"></span>
-                        <div class="modelo-info">
-                            <span class="selection-item-label" title="${modeloNome}">${modeloNome}</span>
-                        </div>
-                    </label>
-                </div>
-            `;
-        });
-        modelosList.innerHTML = html;
-        // Adicionar event listeners para checkboxes
-        document.querySelectorAll('.modelo-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const id = parseInt(this.getAttribute('data-id'));
-                if (this.checked) {
-                    if (!selectedModelos.includes(id)) {
-                        selectedModelos.push(id);
-                    }
-                } else {
-                    selectedModelos = selectedModelos.filter(item => item !== id);
-                }
-                updateSelectionCounts();
-                updateSelectAllCheckbox(selectAllModelos, '.modelo-checkbox');
-            });
-        });
+        
+        // Salvar os resultados filtrados para uso na ordenação
+        modelos = resultados;
+        
+        // Aplicar ordenação aos resultados da pesquisa antes de renderizar
+        applySort();
+        
         // Atualizar contadores
         updateSelectionCounts();
     });
